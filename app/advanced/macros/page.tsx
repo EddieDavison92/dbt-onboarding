@@ -146,14 +146,14 @@ from {{ ref('stg_olids_patient') }}
           {
             prompt: "When does macro Jinja get evaluated?",
             options: [
-              "At query time, inside Snowflake",
+              "At query time, inside Snowflake, like a SQL function",
               "At compile time, before the SQL is sent to Snowflake",
-              "Nightly, by the scheduler",
-              "Only during dbt test",
+              "After the model runs, to post-process the results",
+              "Once, when the package is installed with dbt deps",
             ],
             answer: 1,
             explain:
-              "dbt renders Jinja to plain SQL first. dbt compile shows you exactly what Snowflake will receive — useful for debugging.",
+              "A macro looks like a function call but is template expansion — dbt renders it to plain SQL before Snowflake is involved. dbt compile shows the rendered result.",
           },
           {
             prompt:

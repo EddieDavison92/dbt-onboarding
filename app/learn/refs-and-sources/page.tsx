@@ -91,38 +91,38 @@ from {{ source('csds', 'ActiveSubmission') }}
           {
             prompt: "Why is hardcoding MODELLING.DBT_STAGING.STG_X a problem?",
             options: [
-              "It is slower to query",
+              "dbt will refuse to compile a hardcoded table name",
               "It breaks dev/prod separation and hides the dependency from the DAG",
-              "Snowflake does not allow cross-schema queries",
-              "It is fine, just verbose",
+              "It only becomes a problem if the table is later renamed",
+              "Queries against fully-qualified names are slower in Snowflake",
             ],
             answer: 1,
             explain:
-              "Your dev build would read prod objects, and dbt would not know the dependency exists — wrong build order, invisible lineage.",
+              "The danger is that dbt compiles it without complaint — your dev build silently reads prod objects, and the dependency is invisible to lineage and build ordering.",
           },
           {
             prompt: "Where are you allowed to use source()?",
             options: [
-              "Anywhere, as long as the source is declared",
-              "Staging models only",
-              "Only in auto-generated raw models",
-              "Published models, for performance",
+              "Anywhere, as long as the source is declared in YAML",
+              "In staging models — the standard dbt convention",
+              "Only in generated raw models",
+              "In any model reading a table the raw layer doesn't cover yet",
             ],
             answer: 2,
             explain:
-              "Project convention: raw models are the only consumers of source(). Your models always ref() a raw or later model.",
+              "Many dbt projects do put source() in staging — this one goes a step further. The raw layer is generated, so source() never appears in hand-written SQL; if a table has no raw model, generate one.",
           },
           {
             prompt: "What does the + in dbt build -s +int_wl_current select?",
             options: [
               "The model plus everything upstream of it",
               "The model plus everything downstream of it",
+              "The model plus its direct parents, one level up",
               "The model plus its tests",
-              "All models changed since the last run",
             ],
             answer: 0,
             explain:
-              "+model = upstream parents included; model+ = downstream children. You can combine both: +model+.",
+              "+model includes all ancestors, not just direct parents; model+ includes all descendants. Tests are included by dbt build either way.",
           },
         ]}
       />

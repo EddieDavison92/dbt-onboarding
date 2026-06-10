@@ -106,6 +106,54 @@ from {{ ref('raw_csds_bridging') }}
         </p>
       </Callout>
 
+      <h2>The bigger picture: the analytics development lifecycle</h2>
+      <p>
+        The deeper idea — the one dbt was built around — is that analytics work follows
+        the same lifecycle as software, often called the{" "}
+        <strong>analytics development lifecycle (ADLC)</strong>: plan → develop → test →
+        deploy → operate → observe → discover → analyse, then around again. Each stage
+        has a counterpart in how this team works:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Stage</th>
+            <th>Here, that means</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Plan</td>
+            <td>Agreeing the requirement and definitions before writing SQL</td>
+          </tr>
+          <tr>
+            <td>Develop</td>
+            <td>Models on a branch, in your own dev schema</td>
+          </tr>
+          <tr>
+            <td>Test</td>
+            <td>data_tests locally and in CI, before anything merges</td>
+          </tr>
+          <tr>
+            <td>Deploy</td>
+            <td>Merge to main → automated deployment to production</td>
+          </tr>
+          <tr>
+            <td>Operate &amp; observe</td>
+            <td>The nightly build, test results and run monitoring</td>
+          </tr>
+          <tr>
+            <td>Discover &amp; analyse</td>
+            <td>dbt docs, dashboards and the semantic layer consuming the outputs</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Most analyst work before dbt lives entirely in “develop” — everything else is
+        manual or missing. The rest of this course walks the develop → test → deploy
+        stretch in detail; operate, observe and discover come with the pipeline.
+      </p>
+
       <h2>The trade</h2>
       <p>
         You give up some freedom — naming conventions, a review step, tests before
@@ -119,26 +167,26 @@ from {{ ref('raw_csds_bridging') }}
           {
             prompt: "A dbt model is…",
             options: [
-              "A YAML file describing a table",
-              "A single SELECT statement in a .sql file",
-              "A stored procedure dbt deploys to Snowflake",
-              "A diagram of table relationships",
+              "A .sql file containing a single SELECT statement",
+              "A .sql file containing the CREATE TABLE and INSERT statements for a table",
+              "The YAML file that defines a table's columns and tests",
+              "Any SQL file in the repo, including helper scripts",
             ],
-            answer: 1,
+            answer: 0,
             explain:
-              "One model = one .sql file = one SELECT. dbt wraps it in CREATE TABLE/VIEW and runs it in dependency order.",
+              "A model is one SELECT — dbt generates the surrounding DDL itself. The YAML alongside it documents and tests the model but is not the model.",
           },
           {
             prompt: "How does dbt know which order to build models in?",
             options: [
-              "You number the files",
-              "You maintain a run-order config",
-              "It reads the ref() calls and builds the dependency graph",
-              "Alphabetically",
+              "The order models are listed in dbt_project.yml",
+              "It reads the ref() calls in each model and derives the dependency graph",
+              "Folder order: raw, then staging, then modelling, and so on",
+              "A run-order file maintained alongside the models",
             ],
-            answer: 2,
+            answer: 1,
             explain:
-              "ref() is both a pointer and a declaration of dependency. The DAG is derived entirely from your SQL.",
+              "Order is derived entirely from ref() — there is no run-order config anywhere. Folders organise the code for humans; the DAG comes from the SQL.",
           },
         ]}
       />

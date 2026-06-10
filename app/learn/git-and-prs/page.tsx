@@ -200,38 +200,38 @@ git commit -m "docs: describe waiting list snapshot logic"
           {
             prompt: "Why can't you commit directly to main?",
             options: [
-              "Git doesn't support it",
-              "main is protected — every change needs a reviewed, CI-green PR",
-              "Only the team lead has the password",
-              "You can, it's just discouraged",
+              "You can, by convention it is reserved for small, low-risk fixes",
+              "main is protected — every change arrives via a reviewed PR with passing checks",
+              "Direct commits are allowed but skip CI, so they are discouraged",
+              "Only repository administrators can push to main",
             ],
             answer: 1,
             explain:
-              "Branch protection enforces the workflow: main is always reviewable, tested, and deployable.",
+              "It is enforced, not just discouraged — GitHub rejects direct pushes for everyone, admins included. The point is that main is always reviewed, tested and deployable.",
           },
           {
             prompt: "Your PR's validation check fails. What now?",
             options: [
-              "Close the PR and start over",
-              "Ask an admin to merge anyway",
+              "Re-run the check — CI failures are usually transient",
+              "Open a fresh PR so the checks start clean",
               "Read the failing log, fix locally, commit and push to the same branch",
-              "Delete the failing test",
+              "Rebase onto main and force-push to reset the checks",
             ],
             answer: 2,
             explain:
-              "Pushing to the same branch updates the PR and re-runs CI. Deleting a failing test removes the protection rather than the problem.",
+              "Validation failures are nearly always real — read the log first. Pushing a fix to the same branch updates the PR and re-runs CI; a new PR or a force-push loses review history without fixing anything.",
           },
           {
             prompt: "Which is a valid commit message here?",
             options: [
-              '"updates"',
               '"feat: add CKD register intermediate model"',
-              '"Fixed the issue from the meeting"',
-              '"WIP do not merge"',
+              '"Added CKD register intermediate model"',
+              '"feat: Added the new CKD register model requested by the LTC team in March"',
+              '"new-model: CKD register"',
             ],
-            answer: 1,
+            answer: 0,
             explain:
-              "Type prefix + imperative description. The pre-commit hook rejects the other formats.",
+              "Conventional Commits: a known type prefix (feat, fix, docs…), then a short imperative description. Option b lacks the prefix; c is past tense and over-long; d invents a type.",
           },
         ]}
       />

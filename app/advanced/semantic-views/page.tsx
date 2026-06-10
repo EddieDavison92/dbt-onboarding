@@ -113,26 +113,26 @@ METRICS(
           {
             prompt: "A semantic view differs from a reporting model because…",
             options: [
-              "It runs faster",
+              "It pre-aggregates the data so dashboards query less",
               "It declares structure and meaning (joins, dimensions, metrics) rather than producing rows with a SELECT",
-              "It is written in Python",
-              "It bypasses the DAG",
+              "It is a normal view with richer documentation attached",
+              "It replaces the reporting models it is built on",
             ],
             answer: 1,
             explain:
-              "It is a declaration layered over reporting models via ref() — the DAG still applies, but the output is meaning, not rows.",
+              "Nothing is pre-computed and nothing is replaced — it sits over the reporting models via ref() and declares how to query them correctly. The declarations are functional, not documentation.",
           },
           {
             prompt: "Why define metrics like diabetes_count in the semantic view?",
             options: [
-              "Snowflake requires it",
               "So the definition exists once and every consumer computes the same number",
-              "Metrics are cheaper than columns",
-              "To avoid writing tests",
+              "Because aggregations should not be computed in reporting models",
+              "Pre-defined metrics execute faster than ad-hoc aggregations",
+              "So the metric appears in dbt docs alongside the model",
             ],
-            answer: 1,
+            answer: 0,
             explain:
-              "One agreed definition beats five analysts writing five slightly different CASE expressions.",
+              "The value is agreement, not speed — the metric compiles to the same aggregation an analyst would write, but there is exactly one definition of it. Reporting models still aggregate where appropriate.",
           },
         ]}
       />

@@ -100,26 +100,26 @@ select ...
           {
             prompt: "What does cluster_by actually change?",
             options: [
-              "It creates an index on the column",
+              "It creates an index on the chosen columns",
               "The physical ordering of rows, so partition min/max ranges become narrow and prunable",
-              "It partitions the table into separate tables",
-              "It caches frequent queries",
+              "It splits the table into one micro-partition per distinct value",
+              "It tells the optimiser which columns queries will filter on",
             ],
             answer: 1,
             explain:
-              "Snowflake has no indexes — pruning on micro-partition min/max statistics is the performance mechanism, and clustering is how you make those ranges tight.",
+              "Snowflake has no indexes and takes no hints — the only mechanism is micro-partition pruning on min/max statistics, and clustering works by physically ordering rows so those ranges become tight.",
           },
           {
-            prompt: "Which model most deserves cluster_by?",
+            prompt: "Which model benefits most from cluster_by?",
             options: [
-              "A 2,000-row specialty lookup",
-              "A staging view",
+              "A 2,000-row specialty lookup joined by almost every model",
               "A 100M-row person-level fact that dashboards filter by practice and person",
-              "An ephemeral model",
+              "A 5M-row extract table that consumers always read in full",
+              "A large staging view over an event feed",
             ],
-            answer: 2,
+            answer: 1,
             explain:
-              "Big table + selective filters = pruning pays off. Views and tiny tables have nothing to prune (and views store no data at all).",
+              "Pruning needs both scale and selective filters. The busy lookup is too small to prune; the full-read extract has no filter to prune on; the staging view stores no data at all.",
           },
         ]}
       />

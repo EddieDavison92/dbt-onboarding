@@ -150,26 +150,26 @@ dbt ls -s tag:reporting         # list models carrying a tag
             prompt:
               "A model file has config(materialized='view') but its folder sets +materialized: table. What builds?",
             options: [
-              "A table — dbt_project.yml wins",
+              "A table — dbt_project.yml takes precedence over model files",
               "A view — the model-level config() is most specific and wins",
-              "Both, dbt errors",
-              "Whichever was defined first",
+              "dbt warns about the conflict and falls back to the project default",
+              "Whichever setting was added to the repo more recently",
             ],
             answer: 1,
             explain:
-              "Specificity wins: model config() beats folder config beats project default.",
+              "There is no conflict warning — overriding is the designed behaviour. Specificity decides: model config() beats folder config beats project default.",
           },
           {
             prompt: "Moving a model file between layer folders can change…",
             options: [
-              "Only its position in the docs site",
+              "Its schema only — materialisation is always set per model",
               "Its materialisation, database, schema, tags and post-hooks — all at once",
-              "Nothing, config travels with the file",
-              "Only its tags",
+              "Nothing — configuration travels with the file's config() block",
+              "Its tags and docs grouping, but not where it builds",
             ],
             answer: 1,
             explain:
-              "Folder path is configuration in this project. That is why layer placement is a review point, not a tidiness preference.",
+              "Most models carry no config() block at all — the folder supplies everything. Move the file and it inherits the new folder's full configuration, including where it builds.",
           },
         ]}
       />

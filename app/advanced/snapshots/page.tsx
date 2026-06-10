@@ -83,24 +83,24 @@ where '2025-01-15' >= dbt_valid_from
             options: [
               "where is_current = true",
               "where dbt_valid_to is null",
-              "order by dbt_valid_from desc limit 1",
-              "where dbt_valid_from = current_date",
+              "where dbt_valid_to > current_date",
+              "where dbt_valid_from = (select max(dbt_valid_from) from the snapshot)",
             ],
             answer: 1,
             explain:
-              "An open-ended validity window (null dbt_valid_to) marks the current version of each record.",
+              "Current rows have an open-ended window: dbt_valid_to is null, and null fails a > comparison, so option c returns nothing. There is no is_current column, and max(dbt_valid_from) is one global date, not per record.",
           },
           {
             prompt: "Why is dropping a snapshot table worse than dropping a model?",
             options: [
-              "Snapshots are bigger",
+              "Snapshots usually have more downstream dependencies",
               "dbt cannot rebuild snapshots from source — the recorded history is gone for good",
-              "It breaks the DAG",
-              "It is not worse, dbt rebuilds it",
+              "Snapshot tables are larger, so the rebuild takes longer",
+              "It is not worse — the next snapshot run restores it",
             ],
             answer: 1,
             explain:
-              "Models are derivable from their sources; a snapshot's history exists only in the snapshot. Rebuilding starts history from today.",
+              "The next run does recreate the table — but only with today's state. A model's contents are derivable from its sources; a snapshot's history exists nowhere else.",
           },
         ]}
       />

@@ -145,26 +145,26 @@ from {{ ref('stg_big_event_feed') }}
           {
             prompt: "Staging models are views because…",
             options: [
-              "Views are more secure",
-              "They do trivial work, so storing nothing and staying always-fresh is free",
-              "Snowflake charges less for views",
-              "dbt cannot build tables from staging",
+              "Views are faster to query than tables",
+              "Their work is trivial, so computing it at query time costs little and the data is always current",
+              "Storing the same patient-level rows twice would be a governance issue",
+              "Tables in staging would force downstream models to rebuild more often",
             ],
             answer: 1,
             explain:
-              "A rename-and-cast SELECT costs almost nothing at query time. Tables earn their storage where real computation happens.",
+              "Views are not faster — they defer computation to query time. For rename-and-cast logic that deferred cost is negligible, so the always-fresh, zero-storage trade is worth it. Where real computation happens, tables win.",
           },
           {
             prompt: "You changed the logic of an incremental model. What must you remember?",
             options: [
-              "Nothing — dbt detects logic changes",
-              "Run with --full-refresh so history is rebuilt under the new logic",
-              "Delete the model file and recreate it",
-              "Change the unique_key",
+              "Nothing — dbt detects the logic change and rebuilds the affected rows",
+              "Run with --full-refresh so existing rows are rebuilt under the new logic",
+              "Run dbt build twice — the second pass picks up the new logic",
+              "Update the model version in its YAML so dbt knows to rebuild",
             ],
             answer: 1,
             explain:
-              "Incremental runs only touch new rows; existing rows keep the old logic until a full refresh rebuilds them.",
+              "Incremental runs only process new rows, regardless of what changed in the SQL — dbt does not diff your logic. Until a full refresh, history reflects the old logic while new rows get the new logic.",
           },
         ]}
       />

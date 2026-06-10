@@ -127,23 +127,28 @@ dbt run-operation generate_model_yaml --args '{"model_names": ["stg_your_model"]
         questions={[
           {
             prompt: "A dbt test passes when its compiled query returns…",
-            options: ["At least one row", "Exactly one row", "Zero rows", "TRUE"],
+            options: [
+              "All the rows that satisfy the rule",
+              "A single row containing true",
+              "Zero rows",
+              "A row count matching the model's row count",
+            ],
             answer: 2,
             explain:
-              "Tests select the rows that violate the rule. No violations, no rows, pass.",
+              "Tests select violations, not successes. unique compiles to a query for duplicated keys; an empty result means no duplicates, so the test passes.",
           },
           {
             prompt:
               "int_wl_current has one row per patient pathway per snapshot week. The best protection against a fanning join is…",
             options: [
-              "not_null on every column",
-              "unique_combination_of_columns on the grain columns",
-              "expect_table_row_count_to_be_between",
-              "A relationships test",
+              "unique on each of the three grain columns separately",
+              "unique_combination_of_columns across the three grain columns together",
+              "not_null on the three grain columns",
+              "expect_table_row_count_to_be_between with a generous range",
             ],
             answer: 1,
             explain:
-              "A grain test fails the moment a join duplicates rows — the most common and most damaging modelling bug.",
+              "Separate unique tests would fail immediately — each column legitimately repeats. Only the combination is unique, so only the combination test detects a fan-out. not_null and row counts pass even when rows double.",
           },
         ]}
       />
