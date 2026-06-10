@@ -19,7 +19,7 @@ export default function Page() {
       <Callout kind="info" title="Before you start">
         <p>
           You need a GitHub account added to the org, Snowflake access with the analyst
-          role, and the account details from your team lead. Credentials never go in the
+          role or higher, and the account details from your team lead. Credentials never go in the
           repo — they live in a local <code>.env</code> file that git ignores.
         </p>
       </Callout>
@@ -133,8 +133,17 @@ git config --global commit.gpgsign true
 `}
       />
       <p>
-        Then add the public key to GitHub (Settings → SSH and GPG keys →{" "}
-        <em>New signing key</em>).
+        Then add the public key at{" "}
+        <a
+          href="https://github.com/settings/keys"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub Settings → SSH and GPG keys
+        </a>{" "}
+        → <em>New SSH key</em>. The key-type dropdown defaults to{" "}
+        <em>Authentication Key</em> — change it to <strong>Signing Key</strong>, or
+        commits will still show as unsigned.
       </p>
 
       <h2>Verify the connection</h2>

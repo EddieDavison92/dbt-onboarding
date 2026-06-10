@@ -62,8 +62,9 @@ git pull
       <h2>What happens next</h2>
       <ul>
         <li>
-          <strong>Deploy workflow</strong> picks up the merge and builds changed models
-          into production.
+          <strong>The deploy workflow</strong> (GitHub Actions) picks up the merge and
+          builds your changed models, plus everything downstream of them, in production
+          Snowflake.
         </li>
         <li>
           <strong>The nightly build</strong> now includes your model and runs your tests

@@ -120,18 +120,25 @@ git commit -m "docs: describe waiting list snapshot logic"
             <td>Every model still compiles — catches broken refs and Jinja typos</td>
           </tr>
           <tr>
-            <td>PR validation</td>
+            <td>Code quality</td>
             <td>
-              Builds and tests the models you changed in an isolated environment
+              No hardcoded table references, source() only in the raw/staging path,
+              every changed model has a description and at least one test — plus lint
             </td>
           </tr>
           <tr>
-            <td>Code quality</td>
-            <td>SQLFluff lint — formatting and lowercase keywords only</td>
+            <td>PR validation</td>
+            <td>
+              Builds your changed models in the Snowflake DEV environment — starts once
+              a reviewer is assigned (or the snowflake-ci label is added)
+            </td>
           </tr>
           <tr>
             <td>Model ownership</td>
-            <td>Every new model has an owner in its YAML</td>
+            <td>
+              Checks changed models have an owner in their YAML, suggesting additions
+              inline
+            </td>
           </tr>
           <tr>
             <td>CodeRabbit review</td>

@@ -90,12 +90,13 @@ Needed for the access dashboard; nothing currently stages this table.
 
       <h2>Then: watch CI</h2>
       <p>
-        Within a minute the checks appear at the bottom of your PR: compile, PR
-        validation (builds your changed models), SQLFluff, ownership. The PR is
-        auto-assigned a human reviewer, and <strong>CodeRabbit posts an automated
-        review</strong> — expect line-level comments on conventions and likely issues
-        before anyone has looked at it. While checks run, review your own diff in the
-        “Files changed” tab — self-review catches issues surprisingly often.
+        Within a minute the checks appear at the bottom of your PR: compile, code
+        quality, ownership. <strong>CodeRabbit posts an automated review</strong> —
+        expect line-level comments on conventions and likely issues before anyone has
+        looked at it. The heavier PR validation (which builds your changed models in
+        Snowflake DEV) starts once a reviewer is assigned. While checks run, review
+        your own diff in the “Files changed” tab — self-review catches issues
+        surprisingly often.
       </p>
 
       <Callout kind="warn" title="If a check goes red">

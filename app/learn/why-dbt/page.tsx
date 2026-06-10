@@ -54,10 +54,10 @@ export default function Page() {
         computed fresh on every run, and never something a person has to remember.
       </p>
 
-      <h2>What a dbt model looks like</h2>
+      <h2>What a dbt model actually is</h2>
       <p>
-        A <em>model</em> is one <code>.sql</code> file containing one SELECT. This is a real
-        (small) model from our project:
+        A <em>model</em> is one <code>.sql</code> file containing one SELECT statement.
+        That is the whole definition. This is a real (small) model from our project:
       </p>
       <CodeBlock
         lang="sql"
@@ -70,10 +70,40 @@ from {{ ref('raw_csds_bridging') }}
 `}
       />
       <p>
-        No CREATE TABLE, no DROP, no schema names. You write the SELECT;{" "}
-        <code>dbt run</code> wraps it in the right DDL and builds it in the right database
-        for your environment — your dev schema while you develop, production after your
-        change is merged.
+        Notice what is missing: no CREATE TABLE, no DROP, no database or schema names.
+        That is because <strong>you describe the result; dbt produces the object</strong>.
+        When you run <code>dbt run -s stg_csds_bridging</code>, two things happen:
+      </p>
+      <ol>
+        <li>
+          <strong>Compile.</strong> dbt renders the template parts — here,{" "}
+          <code>{"{{ ref('raw_csds_bridging') }}"}</code> becomes the real
+          database-qualified table name for whichever environment you are in (your dev
+          schema while developing, production after merge).
+        </li>
+        <li>
+          <strong>Run.</strong> dbt wraps the compiled SELECT in the right DDL and
+          executes it in Snowflake. For this model that means, roughly:
+        </li>
+      </ol>
+      <CodeBlock
+        lang="sql"
+        title="what Snowflake actually receives (dev environment)"
+        code={`
+create or replace view DEV__MODELLING.DBT_STAGING.STG_CSDS_BRIDGING as (
+    select
+        person_id,
+        pseudo_nhs_number as sk_patient_id
+    from DEV__MODELLING.DBT_RAW.RAW_CSDS_BRIDGING
+);
+`}
+      />
+      <p>
+        Whether the wrapper is <code>create view</code> or <code>create table</code>,
+        and which database it lands in, comes from project configuration — not from
+        your file. Rebuilding is always safe because models are{" "}
+        <code>create or replace</code>: run it again, get the same object again. You
+        can see the compiled SQL for any model with <code>dbt compile</code>.
       </p>
       <p>
         The <code>{"{{ ref('…') }}"}</code> call is the key mechanism: instead of
@@ -108,8 +138,9 @@ from {{ ref('raw_csds_bridging') }}
       <Callout kind="info" title="What dbt is not">
         <p>
           dbt does not extract or load data — it only transforms what is already in
-          Snowflake (the “T” in ELT). It is also not a scheduler by itself: our nightly
-          build runs via GitHub Actions.
+          Snowflake (the “T” in ELT). It is also not a scheduler by itself: the nightly
+          build is scheduled and run natively inside Snowflake, and deployments after a
+          merge are triggered by GitHub Actions.
         </p>
       </Callout>
 
@@ -161,12 +192,18 @@ from {{ ref('raw_csds_bridging') }}
         stretch in detail; operate, observe and discover come with the pipeline.
       </p>
 
-      <h2>The trade</h2>
+      <h2>What changes for you</h2>
       <p>
-        You give up some freedom — naming conventions, a review step, tests before
-        merge. In exchange, your work runs every night without you, failures surface
+        In a worksheet you can do anything, immediately — and that freedom is exactly
+        why worksheet logic ends up unordered, untested and unshared. Working in this
+        project means working to its conventions: naming, layers, a review step, tests
+        before merge. Those rules are the team&apos;s, not dbt&apos;s — dbt is just the
+        machinery that makes them enforceable.
+      </p>
+      <p>
+        What you get back: your work runs every night without you, failures surface
         immediately rather than silently, and nobody has to reverse-engineer your logic
-        from a Snowflake worksheet.
+        from a worksheet — including you, six months from now.
       </p>
 
       <Quiz
