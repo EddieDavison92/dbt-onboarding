@@ -28,7 +28,24 @@ export default function Page() {
 from {{ ref('stg_csds_bridging') }}
 `}
       />
-      <p>Two things happen:</p>
+      <p>
+        And not only in <code>from</code> — <code>ref()</code> goes anywhere a table
+        name would: joins, CTEs, subqueries. A model reading two upstream models looks
+        like this:
+      </p>
+      <CodeBlock
+        lang="sql"
+        code={`
+select
+    wl.sk_patient_id,
+    wl.week_ending_date,
+    dict.specialty_name
+from {{ ref('stg_wl_wl_openpathways_data') }} wl
+left join {{ ref('stg_dictionary_dbo_specialties') }} dict
+    on wl.treatment_function_code = dict.bk_specialty_code
+`}
+      />
+      <p>Each call does two things:</p>
       <ul>
         <li>
           <strong>dbt resolves the location for you.</strong> In your dev environment it
