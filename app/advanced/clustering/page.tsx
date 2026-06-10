@@ -69,11 +69,45 @@ select ...
         </li>
       </ul>
 
-      <h2>Choosing columns</h2>
+      <h2>What makes a good clustering key</h2>
+      <p>
+        The objective in one sentence:{" "}
+        <strong>
+          cluster by the columns the next consumer will filter or join on
+        </strong>
+        . Not what the model groups by internally, not its primary key for its own
+        sake — what the queries reading it will put in their <code>where</code> and{" "}
+        <code>on</code> clauses. That means the right key can change as the same data
+        moves down the pipeline, because the consumer changes.
+      </p>
+      <p>The OLIDS observation pipeline is a worked example:</p>
+      <ul>
+        <li>
+          <strong>Upstream, cluster by clinical code.</strong> The concept-mapped
+          observation data is clustered by SNOMED concept (for example{" "}
+          <code>stg_olids_concept_map</code> uses{" "}
+          <code>cluster_by=[&apos;source_concept_id&apos;]</code>), because the next
+          step — building <code>int_</code> models — filters to specific types of
+          observation: blood pressure readings, HbA1c results, diagnosis codes. Those
+          code filters prune well against code-ordered data.
+        </li>
+        <li>
+          <strong>Downstream, cluster by person.</strong> Once an <code>int_</code>{" "}
+          model has extracted its observations, its consumers stop filtering by code —
+          registers and demographics join and filter by patient. So the{" "}
+          <code>int_</code> outputs switch to{" "}
+          <code>cluster_by=[&apos;person_id&apos;, &apos;clinical_effective_date&apos;]</code>,
+          and everything built on them joins efficiently.
+        </li>
+      </ul>
+      <p>
+        Same data, two different keys — each chosen for the queries that come next.
+        Three practical rules follow:
+      </p>
       <ol>
         <li>
-          <strong>Cluster by what downstream queries filter and join on</strong>, not by
-          what the model groups by internally.
+          <strong>Ask who reads this model and what they filter or join on.</strong> If
+          you cannot answer, you are not ready to choose a key.
         </li>
         <li>
           <strong>Order matters</strong>: put the coarser, most-filtered column first.
@@ -84,7 +118,34 @@ select ...
           a few micro-partitions; there is nothing to prune. Clustering pays off on
           large person-level and event tables.
         </li>
+        <li>
+          <strong>Cardinality matters at both extremes.</strong> A two-value flag
+          barely narrows anything; a unique timestamp scatters grouping. Mid-cardinality
+          columns — person, code, practice, date — sit in the useful range.
+        </li>
       </ol>
+      <p>
+        Because our tables are rebuilt by dbt rather than continuously loaded,{" "}
+        <code>cluster_by</code> mostly costs nothing extra: dbt sorts the data as it
+        builds the table, so each nightly rebuild comes out freshly clustered.
+      </p>
+
+      <Callout kind="info" title="Going deeper">
+        <p>
+          SELECT.dev&apos;s{" "}
+          <a
+            href="https://select.dev/posts/introduction-to-snowflake-clustering"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Effective Clustering in Snowflake
+          </a>{" "}
+          is the best practical guide to this topic — including natural clustering
+          (data loaded in date order is often already well clustered for free) and why
+          they find clustering worthwhile from hundreds of megabytes, well below
+          Snowflake&apos;s official multi-terabyte guidance.
+        </p>
+      </Callout>
 
       <Callout kind="tip" title="The review heuristic">
         <p>
