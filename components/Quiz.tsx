@@ -27,7 +27,7 @@ export function Quiz({ title = "Quiz", questions }: { title?: string; questions:
             : `${answered}/${questions.length} answered`}
         </span>
       </header>
-      <ol className="!my-0 max-w-none list-none divide-y divide-line !pl-0">
+      <ol className="!my-0 max-w-none !list-none divide-y divide-line !pl-0">
         {questions.map((q, qi) => {
           const sel = picked[qi];
           return (

@@ -14,12 +14,12 @@ export function Checklist({
   const { isChecked, toggleCheck, ready } = useProgress();
 
   return (
-    <ul className="my-5 flex max-w-[72ch] flex-col gap-1.5">
+    <ul className="!my-5 flex max-w-[72ch] !list-none flex-col gap-1.5 !pl-0">
       {items.map((item) => {
         const key = `${id}/${item.key}`;
         const checked = ready && isChecked(key);
         return (
-          <li key={item.key}>
+          <li key={item.key} className="!my-0 !pl-0">
             <label
               className={`flex cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 transition ${
                 checked

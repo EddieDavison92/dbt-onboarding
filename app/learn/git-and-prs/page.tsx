@@ -133,8 +133,24 @@ git commit -m "docs: describe waiting list snapshot logic"
             <td>Model ownership</td>
             <td>Every new model has an owner in its YAML</td>
           </tr>
+          <tr>
+            <td>CodeRabbit review</td>
+            <td>
+              An automated reviewer comments on every PR — conventions, likely bugs,
+              missed project patterns
+            </td>
+          </tr>
         </tbody>
       </table>
+      <p>
+        CodeRabbit&apos;s comments usually arrive before a human reviewer looks at the
+        PR, and it is configured with this project&apos;s own conventions (for example,
+        it checks that large person-level models set <code>cluster_by</code>). Treat its
+        comments like any reviewer&apos;s: address the valid ones, reply to the rest —
+        it is sometimes wrong, and saying why is a legitimate response. The human review
+        still happens; CodeRabbit clears the routine findings first so your reviewer can
+        focus on the logic.
+      </p>
 
       <Callout kind="tip" title="Reading a failing check">
         <p>

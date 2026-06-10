@@ -20,7 +20,7 @@ export function LayerSorter() {
           {finished ? `${correct}/${SORTER_ITEMS.length} correct` : "which layer does each model belong in?"}
         </span>
       </header>
-      <ol className="!my-0 flex max-w-none list-none flex-col gap-4 !pl-0">
+      <ol className="!my-0 flex max-w-none !list-none flex-col gap-4 !pl-0">
         {SORTER_ITEMS.map((item, i) => {
           const sel = assigned[i];
           const revealed = sel !== undefined;

@@ -61,26 +61,64 @@ export default function Page() {
 
       <h2>Run the setup script</h2>
       <p>
-        Open the cloned folder in VS Code and open a terminal — the project&apos;s
-        PowerShell script runs automatically (or run it yourself):
+        Open the cloned folder in VS Code and open a terminal —{" "}
+        <code>start_dbt.ps1</code> runs automatically every time (it is wired into the
+        workspace; you can also run it yourself). It is the project&apos;s bootstrap
+        and does five things on each launch:
       </p>
-      <CodeBlock lang="bash" code={`.\\start_dbt.ps1`} />
-      <p>It installs dbt Fusion (the dbt engine we use), configures git hooks, and loads your environment. First run, it will walk you through creating your <code>.env</code>:</p>
+      <ol>
+        <li>
+          <strong>Configures git hooks</strong> and checks your commit signing is set
+          up, telling you if it is not.
+        </li>
+        <li>
+          <strong>Installs or updates dbt Fusion</strong> — the engine dbt runs on
+          here (a binary, not a Python package), pinned to the version the rest of the
+          team and CI use.
+        </li>
+        <li>
+          <strong>Syncs Python tooling</strong> used only by the helper scripts in{" "}
+          <code>scripts/</code> (dbt itself does not need Python).
+        </li>
+        <li>
+          <strong>Loads your <code>.env</code></strong> and shows which connection
+          details are active.
+        </li>
+        <li>
+          <strong>Installs dbt packages</strong> (<code>dbt deps</code>) when they are
+          missing or out of date.
+        </li>
+      </ol>
+      <p>
+        On first run, with no <code>.env</code> present, it walks you through creating
+        one interactively — prompting for your account identifier, username, role and
+        warehouse (your team lead has these values), then asking how you want to
+        authenticate:
+      </p>
       <CodeBlock
-        lang="bash"
-        title=".env (local only — never committed)"
+        lang="text"
+        title="first-run prompt"
         code={`
-SNOWFLAKE_ACCOUNT=<ask-your-team-lead>
-SNOWFLAKE_USER=<your-snowflake-username>
-SNOWFLAKE_WAREHOUSE=<team-warehouse>
-SNOWFLAKE_ROLE=<analyst-role>
+No .env found - let's set up your Snowflake connection.
+
+Authentication method:
+  1) Browser SSO (externalbrowser)   [default, recommended]
+  2) Programmatic Access Token (PAT)
+  3) Account password + MFA
 `}
       />
-      <Callout kind="warn" title="Authentication">
+      <p>
+        It writes the answers to <code>.env</code> (which git ignores) and loads them
+        into the session, so dbt works immediately. Browser SSO opens a browser window
+        to authenticate each session; a PAT skips that prompt. Secrets are typed at a
+        hidden prompt — never paste them into files inside the repo.
+      </p>
+      <Callout kind="tip" title="If the script flags actions">
         <p>
-          With no password set, dbt opens your browser for SSO each session. If you have
-          a programmatic access token, set <code>SNOWFLAKE_PAT</code> to authenticate
-          without the browser prompt. Never paste tokens into files inside the repo.
+          The script ends with either “Ready!” or a short “To finish setup” list —
+          commit signing not configured, placeholder values left in <code>.env</code>,
+          and so on. Work through that list before continuing; each item points at the
+          fix.
         </p>
       </Callout>
 
@@ -100,10 +138,13 @@ git config --global commit.gpgsign true
       </p>
 
       <h2>Verify the connection</h2>
+      <p>
+        The script has already installed packages (<code>dbt deps</code>), so one
+        command confirms everything works:
+      </p>
       <CodeBlock
         lang="bash"
         code={`
-dbt deps     # install package dependencies
 dbt debug    # check connection + config
 `}
       />
@@ -116,7 +157,7 @@ dbt debug    # check connection + config
       <Checklist
         id="setup-verify"
         items={[
-          { key: "deps", label: <>Ran <code>dbt deps</code> without errors</> },
+          { key: "deps", label: <>The setup script finished with <strong>Ready!</strong> (no outstanding actions)</> },
           { key: "debug", label: <>Saw <strong>All checks passed!</strong> from <code>dbt debug</code></> },
           {
             key: "show",

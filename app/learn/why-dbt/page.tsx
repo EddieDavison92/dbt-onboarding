@@ -24,6 +24,12 @@ export default function Page() {
       </p>
       <ul>
         <li>
+          <strong>Order of operations is manual.</strong> The summary table is only
+          right if the reference data refreshed first, which is only right if the feed
+          loaded — and the person who knows the sequence runs it by hand. One step out
+          of order and the numbers are wrong, with nothing to say so.
+        </li>
+        <li>
           <strong>Nobody knows what depends on what.</strong> Renaming a column means
           guessing what might break.
         </li>
@@ -32,19 +38,20 @@ export default function Page() {
           you hear is a dashboard looking wrong.
         </li>
         <li>
-          <strong>There is no history.</strong> The logic changed last month. Who changed it,
-          and why?
-        </li>
-        <li>
-          <strong>Everyone rebuilds the same thing.</strong> Five people have five slightly
-          different definitions of “current registration”.
+          <strong>Everyone works alone.</strong> Logic lives in personal worksheets and
+          scripts, so five people hold five slightly different definitions of “current
+          registration”, there is no history of who changed what, and work leaves when
+          its author does.
         </li>
       </ul>
       <p>
-        dbt (data build tool) fixes this with one idea: <strong>every transformation is a
-        SELECT statement in a file, in a git repository</strong>. dbt works out the order to
-        run them, builds them as tables or views in Snowflake, tests the results and
-        documents the whole chain.
+        dbt (data build tool) addresses this with two ideas working together. First,{" "}
+        <strong>a shared codebase</strong>: every transformation lives in one git
+        repository, so there is one definition of each concept, full history of every
+        change, and a review step before anything ships. Second,{" "}
+        <strong>every transformation is a SELECT statement</strong> whose dependencies
+        dbt can read — so the order of operations is derived from the code itself,
+        computed fresh on every run, and never something a person has to remember.
       </p>
 
       <h2>What a dbt model looks like</h2>
