@@ -90,44 +90,51 @@ from {{ ref('stg_pds_registration') }}
       <p>
         The textbook snapshot watches a source table with an <code>updated_at</code>{" "}
         column. Much of what this team needs history for is different:{" "}
-        <strong>derived states, not events</strong>. Whether a person is on a cohort
-        or register is computed from several temporal factors at once — diagnoses,
-        resolutions, age, registration status, latest test results. No single event
-        says “membership changed”, so there is no timestamp to watch. The membership
-        is simply different the next time the model builds.
+        <strong>derived states, not events</strong>. A person&apos;s risk group or
+        population segment is computed from several temporal factors at once —
+        conditions, age, latest results, service contacts. Nothing in the data says
+        “this person moved from low to medium risk”; their computed segment is simply
+        different the next time the model builds. There is no timestamp to watch,
+        because the transition only exists as a difference between two builds.
       </p>
       <p>
-        That is exactly what <code>check</code> strategy handles: snapshot the cohort
-        model and list the columns that define the state — dbt notices when a
-        person&apos;s computed values differ from the last recorded version and writes
-        a new row:
+        That is exactly what <code>check</code> strategy captures: snapshot the
+        stratification model and list the columns that define the state — dbt notices
+        when a person&apos;s computed values differ from the last recorded version and
+        writes a new row:
       </p>
       <CodeBlock
         lang="sql"
-        title="snapshotting a derived cohort (illustrative)"
+        title="snapshotting risk segments (illustrative)"
         code={`
-{% snapshot snapshot_diabetes_register %}
+{% snapshot snapshot_person_risk_segment %}
 
 {{
     config(
         unique_key='person_id',
         strategy='check',
-        check_cols=['is_on_register', 'register_reason']
+        check_cols=['risk_band', 'segment']
     )
 }}
 
-select person_id, is_on_register, register_reason
-from {{ ref('fct_person_diabetes_register') }}
+select person_id, risk_band, segment
+from {{ ref('fct_person_risk_stratification') }}
 
 {% endsnapshot %}
 `}
       />
       <p>
-        The result answers questions the register alone cannot: when did this person
-        join the cohort, when did they leave, what was the register&apos;s membership
-        on a given date — without the upstream models having to model their own
-        history. Keep <code>check_cols</code> to the columns that define the state;
-        every column listed is a reason to write a new version, so incidental columns
+        Now the questions the stratification model alone cannot answer become simple
+        queries on the snapshot: when did this person move from low to medium risk?
+        Who entered the high-risk band this quarter, and from where? How long do
+        people typically stay in a segment before stepping up? Each transition is a
+        pair of adjacent rows — the old state closing (<code>dbt_valid_to</code>) at
+        the moment the new one opens — without the upstream models having to model
+        their own history.
+      </p>
+      <p>
+        Keep <code>check_cols</code> to the columns that define the state: every
+        column listed is a reason to write a new version, so incidental columns
         inflate the history.
       </p>
       <Callout kind="info" title="Snapshots have their own command">
