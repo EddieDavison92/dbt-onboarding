@@ -47,6 +47,16 @@ git commit -m "feat: add opening hours staging model"
         </p>
       </Callout>
 
+      <Callout kind="warn" title="This repo is public — check your diff for data">
+        <p>
+          Before committing, read your diff once with one question in mind: does any
+          line contain patient or person-level data, real identifiers in comments or
+          examples, query result extracts, or credentials? None of those ever go in —
+          and the same applies to the PR itself: no screenshots or attachments of
+          row-level results. Describe checks in words and aggregates instead.
+        </p>
+      </Callout>
+
       <h2>Push and open the PR</h2>
       <CodeBlock
         lang="bash"

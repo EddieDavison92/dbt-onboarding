@@ -144,6 +144,41 @@ git commit -m "docs: describe waiting list snapshot logic"
         </p>
       </Callout>
 
+      <h2>The repo is public — keep data out of it</h2>
+      <p>
+        The dbt-analytics code is open on GitHub. Code, YAML and docs are meant to be
+        public; <strong>data never is</strong>. Git history is forever — once pushed,
+        a value is published even if you delete it in the next commit.
+      </p>
+      <ul>
+        <li>
+          <strong>No patient or person-level data, anywhere.</strong> Not in comments
+          (“e.g. NHS number 943…”), not in test fixtures, not in seed CSVs, not in
+          query results pasted to show your model works.
+        </li>
+        <li>
+          <strong>No row-level outputs in PRs.</strong> Describe what you checked
+          (“grain verified unique on site_code + day_of_week”) instead of attaching
+          screenshots or extracts of results. Aggregate counts are fine; rows are not.
+        </li>
+        <li>
+          <strong>No credentials.</strong> Tokens, passwords and account details live
+          in your local <code>.env</code>, which git ignores. If a secret ever lands in
+          a commit, tell the team immediately so it can be rotated — do not quietly
+          delete it.
+        </li>
+      </ul>
+
+      <Callout kind="warn" title="If in doubt, leave it out">
+        <p>
+          Before every commit, skim your diff asking one question: “would I be happy
+          for anyone on the internet to read this line?” If the answer involves a
+          patient, a colleague&apos;s details or a credential, it does not belong in
+          the repo — accidentally publishing patient data is a reportable incident,
+          not just an awkward force-push.
+        </p>
+      </Callout>
+
       <h2>Review etiquette</h2>
       <ul>
         <li>
