@@ -45,8 +45,9 @@ from {{ ref('stg_csds_bridging') }}
 
       <h2>source() — the entry point</h2>
       <p>
-        Tables we do not build — the feeds landing in <code>DATA_LAKE__NCL</code> — are
-        declared once in YAML under <code>models/sources/</code>, then referenced with{" "}
+        Tables we do not build — the feeds landing in the data lake databases (
+        <code>DATA_LAKE</code>, plus <code>DATA_LAKE__NCL</code>) — are declared once in
+        YAML under <code>models/sources/</code>, then referenced with{" "}
         <code>source()</code>:
       </p>
       <CodeBlock
@@ -56,9 +57,11 @@ from {{ source('csds', 'ActiveSubmission') }}
 `}
       />
       <p>
-        In this project, <strong>only auto-generated raw models call source()</strong>.
+        In this project, <strong>only generated raw models call source()</strong>.
         Everything you write uses <code>ref()</code>. That keeps a single, stable
         interface to the outside world: if a feed changes, only the raw layer moves.
+        Source declarations themselves are produced by a mapping pipeline — covered in
+        the “Find your source” practice step — so you rarely write them by hand either.
       </p>
 
       <h2>The DAG</h2>

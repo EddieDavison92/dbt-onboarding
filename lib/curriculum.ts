@@ -48,8 +48,8 @@ export const PRACTICE: NavItem[] = [
   {
     slug: "find-a-source",
     title: "Find your source",
-    blurb: "Locate the raw model you'll build on",
-    minutes: 5,
+    blurb: "How sources are mapped, and locating the raw model you'll build on",
+    minutes: 8,
   },
   {
     slug: "first-model",

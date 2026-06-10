@@ -79,8 +79,9 @@ from {{ ref('raw_csds_bridging') }}
       <p>In this team the pipeline looks like:</p>
       <ol>
         <li>
-          <strong>Source data lands in Snowflake</strong> (<code>DATA_LAKE__NCL</code>) —
-          SUS, CSDS, OLIDS GP data, reference files.
+          <strong>Source data lands in Snowflake</strong> — in the{" "}
+          <code>DATA_LAKE</code> database (the main source) and{" "}
+          <code>DATA_LAKE__NCL</code>: SUS, CSDS, OLIDS GP data, reference files.
         </li>
         <li>
           <strong>dbt transforms it</strong> through five layers (next lesson) into
