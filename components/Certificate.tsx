@@ -102,7 +102,7 @@ export function Certificate({
           onClick={() => window.print()}
           className="rounded-xl border-2 border-ink bg-ink px-6 py-3 font-display text-sm font-extrabold uppercase tracking-widest text-paper transition hover:border-flame hover:bg-flame"
         >
-          Print / save as PDF
+          Save as PDF
         </button>
         <Link
           href="/"

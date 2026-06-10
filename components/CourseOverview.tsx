@@ -101,6 +101,16 @@ export function CourseOverview({
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-ink-soft">
             Learner: <strong className="text-ink">{name}</strong>
+            <button
+              type="button"
+              onClick={() => {
+                setDraft(name);
+                setName("");
+              }}
+              className="ml-2 font-mono text-xs text-ink-faint underline-offset-2 hover:text-flame-deep hover:underline"
+            >
+              change
+            </button>
             <span className="ml-3 font-mono text-xs text-ink-faint">
               {doneCount}/{lessons.length} lessons
             </span>
