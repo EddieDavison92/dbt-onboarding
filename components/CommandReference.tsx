@@ -89,7 +89,7 @@ export function CommandReference() {
                 className="flex items-center gap-3 rounded-xl border border-line bg-paper px-4 py-2.5 !pl-4"
               >
                 <div className="min-w-0 flex-1">
-                  <code className="block overflow-x-auto whitespace-nowrap font-mono text-[13px] text-graphite">
+                  <code className="block !whitespace-pre-wrap break-all font-mono text-[13px] leading-relaxed text-graphite">
                     {c.cmd}
                   </code>
                   <span className="text-xs text-ink-faint">{c.desc}</span>
