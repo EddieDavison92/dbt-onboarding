@@ -1,0 +1,84 @@
+"use client";
+
+import { useState } from "react";
+import { LAYERS, SORTER_ITEMS } from "@/lib/layers";
+
+/** Assign each model description to the layer it belongs in. */
+export function LayerSorter() {
+  const [assigned, setAssigned] = useState<Record<number, string>>({});
+  const answered = Object.keys(assigned).length;
+  const correct = SORTER_ITEMS.filter((it, i) => assigned[i] === it.layer).length;
+  const finished = answered === SORTER_ITEMS.length;
+
+  return (
+    <section className="my-8 max-w-[76ch] rounded-2xl border-2 border-ink bg-paper p-5 shadow-[5px_5px_0_0_var(--color-layer-modelling)]">
+      <header className="mb-4 flex items-baseline justify-between">
+        <h3 className="font-display text-sm font-extrabold uppercase tracking-widest">
+          Sort the strata
+        </h3>
+        <span className="font-mono text-xs text-ink-faint">
+          {finished ? `${correct}/${SORTER_ITEMS.length} correct` : "where does each model live?"}
+        </span>
+      </header>
+      <ol className="flex flex-col gap-4">
+        {SORTER_ITEMS.map((item, i) => {
+          const sel = assigned[i];
+          const revealed = sel !== undefined;
+          return (
+            <li key={i}>
+              <p className="mb-1.5 text-sm font-medium text-ink">
+                “{item.text}”
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {LAYERS.map((l) => {
+                  const chosen = sel === l.id;
+                  const isAnswer = item.layer === l.id;
+                  return (
+                    <button
+                      key={l.id}
+                      type="button"
+                      disabled={revealed}
+                      onClick={() => setAssigned((a) => ({ ...a, [i]: l.id }))}
+                      style={
+                        revealed && isAnswer
+                          ? { backgroundColor: l.color, borderColor: l.color }
+                          : chosen
+                            ? { borderColor: l.color }
+                            : undefined
+                      }
+                      className={`rounded-full border px-3 py-1 font-display text-xs font-bold uppercase tracking-wide transition disabled:cursor-default ${
+                        revealed && isAnswer
+                          ? "text-white"
+                          : chosen
+                            ? "text-ink line-through"
+                            : revealed
+                              ? "border-line text-ink-faint"
+                              : "border-line text-ink-soft hover:border-ink"
+                      }`}
+                    >
+                      {l.name}
+                      {revealed && isAnswer && " ✓"}
+                    </button>
+                  );
+                })}
+              </div>
+              {revealed && sel !== item.layer && (
+                <p className="mt-1.5 text-xs text-ink-faint">
+                  {LAYERS.find((l) => l.id === item.layer)?.name}:{" "}
+                  {LAYERS.find((l) => l.id === item.layer)?.job.toLowerCase()}.
+                </p>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+      {finished && (
+        <p className="mt-4 rounded-lg bg-paper-warm px-4 py-2.5 text-sm text-ink-soft">
+          {correct === SORTER_ITEMS.length
+            ? "Clean sweep — you think in layers already."
+            : "The trick: ask what job the model is doing, not what data it touches."}
+        </p>
+      )}
+    </section>
+  );
+}

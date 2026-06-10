@@ -1,0 +1,209 @@
+@import "tailwindcss";
+
+:root {
+  /* dbt-inspired palette (not an official dbt product) */
+  --paper: #fbfaf8;
+  --paper-warm: #f5f2ed;
+  --ink: #1f2430;
+  --ink-soft: #4b5263;
+  --ink-faint: #8a90a0;
+  --line: #e6e2da;
+  --flame: #ff694a;
+  --flame-deep: #e84e2e;
+  --flame-soft: #fff0ec;
+  --graphite: #262a38;
+  --graphite-deep: #1b1e29;
+
+  /* layer strata */
+  --layer-raw: #64748b;
+  --layer-staging: #0d9488;
+  --layer-modelling: #5b5bd6;
+  --layer-reporting: #ff694a;
+  --layer-published: #b54708;
+  --layer-semantic: #0891b2;
+
+  --background: var(--paper);
+  --foreground: var(--ink);
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-warm: var(--paper-warm);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-flame: var(--flame);
+  --color-flame-deep: var(--flame-deep);
+  --color-flame-soft: var(--flame-soft);
+  --color-graphite: var(--graphite);
+  --color-graphite-deep: var(--graphite-deep);
+  --color-layer-raw: var(--layer-raw);
+  --color-layer-staging: var(--layer-staging);
+  --color-layer-modelling: var(--layer-modelling);
+  --color-layer-reporting: var(--layer-reporting);
+  --color-layer-published: var(--layer-published);
+  --color-layer-semantic: var(--layer-semantic);
+  --font-sans: var(--font-body), ui-sans-serif, sans-serif;
+  --font-display: var(--font-display), ui-sans-serif, sans-serif;
+  --font-mono: var(--font-mono-jb), ui-monospace, monospace;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body), ui-sans-serif, sans-serif;
+  font-feature-settings: "ss01";
+}
+
+::selection {
+  background: var(--flame);
+  color: #fff;
+}
+
+/* subtle paper grain */
+.grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.02 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* prose defaults for lesson bodies */
+.lesson p {
+  margin-block: 0.9rem;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  max-width: 68ch;
+}
+.lesson p strong,
+.lesson li strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.lesson h2 {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 750;
+  font-size: 1.45rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-top: 2.75rem;
+  margin-bottom: 0.25rem;
+  scroll-margin-top: 5rem;
+}
+.lesson h3 {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-top: 2rem;
+  margin-bottom: 0.25rem;
+}
+.lesson ul,
+.lesson ol {
+  margin-block: 0.9rem;
+  padding-left: 1.4rem;
+  max-width: 68ch;
+  color: var(--ink-soft);
+  line-height: 1.65;
+}
+.lesson ul {
+  list-style: disc;
+}
+.lesson ol {
+  list-style: decimal;
+}
+.lesson li {
+  margin-block: 0.35rem;
+  padding-left: 0.2rem;
+}
+.lesson li::marker {
+  color: var(--flame);
+  font-weight: 600;
+}
+.lesson a {
+  color: var(--flame-deep);
+  text-decoration: underline;
+  text-decoration-color: rgb(255 105 74 / 0.4);
+  text-underline-offset: 3px;
+}
+.lesson a:hover {
+  text-decoration-color: var(--flame);
+}
+.lesson code:not(pre code) {
+  font-family: var(--font-mono-jb), monospace;
+  font-size: 0.85em;
+  background: var(--paper-warm);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 0.1em 0.35em;
+  color: var(--graphite);
+  white-space: nowrap;
+}
+.lesson table {
+  width: 100%;
+  max-width: 68ch;
+  margin-block: 1.25rem;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.lesson th {
+  text-align: left;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  border-bottom: 2px solid var(--ink);
+  padding: 0.5rem 0.75rem 0.5rem 0;
+}
+.lesson td {
+  border-bottom: 1px solid var(--line);
+  padding: 0.55rem 0.75rem 0.55rem 0;
+  color: var(--ink-soft);
+  vertical-align: top;
+}
+
+/* staggered page-load reveal */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rise {
+  animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.rise-1 { animation-delay: 0.05s; }
+.rise-2 { animation-delay: 0.12s; }
+.rise-3 { animation-delay: 0.2s; }
+.rise-4 { animation-delay: 0.3s; }
+.rise-5 { animation-delay: 0.42s; }
+
+/* DAG edge draw */
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes flowdot {
+  0% { offset-distance: 0%; opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgb(255 105 74 / 0.45); }
+  70% { box-shadow: 0 0 0 10px rgb(255 105 74 / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(255 105 74 / 0); }
+}

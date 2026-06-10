@@ -1,0 +1,205 @@
+import type { Metadata } from "next";
+import { LessonShell } from "@/components/LessonShell";
+import { CodeBlock } from "@/components/CodeBlock";
+import { Callout } from "@/components/Callout";
+import { Quiz } from "@/components/Quiz";
+
+export const metadata: Metadata = { title: "Git & pull requests" };
+
+const STEPS = [
+  {
+    name: "branch",
+    desc: "Make a safe copy of main to work on",
+    cmd: "git checkout -b feat/diabetes-staging",
+  },
+  {
+    name: "commit",
+    desc: "Save a labelled snapshot of your changes",
+    cmd: 'git commit -m "feat: add diabetes staging model"',
+  },
+  {
+    name: "push",
+    desc: "Upload your branch to GitHub",
+    cmd: "git push -u origin feat/diabetes-staging",
+  },
+  {
+    name: "pull request",
+    desc: "Ask for review; CI starts checking automatically",
+    cmd: "gh pr create",
+  },
+  {
+    name: "merge",
+    desc: "Approved + green checks → lands on main → deploys to prod",
+    cmd: "",
+  },
+];
+
+export default function Page() {
+  return (
+    <LessonShell
+      section="learn"
+      slug="git-and-prs"
+      kicker="Learn 06"
+      title="Git & pull requests"
+      lede="Git is a save system for the whole project; a pull request is how your change gets a second pair of eyes and a robot's approval before it touches production."
+      minutes={9}
+    >
+      <h2>The mental model</h2>
+      <p>
+        <code>main</code> is the production branch — what runs every night. You never
+        edit it directly (it is locked). Instead you take a <strong>branch</strong>: a
+        parallel copy where you can work freely. When your work is ready, a{" "}
+        <strong>pull request (PR)</strong> proposes merging your branch back into{" "}
+        <code>main</code>. Between proposal and merge sit the two safety nets: a human
+        review and automated CI checks.
+      </p>
+
+      <div className="my-6 flex max-w-[72ch] flex-col gap-0">
+        {STEPS.map((s, i) => (
+          <div key={s.name} className="flex gap-4">
+            <div className="flex flex-col items-center">
+              <span className="grid size-8 shrink-0 place-items-center rounded-full border-2 border-ink bg-paper font-display text-sm font-extrabold">
+                {i + 1}
+              </span>
+              {i < STEPS.length - 1 && <span className="w-0.5 flex-1 bg-line" />}
+            </div>
+            <div className="pb-5">
+              <p className="!my-0 font-display text-sm font-extrabold uppercase tracking-wide text-ink">
+                {s.name}
+              </p>
+              <p className="!my-0.5 text-sm">{s.desc}</p>
+              {s.cmd && (
+                <code className="font-mono text-xs text-flame-deep">{s.cmd}</code>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <h2>Project conventions</h2>
+      <h3>Branch names</h3>
+      <p>
+        <code>feat/short-description</code> for new work, <code>fix/short-description</code>{" "}
+        for bug fixes, <code>docs/short-description</code> for documentation. Lowercase,
+        hyphens, no spaces.
+      </p>
+      <h3>Commit messages</h3>
+      <p>
+        We follow <strong>Conventional Commits</strong>: a type prefix, then a short
+        imperative description.
+      </p>
+      <CodeBlock
+        lang="bash"
+        code={`
+git commit -m "feat: add patient demographics staging model"
+git commit -m "fix: correct age band boundary in dim_person_demographics"
+git commit -m "docs: describe waiting list snapshot logic"
+`}
+      />
+      <p>
+        Pre-commit hooks validate the format locally, and commits must be{" "}
+        <strong>signed</strong> (your SSH key — set up once during machine setup, then
+        forget about it).
+      </p>
+
+      <h2>What CI runs on your PR</h2>
+      <p>
+        The moment you open a PR, GitHub Actions starts a series of checks. Green ticks
+        are required to merge:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Check</th>
+            <th>What it verifies</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Compile</td>
+            <td>Every model still compiles — catches broken refs and Jinja typos</td>
+          </tr>
+          <tr>
+            <td>PR validation</td>
+            <td>
+              Builds and tests the models you changed in an isolated environment
+            </td>
+          </tr>
+          <tr>
+            <td>Code quality</td>
+            <td>SQLFluff lint — formatting and lowercase keywords only</td>
+          </tr>
+          <tr>
+            <td>Model ownership</td>
+            <td>Every new model has an owner in its YAML</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <Callout kind="tip" title="A red X is information, not judgement">
+        <p>
+          Click “Details” on the failing check and read the log bottom-up — the actual
+          error is usually in the last 30 lines. Fix locally, commit, push: the PR
+          re-runs automatically. Everyone&apos;s first PR fails CI at least once.
+        </p>
+      </Callout>
+
+      <h2>Review etiquette</h2>
+      <ul>
+        <li>
+          <strong>Keep PRs small.</strong> One model (plus its YAML) reviews in minutes;
+          ten models sit for a week.
+        </li>
+        <li>
+          <strong>Write the description for a stranger.</strong> What changed, why, and
+          how you checked the numbers.
+        </li>
+        <li>
+          <strong>Review comments are about the code.</strong> “Could this join fan
+          out?” is the reviewer doing their job — and soon it will be you asking.
+        </li>
+      </ul>
+
+      <Quiz
+        questions={[
+          {
+            prompt: "Why can't you commit directly to main?",
+            options: [
+              "Git doesn't support it",
+              "main is protected — every change needs a reviewed, CI-green PR",
+              "Only the team lead has the password",
+              "You can, it's just discouraged",
+            ],
+            answer: 1,
+            explain:
+              "Branch protection enforces the workflow: main is always reviewable, tested, and deployable.",
+          },
+          {
+            prompt: "Your PR's validation check fails. What now?",
+            options: [
+              "Close the PR and start over",
+              "Ask an admin to merge anyway",
+              "Read the failing log, fix locally, commit and push to the same branch",
+              "Delete the failing test",
+            ],
+            answer: 2,
+            explain:
+              "Pushing to the same branch updates the PR and re-runs CI. Deleting a failing test is removing the smoke alarm.",
+          },
+          {
+            prompt: "Which is a valid commit message here?",
+            options: [
+              '"updates"',
+              '"feat: add CKD register intermediate model"',
+              '"Fixed stuff in the thing Emily mentioned"',
+              '"WIP do not merge plz"',
+            ],
+            answer: 1,
+            explain:
+              "Type prefix + imperative description. The pre-commit hook rejects the others (with varying degrees of embarrassment).",
+          },
+        ]}
+      />
+    </LessonShell>
+  );
+}
