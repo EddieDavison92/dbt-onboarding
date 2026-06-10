@@ -97,6 +97,18 @@ export const ADVANCED: NavItem[] = [
     minutes: 7,
   },
   {
+    slug: "clustering",
+    title: "Clustering",
+    blurb: "cluster_by — helping Snowflake skip the data you don't need",
+    minutes: 5,
+  },
+  {
+    slug: "project-config",
+    title: "Project configuration",
+    blurb: "dbt_project.yml — where the defaults you've been relying on live",
+    minutes: 7,
+  },
+  {
     slug: "snapshots",
     title: "Snapshots",
     blurb: "Capturing history when the source only keeps the present",

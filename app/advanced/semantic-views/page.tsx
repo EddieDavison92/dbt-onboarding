@@ -11,7 +11,7 @@ export default function Page() {
     <LessonShell
       section="advanced"
       slug="semantic-views"
-      kicker="Going further 04"
+      kicker="Going further 06"
       title="Semantic views"
       lede="The sixth layer: instead of producing rows, a semantic view declares what the data means — facts, dimensions, metrics and how tables relate — so query tools can't get the joins wrong."
       minutes={6}

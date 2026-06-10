@@ -1,0 +1,178 @@
+import type { Metadata } from "next";
+import { LessonShell } from "@/components/LessonShell";
+import { CodeBlock } from "@/components/CodeBlock";
+import { Callout } from "@/components/Callout";
+import { Quiz } from "@/components/Quiz";
+
+export const metadata: Metadata = { title: "Project configuration" };
+
+export default function Page() {
+  return (
+    <LessonShell
+      section="advanced"
+      slug="project-config"
+      kicker="Going further 04"
+      title="Project configuration"
+      lede="Why does a staging model become a view in the right schema with the right grants, when your file contains nothing but a SELECT? Because dbt_project.yml decided it already."
+      minutes={7}
+    >
+      <h2>One file, all the defaults</h2>
+      <p>
+        <code>dbt_project.yml</code> at the repo root configures every model by{" "}
+        <strong>folder path</strong>. An abridged view of ours:
+      </p>
+      <CodeBlock
+        lang="yaml"
+        title="dbt_project.yml (abridged)"
+        code={`
+name: 'wnl_analytics'
+profile: 'wnl_analytics'
+
+models:
+  wnl_analytics:
+    +materialized: table          # project default
+    +persist_docs:
+      columns: true               # YAML descriptions -> Snowflake comments
+    +post-hook: ["{{ grant_ownership_with_copy() }}"]
+
+    staging:
+      +materialized: view         # staging overrides the default
+      +database: "MODELLING"
+      +schema: "DBT_STAGING"
+      +tags: ["staging", "daily"]
+
+    reporting:
+      +database: "REPORTING"
+      +tags: ["reporting"]
+      commissioning:
+        +schema: "COMMISSIONING_REPORTING"
+
+    published:
+      +tags: ["published_reporting"]
+      direct_care:
+        +database: "PUBLISHED_REPORTING__DIRECT_CARE"
+      secondary_use:
+        +database: "PUBLISHED_REPORTING__SECONDARY_USE"
+`}
+      />
+      <p>
+        Read it top-down: settings cascade from project → folder → subfolder, with
+        deeper levels winning. The <code>+</code> prefix marks a config property (as
+        opposed to a folder name).
+      </p>
+
+      <h2>The hierarchy</h2>
+      <p>When the same setting is defined in more than one place, the most specific wins:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Level</th>
+            <th>Example</th>
+            <th>Wins over</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <code>config()</code> in the model file
+            </td>
+            <td>
+              <code>{"{{ config(materialized='view') }}"}</code>
+            </td>
+            <td>everything below</td>
+          </tr>
+          <tr>
+            <td>Folder in dbt_project.yml</td>
+            <td>
+              <code>staging: +materialized: view</code>
+            </td>
+            <td>project default</td>
+          </tr>
+          <tr>
+            <td>Project default</td>
+            <td>
+              <code>+materialized: table</code>
+            </td>
+            <td>dbt&apos;s built-in default</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        This is why your staging model file contains only a SELECT: location does the
+        configuring. It is also why <strong>putting a file in the right folder is a
+        real decision</strong> — it sets materialisation, database, schema, tags and
+        post-hooks in one move.
+      </p>
+
+      <h2>Tags drive the schedules</h2>
+      <p>
+        Those <code>+tags</code> are not decoration. The nightly build selects models by
+        tag — <code>daily</code>-tagged layers rebuild every night; heavier marts run on
+        their own cadence. You can use them too:
+      </p>
+      <CodeBlock
+        lang="bash"
+        code={`
+dbt build -s tag:daily          # everything in the nightly selection
+dbt ls -s tag:reporting         # list models carrying a tag
+`}
+      />
+
+      <h2>Post-hooks: governance on autopilot</h2>
+      <p>
+        The project-level <code>+post-hook</code> runs after every model build —
+        transferring ownership so the right roles can manage the object. Published
+        models add hooks for Snowflake governance tags. You get all of this without
+        writing a line: it is the layer doing the work.
+      </p>
+
+      <Callout kind="info" title="Schemas from folders (OLIDS)">
+        <p>
+          In the OLIDS domain a custom <code>generate_schema_name</code> macro derives
+          the schema from the folder path —{" "}
+          <code>models/modelling/olids/diagnoses/</code> builds into{" "}
+          <code>MODELLING.OLIDS_DIAGNOSES</code> with no config at all. Creating a
+          folder is creating a schema.
+        </p>
+      </Callout>
+
+      <Callout kind="warn" title="Touching dbt_project.yml is a wide-radius change">
+        <p>
+          A one-line edit here can re-materialise hundreds of models. If your change
+          needs it, say so prominently in the PR — and expect the review to involve more
+          people than usual.
+        </p>
+      </Callout>
+
+      <Quiz
+        questions={[
+          {
+            prompt:
+              "A model file has config(materialized='view') but its folder sets +materialized: table. What builds?",
+            options: [
+              "A table — dbt_project.yml wins",
+              "A view — the model-level config() is most specific and wins",
+              "Both, dbt errors",
+              "Whichever was defined first",
+            ],
+            answer: 1,
+            explain:
+              "Specificity wins: model config() beats folder config beats project default.",
+          },
+          {
+            prompt: "Moving a model file between layer folders can change…",
+            options: [
+              "Only its position in the docs site",
+              "Its materialisation, database, schema, tags and post-hooks — all at once",
+              "Nothing, config travels with the file",
+              "Only its tags",
+            ],
+            answer: 1,
+            explain:
+              "Folder path is configuration in this project. That is why layer placement is a review point, not a tidiness preference.",
+          },
+        ]}
+      />
+    </LessonShell>
+  );
+}
