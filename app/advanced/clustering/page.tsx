@@ -32,6 +32,25 @@ export default function Page() {
         values that are queried together are stored together.
       </p>
 
+      <h2>The default is usually fine</h2>
+      <p>
+        Without any <code>cluster_by</code>, Snowflake still micro-partitions
+        everything — the data just sits in whatever order it was written. This{" "}
+        <strong>natural clustering</strong> is often adequate: data loaded or built in
+        date order prunes well for date filters; a table built from an ordered
+        upstream inherits much of that ordering; small and medium tables scan quickly
+        regardless. Snowflake manages the partitioning itself and does a reasonable
+        job with no help.
+      </p>
+      <p>
+        So treat <code>cluster_by</code> as an <strong>optimisation, not a
+        default</strong>. The reason to add it is a known access pattern on a large
+        table — or a measured problem, a query profile showing scans touching far
+        more partitions than the filter should need. Adding it to every model as
+        boilerplate buys nothing on most of them and obscures the cases where it
+        matters.
+      </p>
+
       <h2>The project pattern</h2>
       <p>
         You will see this constantly in reporting and published models — it is one line
