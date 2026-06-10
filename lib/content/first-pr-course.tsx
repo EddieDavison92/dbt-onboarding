@@ -109,6 +109,7 @@ export const FIRST_PR_COURSE: Course = {
             answer: 1,
             explain:
               "Anything committed to this repo is on the public internet. Connection details and tokens live in .env, which .gitignore keeps out of every commit automatically.",
+            affirm: "secrets live in .env on your machine — never in the repo.",
           },
         },
         {
@@ -181,6 +182,7 @@ git config --global commit.gpgsign true
             answer: 1,
             explain:
               "dbt debug tests connection + config, and the connection details come from .env. Check those values, open a fresh terminal so they reload, retry — that resolves nearly every first-day failure.",
+            affirm: "when dbt can't connect, .env is the first suspect.",
           },
         },
       ],
@@ -240,6 +242,7 @@ git config --global commit.gpgsign true
             answer: 1,
             explain:
               "The grain is the table's contract: one row per what. Your grain test (next lessons) asserts it forever — and a join that breaks it is the most common serious modelling bug.",
+            affirm: "one row per what — the grain sentence becomes your most important test.",
           },
         },
       ],
@@ -392,6 +395,7 @@ git config --global commit.gpgsign true
             answer: 1,
             explain:
               "manual: true means a person, not Snowflake's metadata, decides which tables count. Add the table to the manual YAML first; the pipeline then generates its raw model like any other.",
+            affirm: "manual schemas only source the tables a person has listed.",
           },
         },
         {
@@ -464,6 +468,7 @@ git config --global commit.gpgsign true
             answer: 1,
             explain:
               "Job first: joining and deriving a reusable block = modelling (int_). Data second: GP observations = olids. Staging never joins; reporting is for assembled analyst-facing datasets that would ref() this block.",
+            affirm: "the job picks the layer, the data picks the domain.",
           },
         },
         {
@@ -577,6 +582,7 @@ dbt compile                                # render every model to plain SQL
             answer: 1,
             explain:
               "With *, a new upstream column appears downstream unannounced, and a removed one breaks consumers without warning. Naming columns makes the model's contract explicit and changes deliberate.",
+            affirm: "explicit columns are the contract downstream models rely on.",
           },
         },
       ],
@@ -671,6 +677,7 @@ models:
             answer: 2,
             explain:
               "unique on site_code alone would fail now (each site has 7 rows). Only the combination test matches your actual grain — and it fires the moment anything fans the table out.",
+            affirm: "test the combination — that's what your grain actually is.",
           },
         },
         {
@@ -766,6 +773,7 @@ Completed successfully
             answer: 2,
             explain:
               "The test ran a real query against real rows. Either your understanding of the grain is incomplete or the feed has a quality issue — both are findings worth a sentence in your PR description.",
+            affirm: "a failing test is information about the data, not a verdict on you.",
           },
         },
         {
@@ -887,6 +895,7 @@ Needed for the access dashboard; nothing currently stages this table.
             answer: 2,
             explain:
               "Automated review comments are suggestions, not gates. Address the valid ones, push back on the rest in a reply — the human reviewer sees both the comment and your reasoning.",
+            affirm: "automated comments are suggestions — disagreeing with reasons is a valid response.",
           },
         },
       ],
@@ -984,6 +993,7 @@ git pull
             answer: 1,
             explain:
               "This is the payoff of the YAML you wrote in twenty minutes: your understanding of the data became an assertion that runs every night, forever, guarding everyone downstream of you.",
+            affirm: "your tests now guard the pipeline every night, without you.",
           },
         },
       ],

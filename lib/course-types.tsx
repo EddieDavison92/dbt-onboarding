@@ -5,6 +5,8 @@ export type Checkpoint = {
   options: string[];
   answer: number;
   explain: string;
+  /** short concept-grounding phrase shown when revisiting an answered checkpoint */
+  affirm?: string;
 };
 
 export type Step = {

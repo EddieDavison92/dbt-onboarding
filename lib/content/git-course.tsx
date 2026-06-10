@@ -1,6 +1,7 @@
 import type { Course } from "@/lib/course-types";
 import { CodeBlock } from "@/components/CodeBlock";
 import { BranchDiagram } from "@/components/BranchDiagram";
+import { TryIt } from "@/components/TryIt";
 
 export const GIT_COURSE: Course = {
   slug: "git-essentials",
@@ -71,6 +72,7 @@ analysis_v2_FINAL_jw_comments.sql
             answer: 1,
             explain:
               "Every snapshot is permanently in the history. Viewing what a file looked like at any point — and exactly what changed since — is the core thing git does.",
+            affirm: "every version lives in the history — no more _FINAL_v3 copies.",
           },
         },
         {
@@ -119,6 +121,7 @@ analysis_v2_FINAL_jw_comments.sql
             answer: 1,
             explain:
               "A clone is the whole repo — every file and the full history — on your machine. It does not sync by itself: you choose when to pull changes down and push yours up.",
+            affirm: "a clone is the full repo on your machine — it only syncs when you choose.",
           },
         },
       ],
@@ -175,6 +178,7 @@ analysis_v2_FINAL_jw_comments.sql
             answer: 0,
             explain:
               "This is the whole point of branches: your work-in-progress, however broken, exists only on your branch. Production only changes when a branch is deliberately merged into main.",
+            affirm: "nothing on your branch can touch production — that's the point of branches.",
           },
         },
         {
@@ -228,6 +232,7 @@ docs: describe waiting list snapshot logic
             answer: 1,
             explain:
               "Branch = the parallel line; commits = the snapshots along it. One branch per piece of work, several commits per branch.",
+            affirm: "branch = the parallel line, commits = the snapshots along it.",
           },
         },
       ],
@@ -245,10 +250,10 @@ docs: describe waiting list snapshot logic
             <>
               <p>
                 Git has hundreds of commands. Daily work here uses{" "}
-                <strong>five</strong>. This lesson introduces them one at a time, in
-                the order you use them. Don&apos;t memorise — by the end you&apos;ll
-                see the pattern, and there are tools that type these for you (last
-                lesson).
+                <strong>five</strong>. This lesson introduces them one at a time —
+                and you will <em>run</em> each one in a simulated terminal, so you
+                see exactly what your real machine will say back. Nothing to
+                install; type the command (or use “type it for me”) and press Enter.
               </p>
             </>
           ),
@@ -258,33 +263,58 @@ docs: describe waiting list snapshot logic
           title: "1 · git status — where am I?",
           body: (
             <>
-              <CodeBlock lang="bash" code={`git status`} />
               <p>
-                Shows three things: which branch you are on, which files you have
-                changed, and what git suggests doing next. It changes nothing — it
-                only reports. <strong>When in doubt, run this.</strong> It is the
-                command equivalent of looking before crossing.
+                The scenario for this lesson: you have edited one model file and
+                created its documentation file. Start by asking git where things
+                stand:
+              </p>
+              <TryIt
+                stages={[
+                  {
+                    cmd: "git status",
+                    out: `On branch main
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+        modified:   models/staging/shared/stg_opening_hours.sql
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        models/staging/shared/stg_opening_hours.yml`,
+                  },
+                ]}
+                done="Branch, changed files, and a suggestion for what to do next — status changes nothing, it only reports."
+              />
+              <p>
+                Read it top to bottom: you are on <code>main</code> (a problem —
+                next command fixes that), one file is modified, one is brand new
+                (“untracked”). <strong>When in doubt, run this.</strong>
               </p>
             </>
           ),
         },
         {
           id: "switch",
-          title: "2 · git switch — change branch",
+          title: "2 · git switch — get off main",
           body: (
             <>
-              <CodeBlock
-                lang="bash"
-                code={`
-git switch -c feat/my-change    # create a new branch and move onto it
-git switch main                 # move back to main
-`}
+              <p>
+                You should never work on <code>main</code> — and status just showed
+                you are. Create a branch; your edits come with you:
+              </p>
+              <TryIt
+                stages={[
+                  {
+                    cmd: "git switch -c feat/opening-hours",
+                    out: `Switched to a new branch 'feat/opening-hours'`,
+                  },
+                ]}
+                done="One quiet line — you're now on a safe parallel line of history, edits intact."
               />
               <p>
-                <code>switch</code> moves you between branches; the <code>-c</code>{" "}
-                flag (<em>create</em>) makes a new one as it moves. Your files change
-                on disk to match whichever branch you are on — switching is how the
-                same folder safely holds many lines of work.
+                The <code>-c</code> flag (<em>create</em>) makes the branch as it
+                moves you onto it. Without <code>-c</code>, switch moves between
+                branches that already exist — <code>git switch main</code> takes you
+                back.
               </p>
             </>
           ),
@@ -299,6 +329,7 @@ git switch main                 # move back to main
             answer: 0,
             explain:
               "-c is create. Without it, switch moves to a branch that already exists. Nothing is committed yet — you've just opened a fresh line to work on.",
+            affirm: "switch -c creates the branch and moves you onto it — nothing is committed yet.",
           },
         },
         {
@@ -307,23 +338,39 @@ git switch main                 # move back to main
           body: (
             <>
               <p>
-                This is the step that surprises newcomers. Editing a file does{" "}
+                The step that surprises newcomers: editing a file does{" "}
                 <strong>not</strong> put it in your next commit. You explicitly{" "}
-                <em>stage</em> the files you want included:
+                <em>stage</em> what you want included. Stage both files, then check
+                what changed:
               </p>
-              <CodeBlock
-                lang="bash"
-                code={`
-git add models/staging/stg_my_model.sql    # stage one file
-git add -u                                 # stage every file you've modified
-`}
+              <TryIt
+                stages={[
+                  {
+                    cmd: "git add -u",
+                    out: ``,
+                    prompt: "stage every file you've modified (-u = updated)",
+                  },
+                  {
+                    cmd: "git add models/staging/shared/stg_opening_hours.yml",
+                    out: ``,
+                    prompt: "the new file is untracked, so -u didn't catch it — add it by name",
+                  },
+                  {
+                    cmd: "git status",
+                    out: `On branch feat/opening-hours
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   models/staging/shared/stg_opening_hours.sql
+        new file:   models/staging/shared/stg_opening_hours.yml`,
+                  },
+                ]}
+                done="Silence is success for git add — and status confirms both files are staged, ready for the snapshot."
               />
               <p>
-                Why the extra step? Because you often change more than one thing at
-                once — your model, plus a stray file you opened and accidentally
-                touched. Staging lets you commit exactly what you mean and nothing
-                else. <code>git status</code> shows staged files in green, unstaged
-                in red.
+                Why the extra step? Because you often change more than you mean to
+                share — staging lets you commit exactly what you intend and nothing
+                else. Note that <code>git add</code> prints nothing when it works;
+                status is how you confirm.
               </p>
             </>
           ),
@@ -338,7 +385,8 @@ git add -u                                 # stage every file you've modified
             ],
             answer: 1,
             explain:
-              "The commit is exactly the staged set. The other two files keep their changes on disk, uncommitted — git status will keep showing them in red until you stage or discard them.",
+              "The commit is exactly the staged set. The other two files keep their changes on disk, uncommitted — git status will keep showing them until you stage or discard them.",
+            affirm: "a commit contains exactly what you staged — nothing more.",
           },
         },
         {
@@ -346,20 +394,25 @@ git add -u                                 # stage every file you've modified
           title: "4 · git commit — take the snapshot",
           body: (
             <>
-              <CodeBlock
-                lang="bash"
-                code={`git commit -m "feat: add opening hours staging model"`}
+              <p>
+                Both files staged — record the snapshot, with a conventional-commits
+                message (type prefix, colon, short description):
+              </p>
+              <TryIt
+                stages={[
+                  {
+                    cmd: 'git commit -m "feat: add opening hours staging model"',
+                    out: `[feat/opening-hours 3f2a1c9] feat: add opening hours staging model
+ 2 files changed, 34 insertions(+)`,
+                  },
+                ]}
+                done="The snapshot exists — branch name, a short id (3f2a1c9), your message, and what changed."
               />
               <p>
-                Records the staged files as a snapshot on your branch, with your
-                message attached. The message format here is{" "}
-                <strong>conventional commits</strong> — a type prefix (
-                <code>feat</code>, <code>fix</code>, <code>docs</code>,{" "}
-                <code>chore</code>), a colon, then a short description of the change.
-                A hook checks the format and tells you if it is off.
-              </p>
-              <p>
-                Committing is local — nothing has left your machine yet.
+                A hook checks the message format (<code>feat</code>,{" "}
+                <code>fix</code>, <code>docs</code>, <code>chore</code>…) and tells
+                you if it is off. And note: committing is <strong>local</strong> —
+                nothing has left your machine yet.
               </p>
             </>
           ),
@@ -369,16 +422,26 @@ git add -u                                 # stage every file you've modified
           title: "5 · git push — share it",
           body: (
             <>
-              <CodeBlock lang="bash" code={`git push`} />
+              <TryIt
+                stages={[
+                  {
+                    cmd: "git push",
+                    out: `Enumerating objects: 9, done.
+Writing objects: 100% (6/6), 1.21 KiB, done.
+remote:
+remote: Create a pull request for 'feat/opening-hours' on GitHub by visiting:
+remote:   https://github.com/wnl-icb-analytics/dbt-analytics/pull/new/feat/opening-hours
+remote:
+To https://github.com/wnl-icb-analytics/dbt-analytics.git
+ * [new branch]      feat/opening-hours -> feat/opening-hours`,
+                  },
+                ]}
+                done="Your branch is on GitHub — and git even hands you the link to open the pull request."
+              />
               <p>
-                Uploads your branch&apos;s commits to GitHub, where the team can see
-                them and a pull request can be opened. Until you push, your work
-                exists only on your machine — push is the moment it becomes shared.
-              </p>
-              <p>
-                (The first push of a brand-new branch may ask you to set an
-                “upstream” — git prints the exact command to run. Run it once; plain{" "}
-                <code>git push</code> works from then on.)
+                Until you push, your work exists only on your machine — push is the
+                moment it becomes shared. (A brand-new branch may first ask you to
+                set an “upstream”; git prints the exact command to run, once.)
               </p>
             </>
           ),
@@ -417,6 +480,7 @@ git push                       # 5. share it
             answer: 1,
             explain:
               "Commit is local. The snapshot is safely recorded on your branch — but only push sends it to GitHub. (And nothing reaches main until a pull request is merged.)",
+            affirm: "commit saves locally — push is what shares it.",
           },
         },
       ],
@@ -494,6 +558,7 @@ git push                       # 5. share it
             answer: 0,
             explain:
               "A red check is information: click Details, read the last 30 lines of the log, fix, commit, push. The same PR re-runs everything. Failing a check is a normal part of the loop, not a verdict.",
+            affirm: "fix locally, push to the same branch — the checks re-run themselves.",
           },
         },
         {
@@ -532,6 +597,7 @@ git pull          # bring main up to date, now including your work
             answer: 1,
             explain:
               "Main is protected: direct pushes are rejected for everyone. Review + green checks + merge is the single road, which is exactly why main can be trusted as production.",
+            affirm: "a reviewed, green pull request is the only road into main.",
           },
         },
       ],
@@ -590,6 +656,7 @@ git pull          # bring main up to date, now including your work
             answer: 1,
             explain:
               "Tools do mechanics; you own decisions and outcomes. A glance at the diff — in the PR or with git status before pushing — is how you keep that ownership while still letting the tools type.",
+            affirm: "tools type the commands — the diff is still yours to own.",
           },
         },
         {

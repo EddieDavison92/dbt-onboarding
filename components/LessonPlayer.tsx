@@ -213,13 +213,13 @@ export function LessonPlayer({
               }`}
             >
               {answered[i] === "right" && (
-                <>✓ <strong>Right</strong> — you&apos;ve got this one.</>
+                <>✓ <strong>Right</strong> — {step.check.affirm ?? "you've got this one."}</>
               )}
               {answered[i] === "wrong" && (
-                <>✗ <strong>Not quite</strong> — the answer was “{step.check.options[step.check.answer]}”. Worth a re-read before moving on.</>
+                <>✗ <strong>Not quite</strong> — {step.check.affirm ?? `the answer was “${step.check.options[step.check.answer]}”.`} Worth a re-read before moving on.</>
               )}
               {answered[i] === "done" && (
-                <>✓ <strong>Answered</strong> on a previous visit.</>
+                <>✓ {step.check.affirm ?? "Answered on a previous visit."}</>
               )}
             </p>
           ) : (
