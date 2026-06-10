@@ -12,7 +12,7 @@ const COMMANDS: Cmd[] = [
   { group: "Everyday dbt", cmd: "dbt test -s my_model", desc: "Run the model's tests only" },
   { group: "Everyday dbt", cmd: "dbt show -s my_model", desc: "Preview the first 5 rows" },
   { group: "Everyday dbt", cmd: "dbt show -s my_model --limit 20", desc: "Preview more rows" },
-  { group: "Everyday dbt", cmd: "dbt compile -s my_model", desc: "Render Jinja to plain SQL (see target/compiled/)" },
+  { group: "Everyday dbt", cmd: "dbt compile", desc: "Compile the whole project — seconds on Fusion; catches broken refs and Jinja errors everywhere" },
   { group: "Setup & health", cmd: "dbt deps", desc: "Install package dependencies (after every pull that changes packages.yml)" },
   { group: "Setup & health", cmd: "dbt debug", desc: "Check connection and configuration" },
   { group: "Setup & health", cmd: ".\\start_dbt.ps1", desc: "Project setup script — Fusion install, hooks, env" },

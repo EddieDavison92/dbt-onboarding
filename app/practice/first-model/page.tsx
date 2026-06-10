@@ -107,8 +107,8 @@ from current_snapshot
       <CodeBlock
         lang="bash"
         code={`
-dbt show -s stg_reference_opening_hours        # first 5 rows
-dbt compile -s stg_reference_opening_hours     # see the rendered SQL
+dbt show -s stg_reference_opening_hours    # first 5 rows
+dbt compile                                 # compile everything - seconds on Fusion
 `}
       />
       <p>

@@ -41,9 +41,9 @@ export default function Page() {
             key: "vscode",
             label: (
               <>
-                <strong>VS Code</strong> — the team standard. Install the official{" "}
-                <strong>dbt extension</strong> for lineage, autocomplete and
-                click-to-compile.
+                <strong>VS Code</strong> — the team standard. The workspace will prompt
+                you to install the official <strong>dbt extension</strong>, covered
+                below.
               </>
             ),
           },
@@ -119,6 +119,59 @@ Authentication method:
           commit signing not configured, placeholder values left in <code>.env</code>,
           and so on. Work through that list before continuing; each item points at the
           fix.
+        </p>
+      </Callout>
+
+      <h2>The dbt VS Code extension</h2>
+      <p>
+        The project runs on <strong>dbt Fusion</strong> — a Rust rewrite of dbt with a
+        full SQL compiler — and the same engine powers the official VS Code extension.
+        Because it genuinely understands dbt SQL (refs, sources, macros, your actual
+        column types from Snowflake), it behaves like a proper IDE rather than a syntax
+        highlighter. The workspace recommends it automatically when you open the
+        project; if you missed the prompt, install <strong>dbt</strong> by dbt Labs (
+        <code>dbtLabsInc.dbt</code>) from the Extensions panel.
+      </p>
+      <p>The features you will use daily:</p>
+      <ul>
+        <li>
+          <strong>Live error detection.</strong> Invalid column references, broken
+          refs, missing GROUP BY columns and syntax errors are underlined as you type —
+          without querying Snowflake. Most mistakes never survive long enough to reach{" "}
+          <code>dbt build</code>.
+        </li>
+        <li>
+          <strong>Rename symbol (F2).</strong> Rename a column and the extension
+          updates every downstream model that references it, with a preview of each
+          change before you confirm. Renaming a model file updates all{" "}
+          <code>ref()</code> calls project-wide the same way.
+        </li>
+        <li>
+          <strong>Autocomplete.</strong> <code>ref(&apos;</code> suggests every model,{" "}
+          <code>source(&apos;</code> every source, and table aliases suggest their real
+          columns.
+        </li>
+        <li>
+          <strong>Go-to-definition.</strong> Right-click any <code>ref()</code>,
+          source, macro, column or CTE name to jump to where it is defined — navigating
+          the DAG without searching.
+        </li>
+        <li>
+          <strong>Column-level lineage.</strong> Trace a single column upstream and
+          downstream before changing it — impact analysis in one panel.
+        </li>
+        <li>
+          <strong>Compiled SQL view and CTE previews.</strong> See the rendered SQL
+          side-by-side as you save, and run any CTE in place with{" "}
+          <code>Ctrl+Enter</code> (this one needs your Snowflake connection).
+        </li>
+      </ul>
+      <Callout kind="info" title="Some advertised features need dbt Cloud">
+        <p>
+          The extension also offers features that depend on a dbt Cloud account — such
+          as Compare, which diffs model results between environments. This project does
+          not use dbt Cloud, so if a feature prompts you to sign in to it, that is the
+          line: everything above works without it.
         </p>
       </Callout>
 
