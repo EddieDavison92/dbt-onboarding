@@ -40,6 +40,13 @@ export function TryIt({ stages, done = "That's the real output — exactly what 
     }
   };
 
+  const reset = () => {
+    setHistory([]);
+    setInput("");
+    setNudge(false);
+    inputRef.current?.focus();
+  };
+
   return (
     <div className="my-5 overflow-hidden rounded-xl border border-graphite-deep bg-graphite-deep shadow-[0_8px_30px_-12px_rgb(27_30_41/0.5)]">
       <div className="flex items-center gap-2 border-b border-white/10 px-4 py-2">
@@ -51,9 +58,20 @@ export function TryIt({ stages, done = "That's the real output — exactly what 
         <span className="ml-1 font-mono text-xs text-white/50">
           try it — type the command
         </span>
-        {finished && (
-          <span className="ml-auto font-mono text-[11px] text-[#7ee2c0]">✓ done</span>
-        )}
+        <span className="ml-auto flex items-center gap-2">
+          {finished && (
+            <span className="font-mono text-[11px] text-[#7ee2c0]">✓ done</span>
+          )}
+          {history.length > 0 && (
+            <button
+              type="button"
+              onClick={reset}
+              className="rounded-md border border-white/15 px-2 py-0.5 font-mono text-[11px] text-white/60 transition hover:border-flame hover:text-flame"
+            >
+              ↺ reset
+            </button>
+          )}
+        </span>
       </div>
 
       <div
