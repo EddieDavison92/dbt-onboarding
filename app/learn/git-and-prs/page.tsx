@@ -76,6 +76,41 @@ export default function Page() {
         ))}
       </div>
 
+      <h2>The five commands you actually need</h2>
+      <p>
+        Git has hundreds of commands; daily work here uses about five. The one idea to
+        understand is <strong>staging</strong>: a commit only includes what you have
+        explicitly added to it. That is a feature — you choose exactly which files go
+        into each snapshot, even if other files have changed.
+      </p>
+      <CodeBlock
+        lang="bash"
+        title="the whole daily loop"
+        code={`
+git switch -c feat/my-change      # start a branch
+git status                        # what have I changed?
+git add models/staging/my_model.sql    # stage the files you mean to commit
+git add models/staging/my_model.yml
+git commit -m "feat: add my model"     # snapshot the staged files
+git push                          # upload the branch to GitHub
+`}
+      />
+      <p>
+        Run <code>git status</code> whenever unsure — it shows what is changed, what is
+        staged, and usually suggests the command you need next.
+      </p>
+
+      <Callout kind="tip" title="You don't have to live in the terminal">
+        <p>
+          VS Code&apos;s Source Control panel does all of this with clicks — staged
+          files are a list, the commit message is a text box, push is a button. And AI
+          coding assistants will happily run the whole loop for you from a plain
+          instruction. Use whichever you like: the commands above matter because they
+          are what is happening underneath, and knowing them is how you check what a
+          tool — or an agent — actually did on your behalf.
+        </p>
+      </Callout>
+
       <h2>Project conventions</h2>
       <h3>Branch names</h3>
       <p>
