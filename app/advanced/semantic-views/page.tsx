@@ -99,12 +99,12 @@ METRICS(
         </p>
       </Callout>
 
-      <Callout kind="tip" title="Comments are the product">
+      <Callout kind="tip" title="Comments carry real weight here">
         <p>
           In a normal model, a vague description is a documentation problem. In a
           semantic view, comments are read by tools deciding which metric answers a
-          question — write them as if explaining the column to a careful colleague,
-          because functionally that is what they are.
+          question — write each one as a precise explanation of what the field means
+          and when to use it.
         </p>
       </Callout>
 

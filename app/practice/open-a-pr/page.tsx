@@ -13,7 +13,7 @@ export default function Page() {
       slug="open-a-pr"
       kicker="Do · Step 6"
       title="Open your pull request"
-      lede="Branch, commit, push, propose. From here the project's machinery takes over — and you watch your first CI run go green."
+      lede="Branch, commit, push, propose. From here the project's automation takes over and runs its checks against your change."
       minutes={10}
     >
       <h2>Branch first (if you haven&apos;t)</h2>
@@ -93,7 +93,7 @@ Needed for the access dashboard; nothing currently stages this table.
         Within a minute the checks appear at the bottom of your PR: compile, PR
         validation (builds your changed models), SQLFluff, ownership. The PR is also
         auto-assigned a reviewer. While checks run, review your own diff in the “Files
-        changed” tab — you will catch something, everyone does.
+        changed” tab — self-review catches issues surprisingly often.
       </p>
 
       <Callout kind="warn" title="If a check goes red">

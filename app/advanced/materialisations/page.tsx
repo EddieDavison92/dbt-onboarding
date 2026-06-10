@@ -126,7 +126,8 @@ from {{ ref('stg_big_event_feed') }}
         </li>
         <li>
           <code>dbt build --full-refresh -s my_model</code> drops and rebuilds from
-          scratch — your reset button after logic changes.
+          scratch — required after logic changes, so existing rows pick up the new
+          logic.
         </li>
       </ul>
 

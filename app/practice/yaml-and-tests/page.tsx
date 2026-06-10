@@ -73,13 +73,14 @@ models:
           <strong>Not-null on the keys</strong> the grain depends on.
         </li>
         <li>
-          <strong>Row count &gt; 0</strong> — the cheapest possible “did the feed
-          vanish?” alarm.
+          <strong>Row count &gt; 0</strong> — the simplest early warning that a feed
+          has stopped arriving.
         </li>
       </ol>
       <p>
-        Three tests is a perfectly good number for a staging model. Twenty assertions on
-        a staging view is noise; the grain test is the one that earns its keep.
+        Three tests is a reasonable number for a staging model. Twenty assertions on a
+        staging view adds noise without adding protection; the grain test is the one
+        that matters most.
       </p>
 
       <Callout kind="warn" title="data_tests, not tests">

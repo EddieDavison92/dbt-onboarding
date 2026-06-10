@@ -66,13 +66,13 @@ where '2025-01-15' >= dbt_valid_from
         <code>temporal_join()</code> macro — reach for that before writing your own.
       </p>
 
-      <Callout kind="warn" title="Snapshots only see what they witness">
+      <Callout kind="warn" title="Snapshots only record what they observe">
         <p>
-          A snapshot records changes from the day it starts running — it cannot
-          reconstruct history before that, and a skipped run means changes that happened
-          and reverted in between are invisible. That is also why snapshot tables are
-          precious: never drop or full-refresh one casually, the history is
-          irreplaceable.
+          A snapshot captures changes from the day it starts running — it cannot
+          reconstruct history before that, and if a run is skipped, changes that
+          happened and reverted in between are not recorded. For the same reason,
+          never drop or full-refresh a snapshot table without team agreement: the
+          history cannot be regenerated.
         </p>
       </Callout>
 

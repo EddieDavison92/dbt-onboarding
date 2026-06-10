@@ -13,7 +13,7 @@ export default function Page() {
       slug="build-and-test"
       kicker="Do · Step 5"
       title="Build & test locally"
-      lede="One command builds your model and runs its tests in your dev schema. Get it green here and CI becomes a formality."
+      lede="One command builds your model and runs its tests in your dev schema. A clean local build means CI should pass first time."
       minutes={8}
     >
       <h2>dbt build</h2>

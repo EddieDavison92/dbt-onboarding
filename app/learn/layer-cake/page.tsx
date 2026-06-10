@@ -47,8 +47,8 @@ from {{ source('csds', 'ActiveSubmission') }}
       <p>
         One staging model per source table: rename to project conventions (for example{" "}
         <code>pseudo_nhs_number</code> → <code>sk_patient_id</code>), cast types, light
-        cleaning. <strong>No joins, no business logic.</strong> Staging is the stable,
-        boring foundation everything else trusts.
+        cleaning. <strong>No joins, no business logic.</strong> Staging is the stable
+        foundation everything downstream relies on.
       </p>
 
       <h3>Modelling — reusable building blocks</h3>
@@ -138,7 +138,7 @@ from {{ source('csds', 'ActiveSubmission') }}
         </p>
       </Callout>
 
-      <h2>Prove it to yourself</h2>
+      <h2>Try it</h2>
       <LayerSorter />
     </LessonShell>
   );

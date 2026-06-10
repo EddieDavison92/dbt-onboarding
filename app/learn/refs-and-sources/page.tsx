@@ -76,10 +76,10 @@ from {{ source('csds', 'ActiveSubmission') }}
 
       <Callout kind="smell" title="Spot the smell">
         <p>
-          If you ever see a hardcoded <code>DATABASE.SCHEMA.TABLE</code> in a model, or a{" "}
-          <code>source()</code> call outside the raw layer, that is a review comment
-          waiting to happen. The fix is always the same: point at a model with{" "}
-          <code>ref()</code> (and if no model exists yet, that is the real gap).
+          A hardcoded <code>DATABASE.SCHEMA.TABLE</code> in a model, or a{" "}
+          <code>source()</code> call outside the raw layer, will draw a review comment.
+          The fix is always the same: point at a model with <code>ref()</code> — and if
+          no model exists yet, that missing model is the real gap to fill.
         </p>
       </Callout>
 

@@ -70,7 +70,7 @@ python scripts/sources/run_all_source_generation.py
         </li>
         <li>
           <strong>Is there an existing staging model already?</strong> Search{" "}
-          <code>models/staging/</code> — duplicating one is a classic first-PR mistake.
+          <code>models/staging/</code> — duplicating one is a common first-PR mistake.
         </li>
       </ol>
 

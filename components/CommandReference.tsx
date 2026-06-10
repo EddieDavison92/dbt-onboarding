@@ -75,7 +75,7 @@ export function CommandReference() {
         className="w-full max-w-[76ch] rounded-xl border-2 border-ink bg-paper px-4 py-2.5 font-mono text-sm outline-none transition placeholder:text-ink-faint focus:border-flame"
       />
       {groups.size === 0 && (
-        <p className="mt-4 text-sm text-ink-faint">Nothing matches — try fewer letters.</p>
+        <p className="mt-4 text-sm text-ink-faint">No commands match that filter.</p>
       )}
       {[...groups.entries()].map(([group, cmds]) => (
         <div key={group} className="mt-6 max-w-[76ch]">

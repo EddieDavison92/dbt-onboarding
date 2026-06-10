@@ -13,18 +13,19 @@ export default function Page() {
       slug="clustering"
       kicker="Going further 03"
       title="Clustering"
-      lede="Snowflake stores tables in micro-partitions and skips the ones a query can't need. cluster_by arranges your data so that skipping actually works."
+      lede="Snowflake stores tables in micro-partitions and skips those a query cannot match. cluster_by orders the data so that pruning is effective."
       minutes={5}
     >
-      <h2>The 30-second version of how Snowflake stores data</h2>
+      <h2>How Snowflake stores data</h2>
       <p>
         Every table is split into <strong>micro-partitions</strong> — compressed chunks
         of rows. For each chunk Snowflake records the min and max of every column. When
         a query filters on <code>person_id = 123</code>, chunks whose person_id range
         cannot contain 123 are never read at all. This is{" "}
-        <strong>partition pruning</strong>, and it is free — <em>if</em> similar values
-        sit together. In a table loaded in random order, every chunk spans the whole
-        range of person_ids and nothing can be pruned.
+        <strong>partition pruning</strong>. It happens automatically, but it is only
+        effective when similar values are stored together: in a table loaded in random
+        order, every chunk spans the whole range of person_ids and nothing can be
+        skipped.
       </p>
       <p>
         <code>cluster_by</code> tells dbt to sort the data as it builds the table, so
@@ -48,7 +49,7 @@ export default function Page() {
 select ...
 `}
       />
-      <p>The house conventions:</p>
+      <p>The project conventions:</p>
       <ul>
         <li>
           <strong>Person-level models cluster on <code>person_id</code></strong> —
@@ -80,8 +81,8 @@ select ...
         </li>
         <li>
           <strong>Small tables don&apos;t need it.</strong> A 50,000-row lookup fits in
-          a few micro-partitions; there is nothing to prune. Clustering earns its keep
-          on large person-level and event tables.
+          a few micro-partitions; there is nothing to prune. Clustering pays off on
+          large person-level and event tables.
         </li>
       </ol>
 

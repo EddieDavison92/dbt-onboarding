@@ -65,7 +65,7 @@ from {{ ref('raw_reference_opening_hours') }}
         </li>
       </ul>
 
-      <Callout kind="smell" title="The three classic first-model smells">
+      <Callout kind="smell" title="Three common staging-model mistakes">
         <p>
           1) <code>select *</code> (interface undefined), 2) a join “just to add the
           name column” (business logic in staging), 3) filtering out rows someone might

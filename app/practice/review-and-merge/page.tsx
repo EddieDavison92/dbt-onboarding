@@ -67,8 +67,7 @@ git pull
         </li>
         <li>
           <strong>The nightly build</strong> now includes your model and runs your tests
-          every day, forever. If the feed breaks in six months, your grain test is the
-          alarm.
+          every day. If the feed changes in six months, your grain test will surface it.
         </li>
         <li>
           <strong>dbt docs</strong> and Snowflake column comments update with your
@@ -77,10 +76,10 @@ git pull
       </ul>
 
       <p>
-        That is the whole loop. Every change you make from now on — a one-line fix or a
-        new disease register — travels exactly this road: branch, model, YAML, build,
-        PR, review, merge. The road is the point: it is why the team can trust every
-        number the pipeline produces.
+        That is the full cycle. Every change from now on — a one-line fix or a new
+        disease register — follows the same path: branch, model, YAML, build, PR,
+        review, merge. That consistency is what lets the team trust every number the
+        pipeline produces.
       </p>
 
       <Checklist

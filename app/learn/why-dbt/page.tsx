@@ -18,14 +18,14 @@ export default function Page() {
     >
       <h2>The problem dbt solves</h2>
       <p>
-        Every analytics team accumulates SQL. A view someone built in 2022, a script
-        that has to run before another script, a “FINAL_v3” table nobody dares drop.
-        The SQL itself is usually fine — the problems live around it:
+        Every analytics team accumulates SQL: a view someone built in 2022, a script
+        that has to run before another script, a “FINAL_v3” table nobody is sure is
+        safe to drop. The SQL itself is usually fine — the problems sit around it:
       </p>
       <ul>
         <li>
           <strong>Nobody knows what depends on what.</strong> Renaming a column means
-          searching your inbox.
+          guessing what might break.
         </li>
         <li>
           <strong>Nothing is tested.</strong> A duplicate patient row appears, and the first
@@ -69,9 +69,10 @@ from {{ ref('raw_csds_bridging') }}
         change is merged.
       </p>
       <p>
-        The <code>{"{{ ref('…') }}"}</code> bit is the magic: instead of hardcoding a table,
-        you point at another model. From those references dbt assembles the full
-        dependency graph (the <strong>DAG</strong>) and always builds upstream models first.
+        The <code>{"{{ ref('…') }}"}</code> call is the key mechanism: instead of
+        hardcoding a table, you point at another model. From those references dbt
+        assembles the full dependency graph (the <strong>DAG</strong>) and always builds
+        upstream models first.
       </p>
 
       <h2>Where dbt sits in the workflow</h2>
@@ -106,10 +107,10 @@ from {{ ref('raw_csds_bridging') }}
 
       <h2>The trade</h2>
       <p>
-        You give up a little freedom — naming conventions, a review step, tests before
-        merge. In exchange, your work runs every night without you, breaks loudly instead
-        of silently, and nobody ever has to reverse-engineer your logic from a Snowflake
-        worksheet again.
+        You give up some freedom — naming conventions, a review step, tests before
+        merge. In exchange, your work runs every night without you, failures surface
+        immediately rather than silently, and nobody has to reverse-engineer your logic
+        from a Snowflake worksheet.
       </p>
 
       <Quiz

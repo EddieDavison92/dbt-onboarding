@@ -10,12 +10,12 @@ const PILLARS = [
   },
   {
     title: "Tested",
-    body: "Grain, nulls, row counts: assertions run nightly. Bad data wakes the pipeline, not a dashboard user.",
+    body: "Grain, nulls, row counts: assertions run nightly. Bad data is caught by the pipeline, not discovered on a dashboard.",
     color: "var(--layer-modelling)",
   },
   {
     title: "Versioned",
-    body: "Every change is a reviewed pull request with history. “Who changed this and why” takes one click, forever.",
+    body: "Every change is a reviewed pull request with history. “Who changed this and why” is always one click away.",
     color: "var(--layer-reporting)",
   },
 ];
@@ -58,7 +58,7 @@ export default function Home() {
       {/* hero */}
       <section className="relative mx-auto max-w-4xl">
         <p className="rise font-mono text-xs tracking-wide text-ink-faint">
-          WNL Analytics · for SQL analysts who have never touched dbt
+          WNL Analytics · for SQL analysts new to dbt
         </p>
         <h1 className="rise rise-1 mt-4 max-w-[16ch] font-display text-5xl font-black leading-[1.02] tracking-tighter text-ink sm:text-7xl">
           You already write the{" "}
@@ -123,7 +123,7 @@ export default function Home() {
       {/* the case */}
       <section className="mx-auto mt-20 max-w-4xl">
         <h2 className="font-display text-xs font-extrabold uppercase tracking-[0.2em] text-ink-faint">
-          Why bother
+          Why dbt
         </h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
           {PILLARS.map((p) => (

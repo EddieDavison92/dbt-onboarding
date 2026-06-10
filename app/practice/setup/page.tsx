@@ -13,7 +13,7 @@ export default function Page() {
       slug="setup"
       kicker="Do · Step 1"
       title="Set up your machine"
-      lede="One-time setup: tools, credentials, and the moment dbt debug goes green. Budget fifteen minutes."
+      lede="One-time setup: tools, credentials, and a successful dbt debug. Allow about fifteen minutes."
       minutes={15}
     >
       <Callout kind="info" title="Before you start">
@@ -79,8 +79,8 @@ SNOWFLAKE_ROLE=<analyst-role>
       <Callout kind="warn" title="Authentication">
         <p>
           With no password set, dbt opens your browser for SSO each session. If you have
-          a programmatic access token, set <code>SNOWFLAKE_PAT</code> and skip the
-          browser dance. Never paste tokens into files inside the repo.
+          a programmatic access token, set <code>SNOWFLAKE_PAT</code> to authenticate
+          without the browser prompt. Never paste tokens into files inside the repo.
         </p>
       </Callout>
 
@@ -99,7 +99,7 @@ git config --global commit.gpgsign true
         <em>New signing key</em>).
       </p>
 
-      <h2>The green light</h2>
+      <h2>Verify the connection</h2>
       <CodeBlock
         lang="bash"
         code={`

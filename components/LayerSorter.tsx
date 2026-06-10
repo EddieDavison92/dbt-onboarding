@@ -14,10 +14,10 @@ export function LayerSorter() {
     <section className="my-8 max-w-[76ch] rounded-2xl border-2 border-ink bg-paper p-5 shadow-[5px_5px_0_0_var(--color-layer-modelling)]">
       <header className="mb-4 flex items-baseline justify-between">
         <h3 className="!my-0 font-display text-sm font-extrabold uppercase tracking-widest">
-          Sort the strata
+          Match the layer
         </h3>
         <span className="font-mono text-xs text-ink-faint">
-          {finished ? `${correct}/${SORTER_ITEMS.length} correct` : "where does each model live?"}
+          {finished ? `${correct}/${SORTER_ITEMS.length} correct` : "which layer does each model belong in?"}
         </span>
       </header>
       <ol className="!my-0 flex max-w-none list-none flex-col gap-4 !pl-0">
@@ -75,8 +75,8 @@ export function LayerSorter() {
       {finished && (
         <p className="!my-0 !mt-4 rounded-lg bg-paper-warm px-4 py-2.5 text-sm text-ink-soft">
           {correct === SORTER_ITEMS.length
-            ? "Clean sweep — you think in layers already."
-            : "The trick: ask what job the model is doing, not what data it touches."}
+            ? "All correct."
+            : "The reliable test: ask what job the model is doing, not what data it touches."}
         </p>
       )}
     </section>

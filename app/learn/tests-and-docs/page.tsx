@@ -32,7 +32,7 @@ models:
     config:
       meta:
         owner:
-          name: Emily Baldwin
+          name: Your Name
     data_tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           arguments:
@@ -54,8 +54,8 @@ models:
         for <strong>rows that break the rule</strong>. Zero rows back = pass.{" "}
         <code>unique</code> on <code>person_id</code> literally runs “group by person_id
         having count(*) &gt; 1”. Tests run when you <code>dbt build</code>, in CI on your
-        pull request, and in the nightly production build — so a feed going bad wakes the
-        pipeline up, not a dashboard user.
+        pull request, and in the nightly production build — so a problem in a feed is
+        caught by the pipeline rather than discovered by a dashboard user.
       </p>
       <p>The tests you will use constantly:</p>
       <table>

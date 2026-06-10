@@ -41,7 +41,7 @@ export default function Page() {
       slug="git-and-prs"
       kicker="Learn 05"
       title="Git & pull requests"
-      lede="Git is a save system for the whole project; a pull request is how your change gets a second pair of eyes and a robot's approval before it touches production."
+      lede="Git is version control for the whole project; a pull request is how your change gets a human review and automated checks before it reaches production."
       minutes={9}
     >
       <h2>The mental model</h2>
@@ -136,11 +136,11 @@ git commit -m "docs: describe waiting list snapshot logic"
         </tbody>
       </table>
 
-      <Callout kind="tip" title="A red X is information, not judgement">
+      <Callout kind="tip" title="Reading a failing check">
         <p>
-          Click “Details” on the failing check and read the log bottom-up — the actual
-          error is usually in the last 30 lines. Fix locally, commit, push: the PR
-          re-runs automatically. Everyone&apos;s first PR fails CI at least once.
+          Click “Details” on the failing check and read the log from the bottom — the
+          actual error is usually in the last 30 lines. Fix locally, commit, push: the
+          PR re-runs automatically. A failed first CI run is normal and expected.
         </p>
       </Callout>
 
@@ -174,8 +174,8 @@ git commit -m "docs: describe waiting list snapshot logic"
           Before every commit, skim your diff asking one question: “would I be happy
           for anyone on the internet to read this line?” If the answer involves a
           patient, a colleague&apos;s details or a credential, it does not belong in
-          the repo — accidentally publishing patient data is a reportable incident,
-          not just an awkward force-push.
+          the repo. Accidentally publishing patient data is a reportable information
+          governance incident.
         </p>
       </Callout>
 
@@ -219,19 +219,19 @@ git commit -m "docs: describe waiting list snapshot logic"
             ],
             answer: 2,
             explain:
-              "Pushing to the same branch updates the PR and re-runs CI. Deleting a failing test is removing the smoke alarm.",
+              "Pushing to the same branch updates the PR and re-runs CI. Deleting a failing test removes the protection rather than the problem.",
           },
           {
             prompt: "Which is a valid commit message here?",
             options: [
               '"updates"',
               '"feat: add CKD register intermediate model"',
-              '"Fixed stuff in the thing Emily mentioned"',
-              '"WIP do not merge plz"',
+              '"Fixed the issue from the meeting"',
+              '"WIP do not merge"',
             ],
             answer: 1,
             explain:
-              "Type prefix + imperative description. The pre-commit hook rejects the others (with varying degrees of embarrassment).",
+              "Type prefix + imperative description. The pre-commit hook rejects the other formats.",
           },
         ]}
       />

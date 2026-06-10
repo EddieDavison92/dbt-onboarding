@@ -13,23 +13,49 @@ export default function Page() {
       slug="macros"
       kicker="Going further 01"
       title="Macros"
-      lede="The 40-line age-band CASE statement already exists, is already tested, and already agrees with everyone else's age bands. Call it instead of writing it."
+      lede="Organisation codes, age bands, deduplication — the same cleaning logic is needed in model after model. Macros define it once so every model agrees."
       minutes={5}
     >
       <h2>SQL functions, written in Jinja</h2>
       <p>
         A macro is a reusable snippet of SQL with parameters. Anything between{" "}
         <code>{"{% … %}"}</code> or <code>{"{{ … }}"}</code> in a model is Jinja — dbt
-        renders it to plain SQL before Snowflake ever sees it. You have been using macros
-        all along: <code>ref()</code> and <code>source()</code> are macros.
+        renders it to plain SQL before Snowflake sees it. You have been using macros
+        from the start: <code>ref()</code> and <code>source()</code> are macros. The
+        project keeps shared ones in <code>macros/</code>.
       </p>
+
+      <h2>A familiar pain point: organisation codes</h2>
       <p>
-        The project keeps shared ones in <code>macros/</code>. The flagship example —
-        instead of hand-writing age bands:
+        Provider, practice and ICB codes arrive in inconsistent forms. Feeds often carry
+        site-level codes with suffixes (<code>RRP00</code>) where reference data holds
+        the parent organisation (<code>RRP</code>) — so joins to the organisation
+        dictionary quietly return nothing. The project handles this once, in a macro:
       </p>
       <CodeBlock
         lang="sql"
-        title="any model that needs age attributes"
+        title="any model that joins on organisation codes"
+        code={`
+select
+    {{ clean_organisation_id('provider_code') }} as provider_code,
+    ...
+from {{ ref('stg_some_activity_feed') }}
+`}
+      />
+      <p>
+        <code>clean_organisation_id()</code> keeps the code if it is a recognised
+        organisation, and otherwise falls back to the 3-character parent code. Every
+        model that uses it resolves codes the same way — and when the rule needs to
+        change, it changes in one place.
+      </p>
+
+      <h2>Another example: age attributes</h2>
+      <p>
+        The same principle applies to derivations. Instead of each model defining its
+        own age bands:
+      </p>
+      <CodeBlock
+        lang="sql"
         code={`
 select
     person_id,
@@ -38,10 +64,10 @@ from {{ ref('stg_olids_patient') }}
 `}
       />
       <p>
-        That single call expands into <code>age</code>, <code>age_band_5y</code>,{" "}
+        One call expands into <code>age</code>, <code>age_band_5y</code>,{" "}
         <code>age_band_10y</code>, <code>age_band_nhs</code>, <code>age_band_ons</code>,{" "}
-        <code>life_stage</code> and school-age flags — consistent across every model that
-        uses it. When the definition of a band changes, it changes once.
+        <code>life_stage</code> and school-age flags — consistent across every model,
+        with the band boundaries defined once.
       </p>
 
       <h2>The ones you will reach for</h2>
@@ -55,6 +81,18 @@ from {{ ref('stg_olids_patient') }}
         <tbody>
           <tr>
             <td>
+              <code>clean_organisation_id()</code>
+            </td>
+            <td>Resolves organisation codes against the dictionary, with a parent-code fallback</td>
+          </tr>
+          <tr>
+            <td>
+              <code>clean_icd10_code()</code>
+            </td>
+            <td>Standardises ICD-10 codes before joining to reference data</td>
+          </tr>
+          <tr>
+            <td>
               <code>calculate_age_attributes()</code>
             </td>
             <td>Age plus every standard age band and life stage</td>
@@ -63,19 +101,13 @@ from {{ ref('stg_olids_patient') }}
             <td>
               <code>deduplicate_table()</code>
             </td>
-            <td>Removes duplicate rows by key + ordering rule</td>
+            <td>Removes duplicate rows by key and ordering rule</td>
           </tr>
           <tr>
             <td>
               <code>join_concept_display()</code>
             </td>
             <td>Joins clinical concept codes to display terms</td>
-          </tr>
-          <tr>
-            <td>
-              <code>clean_icd10_code()</code> / <code>clean_organisation_id()</code>
-            </td>
-            <td>Standardise messy identifiers</td>
           </tr>
           <tr>
             <td>
@@ -94,18 +126,18 @@ from {{ ref('stg_olids_patient') }}
 
       <Callout kind="tip" title="The rule of three">
         <p>
-          Pasted the same logic into a second model? Fine. A third? Stop — it wants to be
-          a macro (or an <code>int_</code> model, if it is more data than logic). Ask in
-          review if unsure; promoting logic later is much harder than starting it in the
-          right place.
+          Pasting the same logic into a third model is the signal to stop — it should
+          become a macro (or an <code>int_</code> model, if it is more data than logic).
+          Ask in review if unsure; promoting logic later is harder than starting it in
+          the right place.
         </p>
       </Callout>
 
       <Callout kind="warn">
         <p>
-          Macros are rendered <em>before</em> the SQL runs — they cannot react to data,
-          only to arguments and project config. If your logic needs to read rows to make
-          decisions, it belongs in a model, not a macro.
+          Macros are rendered <em>before</em> the SQL runs — they can respond to
+          arguments and project configuration, but not to data. Logic that needs to read
+          rows to make decisions belongs in a model, not a macro.
         </p>
       </Callout>
 
@@ -122,6 +154,19 @@ from {{ ref('stg_olids_patient') }}
             answer: 1,
             explain:
               "dbt renders Jinja to plain SQL first. dbt compile shows you exactly what Snowflake will receive — useful for debugging.",
+          },
+          {
+            prompt:
+              "A provider code column contains site-level codes that fail to join the organisation dictionary. The project-standard fix is…",
+            options: [
+              "left(provider_code, 3) written inline in your model",
+              "clean_organisation_id(), so every model resolves codes the same way",
+              "A where clause excluding unmatched codes",
+              "Editing the dictionary",
+            ],
+            answer: 1,
+            explain:
+              "An inline left(…, 3) works until the rule needs to change — then every copy needs finding. The macro is the single agreed definition.",
           },
         ]}
       />
