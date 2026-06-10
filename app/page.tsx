@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { LEARN, PRACTICE } from "@/lib/curriculum";
+import { ADVANCED, LEARN, PRACTICE } from "@/lib/curriculum";
 
 const PILLARS = [
   {
@@ -179,6 +179,22 @@ export default function Home() {
               title={p.title}
               blurb={p.blurb}
               minutes={p.minutes}
+            />
+          ))}
+        </div>
+
+        <h2 className="mt-12 font-display text-xs font-extrabold uppercase tracking-[0.2em] text-ink-faint">
+          Part three · Going further
+        </h2>
+        <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+          {ADVANCED.map((a, i) => (
+            <TrackCard
+              key={a.slug}
+              index={i + 1}
+              href={`/advanced/${a.slug}`}
+              title={a.title}
+              blurb={a.blurb}
+              minutes={a.minutes}
             />
           ))}
         </div>

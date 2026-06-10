@@ -9,9 +9,9 @@ export const metadata: Metadata = { title: "Macros" };
 export default function Page() {
   return (
     <LessonShell
-      section="learn"
+      section="advanced"
       slug="macros"
-      kicker="Learn 05"
+      kicker="Going further 01"
       title="Macros"
       lede="The 40-line age-band CASE statement already exists, is already tested, and already agrees with everyone else's age bands. Call it instead of writing it."
       minutes={5}

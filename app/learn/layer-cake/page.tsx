@@ -81,9 +81,9 @@ from {{ source('csds', 'ActiveSubmission') }}
       <Callout kind="info" title="There is a sixth layer">
         <p>
           <code>models/semantic/</code> holds Snowflake Semantic Views (
-          <code>sem_</code>) — pre-defined facts, dimensions and metrics that let Cortex
-          Analyst answer natural-language questions safely. You will meet these later;
-          they follow the same ref() rules.
+          <code>sem_</code>) — pre-defined facts, dimensions and metrics that give
+          downstream query tools an agreed definition of the data. You will meet these
+          in the Going further section; they follow the same ref() rules.
         </p>
       </Callout>
 

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { PagerFooter } from "@/components/PagerFooter";
+import type { Section } from "@/lib/curriculum";
 
 export function LessonShell({
   section,
@@ -10,7 +11,7 @@ export function LessonShell({
   minutes,
   children,
 }: {
-  section: "learn" | "practice";
+  section: Section;
   slug: string;
   kicker: string;
   title: string;

@@ -59,7 +59,7 @@ export default function Page() {
             <tr>
               <td><code>sem_</code></td>
               <td>Semantic</td>
-              <td>Snowflake semantic view for Cortex Analyst</td>
+              <td>Snowflake semantic view (semantic layer)</td>
             </tr>
           </tbody>
         </table>

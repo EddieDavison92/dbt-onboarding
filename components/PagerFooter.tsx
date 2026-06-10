@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { useProgress } from "@/lib/progress";
-import { pager } from "@/lib/curriculum";
+import { pager, type Section } from "@/lib/curriculum";
 
 export function PagerFooter({
   section,
   slug,
 }: {
-  section: "learn" | "practice";
+  section: Section;
   slug: string;
 }) {
   const { isDone, toggleDone, ready } = useProgress();

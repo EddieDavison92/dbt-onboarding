@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LEARN, PRACTICE } from "@/lib/curriculum";
+import { ADVANCED, LEARN, PRACTICE } from "@/lib/curriculum";
 import { useProgress } from "@/lib/progress";
 
 function Section({
@@ -11,7 +11,7 @@ function Section({
   items,
 }: {
   heading: string;
-  base: "learn" | "practice";
+  base: "learn" | "practice" | "advanced";
   items: { slug: string; title: string }[];
 }) {
   const pathname = usePathname();
@@ -61,9 +61,12 @@ function Section({
 export function Sidebar() {
   const pathname = usePathname();
   const { done, ready } = useProgress();
-  const total = LEARN.length + PRACTICE.length;
+  const total = LEARN.length + PRACTICE.length + ADVANCED.length;
   const completed = ready
-    ? done.filter((d) => d.startsWith("learn/") || d.startsWith("practice/")).length
+    ? done.filter(
+        (d) =>
+          d.startsWith("learn/") || d.startsWith("practice/") || d.startsWith("advanced/"),
+      ).length
     : 0;
   const pct = Math.round((completed / total) * 100);
 
@@ -83,6 +86,7 @@ export function Sidebar() {
       </div>
       <Section heading="Learn" base="learn" items={LEARN} />
       <Section heading="Do · your first PR" base="practice" items={PRACTICE} />
+      <Section heading="Going further" base="advanced" items={ADVANCED} />
       <div>
         <p className="mb-1.5 px-3 font-display text-[11px] font-extrabold uppercase tracking-[0.18em] text-ink-faint">
           Keep handy

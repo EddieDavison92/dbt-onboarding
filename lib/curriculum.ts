@@ -31,12 +31,6 @@ export const LEARN: NavItem[] = [
     minutes: 7,
   },
   {
-    slug: "macros",
-    title: "Macros",
-    blurb: "Reusable SQL — stop copy-pasting that CASE statement",
-    minutes: 5,
-  },
-  {
     slug: "git-and-prs",
     title: "Git & pull requests",
     blurb: "Branch, commit, PR, CI — the whole loop, no git experience assumed",
@@ -89,29 +83,51 @@ export const PRACTICE: NavItem[] = [
   },
 ];
 
-export function learnIndex(slug: string): number {
-  return LEARN.findIndex((l) => l.slug === slug);
-}
+export const ADVANCED: NavItem[] = [
+  {
+    slug: "macros",
+    title: "Macros",
+    blurb: "Reusable SQL — stop copy-pasting that CASE statement",
+    minutes: 5,
+  },
+  {
+    slug: "materialisations",
+    title: "Materialisations",
+    blurb: "Views, tables, incremental models — and when each earns its keep",
+    minutes: 7,
+  },
+  {
+    slug: "snapshots",
+    title: "Snapshots",
+    blurb: "Capturing history when the source only keeps the present",
+    minutes: 6,
+  },
+  {
+    slug: "semantic-views",
+    title: "Semantic views",
+    blurb: "Pre-defined facts, dimensions and metrics for the semantic layer",
+    minutes: 6,
+  },
+];
 
-export function practiceIndex(slug: string): number {
-  return PRACTICE.findIndex((l) => l.slug === slug);
-}
+export type Section = "learn" | "practice" | "advanced";
 
-/** prev/next within the combined journey: learn lessons then practice steps */
-export function pager(section: "learn" | "practice", slug: string) {
-  const list = section === "learn" ? LEARN : PRACTICE;
-  const i = list.findIndex((l) => l.slug === slug);
-  const prev =
-    i > 0
-      ? { href: `/${section}/${list[i - 1].slug}`, title: list[i - 1].title }
-      : section === "practice"
-        ? { href: `/learn/${LEARN[LEARN.length - 1].slug}`, title: LEARN[LEARN.length - 1].title }
-        : null;
+const SECTIONS: { id: Section; list: NavItem[] }[] = [
+  { id: "learn", list: LEARN },
+  { id: "practice", list: PRACTICE },
+  { id: "advanced", list: ADVANCED },
+];
+
+/** prev/next across the journey: learn → practice → going further → reference */
+export function pager(section: Section, slug: string) {
+  const flat = SECTIONS.flatMap((s) =>
+    s.list.map((item) => ({ href: `/${s.id}/${item.slug}`, title: item.title })),
+  );
+  const i = flat.findIndex((f) => f.href === `/${section}/${slug}`);
+  const prev = i > 0 ? flat[i - 1] : null;
   const next =
-    i < list.length - 1
-      ? { href: `/${section}/${list[i + 1].slug}`, title: list[i + 1].title }
-      : section === "learn"
-        ? { href: `/practice/${PRACTICE[0].slug}`, title: PRACTICE[0].title }
-        : { href: "/reference", title: "Command reference" };
+    i < flat.length - 1
+      ? flat[i + 1]
+      : { href: "/reference", title: "Command reference" };
   return { prev, next };
 }
