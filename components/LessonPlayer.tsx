@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useProgress } from "@/lib/progress";
@@ -98,48 +98,50 @@ export function LessonPlayer({
   const { ready, getStep, setStep, markDone, isDone } = useProgress();
   const router = useRouter();
 
-  // number of steps currently revealed (at least 1)
-  const [revealed, setRevealed] = useState(1);
-  // checkpoints answered this visit (resumed steps count as answered)
+  // current step shown (1-based)
+  const [pos, setPos] = useState(1);
+  // checkpoints answered (this visit, or restored from a previous one)
   const [answered, setAnswered] = useState<Record<number, boolean>>({});
-  // steps restored from a previous visit — checkpoint shown as already done
-  const [preAnswered, setPreAnswered] = useState<Record<number, boolean>>({});
   const [restored, setRestored] = useState(false);
-  const endRef = useRef<HTMLDivElement>(null);
 
-  // restore furthest position once progress is loaded
+  // resume at the furthest step reached previously
   useEffect(() => {
     if (ready && !restored) {
       const saved = getStep(lessonId);
       if (saved > 1) {
         const upTo = Math.min(saved, steps.length);
-        setRevealed(upTo);
+        setPos(upTo);
         const pre: Record<number, boolean> = {};
         for (let i = 0; i < upTo - 1; i++) pre[i] = true;
         setAnswered(pre);
-        setPreAnswered(pre);
       }
       setRestored(true);
     }
   }, [ready, restored, getStep, lessonId, steps.length]);
 
+  // persist the furthest position reached
   useEffect(() => {
-    if (restored) setStep(lessonId, revealed);
-  }, [revealed, restored, setStep, lessonId]);
+    if (restored) setStep(lessonId, pos);
+  }, [pos, restored, setStep, lessonId]);
 
-  const current = steps[revealed - 1];
-  const blocked = !!current?.check && !answered[revealed - 1];
-  const atEnd = revealed >= steps.length;
+  const i = pos - 1;
+  const step = steps[i];
+  const blocked = !!step.check && !answered[i];
+  const atEnd = pos >= steps.length;
   const finished = ready && isDone(`course/${lessonId}`);
+
+  const goBack = () => {
+    if (pos > 1) {
+      setPos((p) => p - 1);
+      window.scrollTo({ top: 0 });
+    }
+  };
 
   const advance = () => {
     if (blocked) return;
     if (!atEnd) {
-      setRevealed((r) => r + 1);
-      setTimeout(
-        () => endRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
-        60,
-      );
+      setPos((p) => p + 1);
+      window.scrollTo({ top: 0 });
     } else {
       markDone(`course/${lessonId}`);
       router.push(nextHref);
@@ -163,48 +165,63 @@ export function LessonPlayer({
         <h1 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-ink">
           {lessonTitle}
         </h1>
-        <div className="mt-4 flex gap-1" aria-label={`step ${revealed} of ${steps.length}`}>
-          {steps.map((s, i) => (
-            <span
+        <div className="mt-4 flex gap-1" aria-label={`step ${pos} of ${steps.length}`}>
+          {steps.map((s, si) => (
+            <button
               key={s.id}
-              className={`h-1.5 flex-1 rounded-full transition-colors ${
-                i < revealed ? "bg-flame" : "bg-line"
+              type="button"
+              aria-label={`step ${si + 1}`}
+              disabled={si + 1 > Math.max(pos, ready ? getStep(lessonId) : 1)}
+              onClick={() => {
+                setPos(si + 1);
+                window.scrollTo({ top: 0 });
+              }}
+              className={`h-1.5 flex-1 rounded-full transition-colors disabled:cursor-default ${
+                si + 1 === pos
+                  ? "bg-flame"
+                  : si + 1 < pos || answered[si]
+                    ? "bg-flame/40 hover:bg-flame/70"
+                    : "bg-line"
               }`}
             />
           ))}
         </div>
       </header>
 
-      <div className="lesson flex flex-col gap-2">
-        {steps.slice(0, revealed).map((step, i) => (
-          <section key={step.id} className={i === revealed - 1 ? "rise" : undefined}>
-            {step.title && (
-              <h2 className="!mt-6 font-display text-xl font-extrabold tracking-tight text-ink">
-                {step.title}
-              </h2>
-            )}
-            <div>{step.body}</div>
-            {step.check &&
-              (preAnswered[i] ? (
-                <p className="!my-3 rounded-lg bg-paper-warm px-3.5 py-2 font-mono text-xs text-ink-faint">
-                  ✓ checkpoint answered on a previous visit
-                </p>
-              ) : (
-                <CheckpointBlock
-                  check={step.check}
-                  onAnswered={() => setAnswered((a) => ({ ...a, [i]: true }))}
-                />
-              ))}
-          </section>
-        ))}
+      <div key={step.id} className="lesson rise">
+        {step.title && (
+          <h2 className="!mt-0 font-display text-xl font-extrabold tracking-tight text-ink">
+            {step.title}
+          </h2>
+        )}
+        <div>{step.body}</div>
+        {step.check &&
+          (answered[i] ? (
+            <p className="!my-3 rounded-lg bg-paper-warm px-3.5 py-2 font-mono text-xs text-ink-faint">
+              ✓ checkpoint answered — continue when ready
+            </p>
+          ) : (
+            <CheckpointBlock
+              check={step.check}
+              onAnswered={() => setAnswered((a) => ({ ...a, [i]: true }))}
+            />
+          ))}
       </div>
 
-      <div ref={endRef} className="mt-8 scroll-mt-24">
+      <div className="mt-10 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={goBack}
+          disabled={pos <= 1}
+          className="rounded-xl border-2 border-line px-5 py-3.5 font-display text-sm font-extrabold uppercase tracking-widest text-ink-soft transition enabled:hover:border-ink enabled:hover:text-ink disabled:opacity-40"
+        >
+          ← Back
+        </button>
         <button
           type="button"
           onClick={advance}
           disabled={blocked}
-          className={`w-full rounded-xl border-2 px-5 py-3.5 font-display text-sm font-extrabold uppercase tracking-widest transition ${
+          className={`flex-1 rounded-xl border-2 px-5 py-3.5 font-display text-sm font-extrabold uppercase tracking-widest transition ${
             blocked
               ? "cursor-not-allowed border-line bg-paper-warm text-ink-faint"
               : "border-ink bg-ink text-paper hover:border-flame hover:bg-flame"
@@ -218,12 +235,10 @@ export function LessonPlayer({
                 : `Finish lesson · ${nextLabel} →`
               : "Continue"}
         </button>
-        {!atEnd && (
-          <p className="mt-2 text-center font-mono text-[11px] text-ink-faint">
-            step {revealed} of {steps.length}
-          </p>
-        )}
       </div>
+      <p className="mt-2 text-center font-mono text-[11px] text-ink-faint">
+        step {pos} of {steps.length}
+      </p>
     </div>
   );
 }
