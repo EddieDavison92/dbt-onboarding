@@ -68,6 +68,12 @@ from {{ source('csds', 'ActiveSubmission') }}
         <code>pit_</code> (point-in-time), <code>obt_</code> (one big table) and{" "}
         <code>dq_</code> (data quality) prefixes here.
       </p>
+      <p>
+        This layer is where most of your work <em>starts</em>, not where it ends: when
+        a question lands, check what already exists in reporting before building
+        anything. The fastest model is the one someone already wrote, tested and
+        refreshes nightly.
+      </p>
 
       <h3>Published — governed outputs</h3>
       <p>

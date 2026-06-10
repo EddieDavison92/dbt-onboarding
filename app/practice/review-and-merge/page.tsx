@@ -82,6 +82,12 @@ git pull
         review, merge. That consistency is what lets the team trust every number the
         pipeline produces.
       </p>
+      <p>
+        It also gets fast. The first time through, this track is an afternoon; once
+        the tools are familiar, a routine change — branch, edit, build, PR — is a
+        loop measured in minutes, with most of the elapsed time being review rather
+        than your effort. The process feels heavyweight exactly once.
+      </p>
 
       <Checklist
         id="merge"

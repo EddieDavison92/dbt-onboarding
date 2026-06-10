@@ -13,7 +13,7 @@ export default function Page() {
       slug="setup"
       kicker="Do · Step 1"
       title="Set up your machine"
-      lede="One-time setup: tools, credentials, and a successful dbt debug. Allow about fifteen minutes."
+      lede="One-time setup: tools, credentials, and a successful dbt debug. Allow about fifteen minutes — this is the slowest day; the everyday loop after it is minutes."
       minutes={15}
     >
       <Callout kind="info" title="Before you start">

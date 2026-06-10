@@ -4,6 +4,11 @@ import { ADVANCED, LEARN, PRACTICE } from "@/lib/curriculum";
 
 const PILLARS = [
   {
+    title: "Reused",
+    body: "Hundreds of tested models already exist. Most analyses start at ref('dim_person_demographics'), not from a blank worksheet.",
+    color: "var(--layer-reporting)",
+  },
+  {
     title: "Ordered",
     body: "dbt reads your SQL and builds a dependency graph. Upstream always runs first — nobody schedules anything by hand.",
     color: "var(--layer-staging)",
@@ -16,7 +21,7 @@ const PILLARS = [
   {
     title: "Versioned",
     body: "Every change is a reviewed pull request with history. “Who changed this and why” is always one click away.",
-    color: "var(--layer-reporting)",
+    color: "var(--layer-published)",
   },
 ];
 
@@ -125,7 +130,7 @@ export default function Home() {
         <h2 className="font-display text-xs font-extrabold uppercase tracking-[0.2em] text-ink-faint">
           Why dbt
         </h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {PILLARS.map((p) => (
             <div
               key={p.title}
@@ -144,8 +149,10 @@ export default function Home() {
         </div>
         <p className="mt-5 max-w-[64ch] text-[15px] leading-relaxed text-ink-soft">
           The day-to-day barely changes — it is still SQL against Snowflake. What
-          changes is that your logic stops living in worksheets and starts living in a
-          pipeline the whole team can trust, rerun and build on.
+          changes is the starting point: instead of rebuilding demographics, registers
+          and lookups for every piece of work, you join models that already exist, are
+          already tested, and refresh themselves every night. The setup in this course
+          is a one-off; the everyday loop — edit, build, PR — takes minutes.
         </p>
       </section>
 
