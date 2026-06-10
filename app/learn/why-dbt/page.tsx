@@ -38,6 +38,12 @@ export default function Page() {
           you hear is a dashboard looking wrong.
         </li>
         <li>
+          <strong>Everything is built end-to-end, every time.</strong> Each script
+          runs the whole journey from source to product privately — the cleaning, the
+          lookups, the business logic, all repeated per output and reused by nothing.
+          The same column gets cleaned a dozen different ways across a dozen scripts.
+        </li>
+        <li>
           <strong>Everyone works alone.</strong> Logic lives in personal worksheets and
           scripts, so five people hold five slightly different definitions of “current
           registration”, there is no history of who changed what, and work leaves when

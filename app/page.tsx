@@ -5,7 +5,7 @@ import { ADVANCED, LEARN, PRACTICE } from "@/lib/curriculum";
 const PILLARS = [
   {
     title: "Reused",
-    body: "Hundreds of tested models already exist. Most analyses start at ref('dim_person_demographics'), not from a blank worksheet.",
+    body: "Hundreds of tested models already exist. Most analyses start from another model, not a blank worksheet.",
     color: "var(--layer-reporting)",
   },
   {
