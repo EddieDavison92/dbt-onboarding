@@ -95,30 +95,52 @@ export function TryIt({ stages, done = "That's the real output — exactly what 
             )}
             <div className="flex items-center">
               <span className="text-[#7ee2c0]">$ </span>
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                onChange={(e) => {
-                  setInput(e.target.value);
-                  setNudge(false);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") run(input);
-                }}
-                spellCheck={false}
-                autoCapitalize="off"
-                autoComplete="off"
-                aria-label={`type the command ${stage.cmd}`}
-                className="ml-1 min-w-0 flex-1 border-none bg-transparent font-mono text-[13px] text-[#e8eaf2] caret-flame outline-none placeholder:text-white/25"
-                placeholder={stage.cmd}
-              />
+              <div className="relative ml-1 min-w-0 flex-1">
+                {/* ghost suggestion: stays visible underneath as you type over it */}
+                {stage.cmd.startsWith(input) && (
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 select-none whitespace-pre font-mono text-[13px] text-white/30"
+                  >
+                    {stage.cmd}
+                  </span>
+                )}
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => {
+                    setInput(e.target.value);
+                    setNudge(false);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") run(input);
+                    if (
+                      (e.key === "Tab" || e.key === "ArrowRight") &&
+                      input.length < stage.cmd.length &&
+                      stage.cmd.startsWith(input)
+                    ) {
+                      e.preventDefault();
+                      setInput(stage.cmd);
+                    }
+                  }}
+                  spellCheck={false}
+                  autoCapitalize="off"
+                  autoComplete="off"
+                  aria-label={`type the command ${stage.cmd}`}
+                  className="relative w-full border-none bg-transparent font-mono text-[13px] text-[#e8eaf2] caret-flame outline-none"
+                />
+              </div>
             </div>
-            {nudge && (
-              <p className="!mb-0 !mt-1 text-[11px] text-[#ff9a82]">
-                not quite — type: <span className="text-white/80">{stage.cmd}</span>
-              </p>
-            )}
+            <p className="!mb-0 !mt-1 text-[11px] text-white/30">
+              {nudge ? (
+                <span className="text-[#ff9a82]">
+                  not quite — the command is shown in grey; Tab completes it
+                </span>
+              ) : (
+                <>press <span className="text-white/50">Tab</span> to autocomplete · Enter to run</>
+              )}
+            </p>
           </>
         )}
 
