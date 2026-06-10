@@ -18,7 +18,7 @@ export default function Page() {
     >
       <h2>The problem dbt solves</h2>
       <p>
-        Every analytics team accumulates SQL: a view someone built in 2022, a script
+        Every analytics team accumulates SQL: a view someone built a year ago, a script
         that has to run before another script, a “FINAL_v3” table nobody is sure is
         safe to drop. The SQL itself is usually fine — the problems sit around it:
       </p>
