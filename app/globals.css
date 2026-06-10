@@ -202,6 +202,20 @@ body {
   100% { offset-distance: 100%; opacity: 0; }
 }
 
+@media print {
+  header,
+  footer {
+    display: none !important;
+  }
+  .grain::before {
+    display: none;
+  }
+  #certificate {
+    box-shadow: none !important;
+    border-width: 2px;
+  }
+}
+
 @keyframes pulse-ring {
   0% { box-shadow: 0 0 0 0 rgb(255 105 74 / 0.45); }
   70% { box-shadow: 0 0 0 10px rgb(255 105 74 / 0); }

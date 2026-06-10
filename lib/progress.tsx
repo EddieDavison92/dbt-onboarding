@@ -12,18 +12,28 @@ import {
 const KEY = "dbt-onboarding-progress-v1";
 
 type ProgressState = {
-  /** completed page ids, e.g. "learn/why-dbt" */
+  /** completed page/lesson ids, e.g. "learn/why-dbt" or "course/git/branches" */
   done: string[];
   /** ticked checklist item ids */
   checks: string[];
+  /** learner name, shown on certificates */
+  name: string;
+  /** per-lesson furthest revealed step index, keyed by lesson id */
+  steps: Record<string, number>;
 };
+
+const EMPTY: ProgressState = { done: [], checks: [], name: "", steps: {} };
 
 type ProgressContextValue = ProgressState & {
   ready: boolean;
   toggleDone: (id: string) => void;
+  markDone: (id: string) => void;
   isDone: (id: string) => boolean;
   toggleCheck: (id: string) => void;
   isChecked: (id: string) => boolean;
+  setName: (name: string) => void;
+  setStep: (lessonId: string, step: number) => void;
+  getStep: (lessonId: string) => number;
   reset: () => void;
 };
 
@@ -37,16 +47,19 @@ function load(): ProgressState {
       return {
         done: Array.isArray(parsed.done) ? parsed.done : [],
         checks: Array.isArray(parsed.checks) ? parsed.checks : [],
+        name: typeof parsed.name === "string" ? parsed.name : "",
+        steps:
+          parsed.steps && typeof parsed.steps === "object" ? parsed.steps : {},
       };
     }
   } catch {
     /* corrupted storage — start fresh */
   }
-  return { done: [], checks: [] };
+  return EMPTY;
 }
 
 export function ProgressProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<ProgressState>({ done: [], checks: [] });
+  const [state, setState] = useState<ProgressState>(EMPTY);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -65,6 +78,12 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  const markDone = useCallback((id: string) => {
+    setState((s) =>
+      s.done.includes(id) ? s : { ...s, done: [...s.done, id] },
+    );
+  }, []);
+
   const toggleCheck = useCallback((id: string) => {
     setState((s) => ({
       ...s,
@@ -74,16 +93,44 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  const setName = useCallback((name: string) => {
+    setState((s) => ({ ...s, name }));
+  }, []);
+
+  const setStep = useCallback((lessonId: string, step: number) => {
+    setState((s) =>
+      (s.steps[lessonId] ?? 0) >= step
+        ? s
+        : { ...s, steps: { ...s.steps, [lessonId]: step } },
+    );
+  }, []);
+
   const isDone = useCallback((id: string) => state.done.includes(id), [state.done]);
   const isChecked = useCallback(
     (id: string) => state.checks.includes(id),
     [state.checks],
   );
-  const reset = useCallback(() => setState({ done: [], checks: [] }), []);
+  const getStep = useCallback(
+    (lessonId: string) => state.steps[lessonId] ?? 0,
+    [state.steps],
+  );
+  const reset = useCallback(() => setState(EMPTY), []);
 
   return (
     <ProgressContext.Provider
-      value={{ ...state, ready, toggleDone, isDone, toggleCheck, isChecked, reset }}
+      value={{
+        ...state,
+        ready,
+        toggleDone,
+        markDone,
+        isDone,
+        toggleCheck,
+        isChecked,
+        setName,
+        setStep,
+        getStep,
+        reset,
+      }}
     >
       {children}
     </ProgressContext.Provider>

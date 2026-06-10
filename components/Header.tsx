@@ -14,6 +14,26 @@ export function Header() {
             WNL Analytics
           </span>
         </Link>
+        <nav className="ml-6 hidden items-center gap-4 sm:flex">
+          <Link
+            href="/"
+            className="font-display text-xs font-bold uppercase tracking-wider text-ink-soft transition hover:text-flame-deep"
+          >
+            Courses
+          </Link>
+          <Link
+            href="/learn/why-dbt"
+            className="font-display text-xs font-bold uppercase tracking-wider text-ink-soft transition hover:text-flame-deep"
+          >
+            Handbook
+          </Link>
+          <Link
+            href="/reference"
+            className="font-display text-xs font-bold uppercase tracking-wider text-ink-soft transition hover:text-flame-deep"
+          >
+            Reference
+          </Link>
+        </nav>
         <span
           className="ml-auto hidden rounded-full border border-flame/30 bg-flame-soft px-2.5 py-0.5 font-mono text-[10px] text-flame-deep md:inline"
           title="A community onboarding guide. dbt is a trademark of dbt Labs, Inc."

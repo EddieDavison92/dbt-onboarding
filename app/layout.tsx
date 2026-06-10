@@ -3,7 +3,6 @@ import { Archivo, Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ProgressProvider } from "@/lib/progress";
 import { Header } from "@/components/Header";
-import { Sidebar } from "@/components/Sidebar";
 
 const display = Archivo({
   variable: "--font-display",
@@ -44,12 +43,7 @@ export default function RootLayout({
       <body className="grain min-h-full">
         <ProgressProvider>
           <Header />
-          <div className="mx-auto flex max-w-7xl">
-            <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-64 shrink-0 border-r border-line lg:block">
-              <Sidebar />
-            </aside>
-            <main className="min-w-0 flex-1">{children}</main>
-          </div>
+          {children}
           <footer className="border-t border-line py-6 text-center font-mono text-[11px] text-ink-faint">
             Built by the WNL Analytics team · dbt™ is a trademark of dbt Labs, Inc. — this
             guide is a community resource, not an official dbt product.

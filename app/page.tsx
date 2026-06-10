@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ADVANCED, LEARN, PRACTICE } from "@/lib/curriculum";
+import { COURSES, UPCOMING } from "@/lib/courses";
+import { LEARN, PRACTICE, ADVANCED } from "@/lib/curriculum";
 
 const PILLARS = [
   {
@@ -24,38 +25,6 @@ const PILLARS = [
     color: "var(--layer-published)",
   },
 ];
-
-function TrackCard({
-  index,
-  href,
-  title,
-  blurb,
-  minutes,
-}: {
-  index: number;
-  href: string;
-  title: string;
-  blurb: string;
-  minutes: number;
-}) {
-  return (
-    <Link
-      href={href}
-      className="group flex items-start gap-4 rounded-xl border border-line bg-paper px-5 py-4 transition hover:-translate-y-0.5 hover:border-flame hover:shadow-[4px_4px_0_0_var(--color-flame)]"
-    >
-      <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full border-2 border-ink font-display text-sm font-extrabold transition group-hover:border-flame group-hover:bg-flame group-hover:text-white">
-        {index}
-      </span>
-      <span className="min-w-0">
-        <span className="flex items-baseline gap-2">
-          <span className="font-display text-[15px] font-bold text-ink">{title}</span>
-          <span className="font-mono text-[11px] text-ink-faint">~{minutes}m</span>
-        </span>
-        <span className="block text-sm text-ink-soft">{blurb}</span>
-      </span>
-    </Link>
-  );
-}
 
 export default function Home() {
   return (
@@ -89,7 +58,7 @@ export default function Home() {
           dbt handles everything around it.
         </h2>
         <p className="rise rise-3 mt-6 max-w-[58ch] text-lg leading-relaxed text-ink-soft">
-          This is a hands-on course for analysts joining the{" "}
+          Interactive courses for analysts joining the{" "}
           <a
             href="https://github.com/wnl-icb-analytics/dbt-analytics"
             target="_blank"
@@ -98,23 +67,9 @@ export default function Home() {
           >
             dbt-analytics
           </a>{" "}
-          project. Six short lessons on the ideas, then a guided walkthrough to your
-          first merged pull request — real conventions, real commands, real CI.
+          project — small steps, real commands, a certificate at the end of each.
+          Plus a handbook for looking things up later.
         </p>
-        <div className="rise rise-4 mt-8 flex flex-wrap items-center gap-3">
-          <Link
-            href={`/learn/${LEARN[0].slug}`}
-            className="rounded-xl border-2 border-ink bg-ink px-6 py-3 font-display text-sm font-extrabold uppercase tracking-widest text-paper transition hover:border-flame hover:bg-flame"
-          >
-            Start lesson one →
-          </Link>
-          <Link
-            href={`/practice/${PRACTICE[0].slug}`}
-            className="rounded-xl border-2 border-ink px-6 py-3 font-display text-sm font-extrabold uppercase tracking-widest text-ink transition hover:border-flame hover:text-flame"
-          >
-            Skip to setup
-          </Link>
-        </div>
         <Image
           src="/logos/dbt.svg"
           alt=""
@@ -123,6 +78,72 @@ export default function Home() {
           className="pointer-events-none absolute -right-20 -top-10 -z-10 hidden opacity-[0.06] lg:block"
           priority
         />
+      </section>
+
+      {/* courses */}
+      <section className="mx-auto mt-14 max-w-4xl">
+        <h2 className="font-display text-xs font-extrabold uppercase tracking-[0.2em] text-ink-faint">
+          The courses · in order
+        </h2>
+        <div className="mt-4 flex flex-col gap-4">
+          {COURSES.map((c, i) => (
+            <Link
+              key={c.slug}
+              href={`/courses/${c.slug}`}
+              className={`rise rise-${i + 2} group flex flex-col gap-3 rounded-2xl border-2 bg-paper p-6 transition hover:-translate-y-0.5 sm:flex-row sm:items-center`}
+              style={{ borderColor: c.accent, boxShadow: `5px 5px 0 0 ${c.accent}` }}
+            >
+              <span className="grid size-12 shrink-0 place-items-center rounded-full border-2 border-ink font-display text-lg font-black">
+                {i}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="flex flex-wrap items-baseline gap-2">
+                  <span className="font-display text-xl font-extrabold tracking-tight text-ink">
+                    {c.title}
+                  </span>
+                  <span className="font-mono text-xs text-ink-faint">
+                    {c.lessons.length} lessons · {c.hours}
+                  </span>
+                </span>
+                <span className="mt-0.5 block text-[15px] text-ink-soft">{c.tagline}</span>
+                <span className="mt-1 block text-xs text-ink-faint">{c.audience}</span>
+              </span>
+              <span
+                className="shrink-0 font-display text-sm font-extrabold uppercase tracking-widest group-hover:underline"
+                style={{ color: c.accent }}
+              >
+                Open →
+              </span>
+            </Link>
+          ))}
+          {UPCOMING.map((c) => (
+            <div
+              key={c.slug}
+              className="flex flex-col gap-3 rounded-2xl border-2 border-dashed border-line bg-paper-warm/50 p-6 sm:flex-row sm:items-center"
+            >
+              <span className="grid size-12 shrink-0 place-items-center rounded-full border-2 border-line font-display text-lg font-black text-ink-faint">
+                ?
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="flex flex-wrap items-baseline gap-2">
+                  <span className="font-display text-xl font-extrabold tracking-tight text-ink-faint">
+                    {c.title}
+                  </span>
+                  <span className="font-mono text-xs text-ink-faint">{c.hours}</span>
+                </span>
+                <span className="mt-0.5 block text-[15px] text-ink-faint">{c.tagline}</span>
+              </span>
+              <span className="shrink-0 rounded-full border border-line px-3 py-1 font-mono text-[11px] text-ink-faint">
+                coming soon
+              </span>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 max-w-[64ch] text-sm leading-relaxed text-ink-faint">
+          Start with Git essentials if version control is new — everything else
+          assumes it. Already fluent in git? Go straight to Your first PR. Progress
+          and certificates are saved in your browser.
+        </p>
       </section>
 
       {/* the case */}
@@ -151,74 +172,66 @@ export default function Home() {
           The day-to-day barely changes — it is still SQL against Snowflake. What
           changes is the starting point: instead of rebuilding demographics, registers
           and lookups for every piece of work, you join models that already exist, are
-          already tested, and refresh themselves every night. The setup in this course
-          is a one-off; the everyday loop — edit, build, PR — takes minutes.
+          already tested, and refresh themselves every night. The setup is a one-off;
+          the everyday loop — edit, build, PR — takes minutes.
         </p>
       </section>
 
-      {/* journey */}
+      {/* handbook */}
       <section className="mx-auto mt-20 max-w-4xl">
         <h2 className="font-display text-xs font-extrabold uppercase tracking-[0.2em] text-ink-faint">
-          Part one · Learn the ideas
+          The handbook · reference for later
         </h2>
+        <p className="mt-3 max-w-[64ch] text-[15px] leading-relaxed text-ink-soft">
+          Longer-form reference pages on every topic the courses introduce — for when
+          you need the full story on layers, sources, materialisations or snapshots,
+          months after onboarding.
+        </p>
         <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
-          {LEARN.map((l, i) => (
-            <TrackCard
-              key={l.slug}
-              index={i + 1}
-              href={`/learn/${l.slug}`}
-              title={l.title}
-              blurb={l.blurb}
-              minutes={l.minutes}
-            />
-          ))}
-        </div>
-
-        <h2 className="mt-12 font-display text-xs font-extrabold uppercase tracking-[0.2em] text-ink-faint">
-          Part two · Ship your first PR
-        </h2>
-        <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
-          {PRACTICE.map((p, i) => (
-            <TrackCard
-              key={p.slug}
-              index={i + 1}
-              href={`/practice/${p.slug}`}
-              title={p.title}
-              blurb={p.blurb}
-              minutes={p.minutes}
-            />
-          ))}
-        </div>
-
-        <h2 className="mt-12 font-display text-xs font-extrabold uppercase tracking-[0.2em] text-ink-faint">
-          Part three · Going further
-        </h2>
-        <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
-          {ADVANCED.map((a, i) => (
-            <TrackCard
-              key={a.slug}
-              index={i + 1}
-              href={`/advanced/${a.slug}`}
-              title={a.title}
-              blurb={a.blurb}
-              minutes={a.minutes}
-            />
-          ))}
-        </div>
-
-        <div className="mt-12 rounded-2xl border-2 border-ink bg-paper-warm p-6 shadow-[5px_5px_0_0_var(--color-ink)]">
-          <h2 className="font-display text-lg font-extrabold tracking-tight text-ink">
-            Keep handy: the command reference
-          </h2>
-          <p className="mt-1 max-w-[56ch] text-sm text-ink-soft">
-            Every dbt, git and project-helper command from the course in one searchable,
-            copy-paste page.
-          </p>
+          <Link
+            href={`/learn/${LEARN[0].slug}`}
+            className="group rounded-xl border border-line bg-paper px-5 py-4 transition hover:border-flame"
+          >
+            <span className="font-display text-[15px] font-bold text-ink group-hover:text-flame-deep">
+              Concepts
+            </span>
+            <span className="block text-sm text-ink-soft">
+              Why dbt, the layer cake, refs, tests, git & PRs — {LEARN.length} pages
+            </span>
+          </Link>
+          <Link
+            href={`/practice/${PRACTICE[0].slug}`}
+            className="group rounded-xl border border-line bg-paper px-5 py-4 transition hover:border-flame"
+          >
+            <span className="font-display text-[15px] font-bold text-ink group-hover:text-flame-deep">
+              Working practice
+            </span>
+            <span className="block text-sm text-ink-soft">
+              Setup, sources, models, YAML, building, PRs — {PRACTICE.length} pages
+            </span>
+          </Link>
+          <Link
+            href={`/advanced/${ADVANCED[0].slug}`}
+            className="group rounded-xl border border-line bg-paper px-5 py-4 transition hover:border-flame"
+          >
+            <span className="font-display text-[15px] font-bold text-ink group-hover:text-flame-deep">
+              Going further
+            </span>
+            <span className="block text-sm text-ink-soft">
+              Macros, materialisations, clustering, snapshots, semantic views, Python —{" "}
+              {ADVANCED.length} pages
+            </span>
+          </Link>
           <Link
             href="/reference"
-            className="mt-3 inline-block font-display text-sm font-extrabold uppercase tracking-widest text-flame-deep hover:text-flame"
+            className="group rounded-xl border border-line bg-paper px-5 py-4 transition hover:border-flame"
           >
-            Open the reference →
+            <span className="font-display text-[15px] font-bold text-ink group-hover:text-flame-deep">
+              Command reference
+            </span>
+            <span className="block text-sm text-ink-soft">
+              Every dbt and git command, searchable and copy-paste ready
+            </span>
           </Link>
         </div>
       </section>
