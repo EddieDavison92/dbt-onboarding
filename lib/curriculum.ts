@@ -112,7 +112,7 @@ export const ADVANCED: NavItem[] = [
     slug: "snapshots",
     title: "Snapshots",
     blurb: "Capturing history when the source only keeps the present",
-    minutes: 8,
+    minutes: 9,
   },
   {
     slug: "semantic-views",

@@ -76,14 +76,60 @@ from {{ ref('stg_pds_registration') }}
         <li>
           <strong><code>timestamp</code> strategy</strong> — dbt compares an{" "}
           <code>updated_at</code> column and processes only rows whose timestamp moved.
-          Fast; use it whenever the source has a reliable last-updated column.
+          Fast and simple, when the source has a reliable last-updated column.
         </li>
         <li>
-          <strong><code>check</code> strategy</strong> — dbt compares the values of a
-          configured column list. Slower, but the only option when the source has no
-          trustworthy timestamp.
+          <strong><code>check</code> strategy</strong> — dbt compares the actual
+          values of a configured column list and records a new version when any of
+          them change. Slower, but it works on data that has no timestamp at all —
+          which makes it the natural choice for most of what we want to snapshot.
         </li>
       </ul>
+
+      <h2>Why check strategy fits population health</h2>
+      <p>
+        The textbook snapshot watches a source table with an <code>updated_at</code>{" "}
+        column. Much of what this team needs history for is different:{" "}
+        <strong>derived states, not events</strong>. Whether a person is on a cohort
+        or register is computed from several temporal factors at once — diagnoses,
+        resolutions, age, registration status, latest test results. No single event
+        says “membership changed”, so there is no timestamp to watch. The membership
+        is simply different the next time the model builds.
+      </p>
+      <p>
+        That is exactly what <code>check</code> strategy handles: snapshot the cohort
+        model and list the columns that define the state — dbt notices when a
+        person&apos;s computed values differ from the last recorded version and writes
+        a new row:
+      </p>
+      <CodeBlock
+        lang="sql"
+        title="snapshotting a derived cohort (illustrative)"
+        code={`
+{% snapshot snapshot_diabetes_register %}
+
+{{
+    config(
+        unique_key='person_id',
+        strategy='check',
+        check_cols=['is_on_register', 'register_reason']
+    )
+}}
+
+select person_id, is_on_register, register_reason
+from {{ ref('fct_person_diabetes_register') }}
+
+{% endsnapshot %}
+`}
+      />
+      <p>
+        The result answers questions the register alone cannot: when did this person
+        join the cohort, when did they leave, what was the register&apos;s membership
+        on a given date — without the upstream models having to model their own
+        history. Keep <code>check_cols</code> to the columns that define the state;
+        every column listed is a reason to write a new version, so incidental columns
+        inflate the history.
+      </p>
       <Callout kind="info" title="Snapshots have their own command">
         <p>
           <code>dbt build</code> and <code>dbt run</code> do not execute snapshots —
