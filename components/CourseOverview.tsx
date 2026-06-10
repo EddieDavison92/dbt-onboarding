@@ -31,6 +31,7 @@ export function CourseOverview({
 }) {
   const { ready, name, setName, isDone } = useProgress();
   const [draft, setDraft] = useState("");
+  const [confirming, setConfirming] = useState(false);
 
   const doneCount = ready
     ? lessons.filter((l) => isDone(`course/${slug}/${l.slug}`)).length
@@ -64,7 +65,9 @@ export function CourseOverview({
           className="mt-6 rounded-2xl border-2 border-ink bg-paper-warm p-5"
           onSubmit={(e) => {
             e.preventDefault();
-            if (draft.trim()) setName(draft.trim());
+            if (!draft.trim()) return;
+            if (confirming) setName(draft.trim());
+            else setConfirming(true);
           }}
         >
           <label
@@ -74,26 +77,41 @@ export function CourseOverview({
             First, your name
           </label>
           <p className="mt-1 text-sm text-ink-soft">
-            It appears on your certificate when you finish (stored only in this
-            browser — nothing is sent anywhere).
+            It appears on your certificates and is{" "}
+            <strong className="text-ink">set once — it can&apos;t be changed
+            afterwards</strong>, so check the spelling. (Stored only in this
+            browser; nothing is sent anywhere.)
           </p>
           <div className="mt-3 flex gap-2">
             <input
               id="learner-name"
               type="text"
               value={draft}
-              onChange={(e) => setDraft(e.target.value)}
+              onChange={(e) => {
+                setDraft(e.target.value);
+                setConfirming(false);
+              }}
               placeholder="Your name"
               className="min-w-0 flex-1 rounded-xl border-2 border-ink bg-paper px-4 py-2.5 text-sm outline-none placeholder:text-ink-faint focus:border-flame"
             />
             <button
               type="submit"
               disabled={!draft.trim()}
-              className="rounded-xl border-2 border-ink bg-ink px-5 py-2.5 font-display text-sm font-extrabold uppercase tracking-widest text-paper transition enabled:hover:border-flame enabled:hover:bg-flame disabled:opacity-40"
+              className={`rounded-xl border-2 px-5 py-2.5 font-display text-sm font-extrabold uppercase tracking-widest transition disabled:opacity-40 ${
+                confirming
+                  ? "border-flame bg-flame text-white hover:bg-flame-deep"
+                  : "border-ink bg-ink text-paper enabled:hover:border-flame enabled:hover:bg-flame"
+              }`}
             >
-              Save
+              {confirming ? "Confirm" : "Save"}
             </button>
           </div>
+          {confirming && (
+            <p className="mt-2 text-sm text-ink-soft">
+              Lock in <strong className="text-ink">{draft.trim()}</strong>? This is
+              the name your certificates will carry.
+            </p>
+          )}
         </form>
       )}
 
@@ -101,16 +119,6 @@ export function CourseOverview({
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-ink-soft">
             Learner: <strong className="text-ink">{name}</strong>
-            <button
-              type="button"
-              onClick={() => {
-                setDraft(name);
-                setName("");
-              }}
-              className="ml-2 font-mono text-xs text-ink-faint underline-offset-2 hover:text-flame-deep hover:underline"
-            >
-              change
-            </button>
             <span className="ml-3 font-mono text-xs text-ink-faint">
               {doneCount}/{lessons.length} lessons
             </span>
