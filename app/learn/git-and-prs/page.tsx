@@ -49,7 +49,7 @@ export default function Page() {
         <code>main</code> is the production branch — what runs every night. You never
         edit it directly (it is locked). Instead you take a <strong>branch</strong>: a
         parallel copy where you can work freely. When your work is ready, a{" "}
-        <strong>pull request (PR)</strong> proposes merging your branch back into{" "}
+        <strong>pull request (PR)</strong> proposes merging your changes into{" "}
         <code>main</code>. Between proposal and merge sit the two safety nets: a human
         review and automated CI checks.
       </p>
