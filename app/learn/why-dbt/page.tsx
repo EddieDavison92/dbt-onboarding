@@ -212,7 +212,7 @@ create or replace view DEV__MODELLING.DBT_STAGING.STG_CSDS_BRIDGING as (
         visible in both directions: change something here and you know immediately
         that it breaks something over there — in lineage, in compile errors, in CI on
         your pull request — before production is touched, rather than weeks later when
-        a number looks wrong.
+        a number looks wrong or a dashboard stops refreshing.
       </p>
 
       <Quiz
