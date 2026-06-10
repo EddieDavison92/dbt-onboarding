@@ -131,6 +131,30 @@ from {{ ref('stg_big_event_feed') }}
         </li>
       </ul>
 
+      <h2>The ones we deliberately don&apos;t use</h2>
+      <p>
+        Snowflake offers two further options you may read about:{" "}
+        <strong>dynamic tables</strong> (dbt supports{" "}
+        <code>materialized=&apos;dynamic_table&apos;</code>) and{" "}
+        <strong>materialised views</strong>. Both are tables that Snowflake keeps
+        fresh by itself — you declare a target lag or let Snowflake decide, and it
+        refreshes the data on its own schedule.
+      </p>
+      <p>
+        We avoid them for an orchestration reason, not a technical one. This
+        project&apos;s freshness model is simple: <strong>the DAG is the
+        orchestrator</strong> — everything rebuilds in dependency order in the nightly
+        build, so “how current is this table?” has one answer. A dynamic table
+        refreshes on Snowflake&apos;s schedule instead, which means two orchestrators
+        with different clocks: a downstream model might build before its dynamic
+        upstream has refreshed, and nothing in the DAG would show why the numbers
+        disagree. Materialised views land in the same spot for the same reason.
+      </p>
+      <p>
+        If a use case ever genuinely needs intra-day freshness for one table, that is
+        a team conversation about orchestration — not a config change on a model.
+      </p>
+
       <h2>The pitfalls that earn incremental its reputation</h2>
       <p>
         The pattern above looks simple; the failure modes are where the care goes:
