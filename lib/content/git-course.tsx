@@ -396,7 +396,8 @@ Changes to be committed:
             <>
               <p>
                 Both files staged — record the snapshot, with a conventional-commits
-                message (type prefix, colon, short description):
+                message (type prefix, colon, short description). Then check status
+                to see what changed:
               </p>
               <TryIt
                 stages={[
@@ -405,9 +406,35 @@ Changes to be committed:
                     out: `[feat/opening-hours 3f2a1c9] feat: add opening hours staging model
  2 files changed, 34 insertions(+)`,
                   },
+                  {
+                    cmd: "git status",
+                    out: `On branch feat/opening-hours
+nothing to commit, working tree clean`,
+                    prompt: "where did the staged files go? ask status",
+                  },
                 ]}
-                done="The snapshot exists — branch name, a short id (3f2a1c9), your message, and what changed."
+                done="The staged files are now a permanent snapshot in your branch's history — which is why status reports a clean working tree."
               />
+              <p>What actually happened, decoded from that first output line:</p>
+              <ul>
+                <li>
+                  Your two staged files became a <strong>permanent snapshot</strong>{" "}
+                  in the branch&apos;s history — that is the whole event.
+                </li>
+                <li>
+                  <code>3f2a1c9</code> is the snapshot&apos;s id: a short reference
+                  you (or anyone) can use to look at exactly this version forever.
+                </li>
+                <li>
+                  <code>2 files changed, 34 insertions(+)</code> summarises the
+                  difference this snapshot records against the previous one.
+                </li>
+                <li>
+                  The staging area is now empty — hence{" "}
+                  <code>working tree clean</code>. Editing a file would start the
+                  status → add → commit cycle again.
+                </li>
+              </ul>
               <p>
                 A hook checks the message format (<code>feat</code>,{" "}
                 <code>fix</code>, <code>docs</code>, <code>chore</code>…) and tells
