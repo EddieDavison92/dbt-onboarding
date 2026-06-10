@@ -170,17 +170,50 @@ python scripts/sources/run_all_source_generation.py
       <p>
         Not everything comes through a feed. Small, slow-changing reference data that
         the team itself owns — code lists, thresholds, standard population weights —
-        lives as CSV files in the repo&apos;s <code>seeds/</code> directory.{" "}
-        <code>dbt seed</code> loads them into Snowflake as tables, and models{" "}
-        <code>ref()</code> them like any other model. The project uses them for things
-        like <code>bp_thresholds</code> and <code>esp_2013</code> (European Standard
-        Population weights).
+        lives in the repo as <strong>seeds</strong>. A seed is nothing more than a CSV
+        file in the <code>seeds/</code> directory; the file name becomes the table
+        name:
+      </p>
+      <CodeBlock
+        lang="text"
+        title="seeds/bp_thresholds.csv"
+        code={`
+threshold_type,age_group,systolic_max,diastolic_max
+clinic,under_80,140,90
+clinic,80_and_over,150,90
+home,under_80,135,85
+`}
+      />
+      <p>
+        Running <code>dbt seed</code> loads every CSV into Snowflake as a table (one
+        column per CSV column, types inferred). From there a seed behaves exactly like
+        a model: reference it with <code>ref()</code>, and it appears in the DAG and
+        lineage like everything else.
+      </p>
+      <CodeBlock
+        lang="sql"
+        code={`
+select ...
+from {{ ref('int_blood_pressure_all') }} bp
+inner join {{ ref('bp_thresholds') }} t
+    on bp.age_group = t.age_group
+`}
+      />
+      <p>
+        Like models, seeds can carry a YAML file alongside the CSV — descriptions,
+        tests, and explicit column types when the inferred ones are wrong (the classic
+        case: a code column like <code>01</code> that inference turns into the number
+        1, fixed with a <code>column_types</code> config). The project uses seeds for
+        things like <code>bp_thresholds</code> and <code>esp_2013</code> (European
+        Standard Population weights); to change one, edit the CSV and re-run{" "}
+        <code>dbt seed</code>.
       </p>
       <p>
         The advantage over an uploaded table: the values are version-controlled. A
         change to a clinical threshold arrives as a reviewed pull request with history,
         not a silent overwrite. The limit: seeds are for small, static data — a few
-        thousand rows of reference values, not a data feed.
+        thousand rows of reference values, not a data feed, and never anything
+        patient-level (the repo is public).
       </p>
 
       <h2>Understand what you found</h2>
