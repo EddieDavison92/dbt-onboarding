@@ -106,10 +106,12 @@ create or replace view DEV__MODELLING.DBT_STAGING.STG_CSDS_BRIDGING as (
         can see the compiled SQL for any model with <code>dbt compile</code>.
       </p>
       <p>
-        The <code>{"{{ ref('…') }}"}</code> call is the key mechanism: instead of
-        hardcoding a table, you point at another model. From those references dbt
-        assembles the full dependency graph (the <strong>DAG</strong>) and always builds
-        upstream models first.
+        The <code>{"{{ ref('…') }}"}</code> call is the key mechanism — and remember, a
+        model is just another <code>.sql</code> file in the project. So instead of
+        hardcoding a table name, you point at a file: <code>ref(&apos;raw_csds_bridging&apos;)</code>{" "}
+        means “the table that <code>raw_csds_bridging.sql</code> builds, wherever that
+        is”. From those references dbt assembles the full dependency graph (the{" "}
+        <strong>DAG</strong>) and always builds upstream models first.
       </p>
 
       <h2>Where dbt sits in the workflow</h2>
@@ -204,6 +206,13 @@ create or replace view DEV__MODELLING.DBT_STAGING.STG_CSDS_BRIDGING as (
         What you get back: your work runs every night without you, failures surface
         immediately rather than silently, and nobody has to reverse-engineer your logic
         from a worksheet — including you, six months from now.
+      </p>
+      <p>
+        And because everyone can see everyone else&apos;s code, dependencies are
+        visible in both directions: change something here and you know immediately
+        that it breaks something over there — in lineage, in compile errors, in CI on
+        your pull request — before production is touched, rather than weeks later when
+        a number looks wrong.
       </p>
 
       <Quiz
