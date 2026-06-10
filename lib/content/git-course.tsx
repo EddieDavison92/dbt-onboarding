@@ -1,6 +1,6 @@
 import type { Course } from "@/lib/course-types";
 import { CodeBlock } from "@/components/CodeBlock";
-import { Callout } from "@/components/Callout";
+import { BranchDiagram } from "@/components/BranchDiagram";
 
 export const GIT_COURSE: Course = {
   slug: "git-essentials",
@@ -209,14 +209,7 @@ docs: describe waiting list snapshot logic
           body: (
             <>
               <p>The shape of all work in this project, every time:</p>
-              <CodeBlock
-                lang="text"
-                code={`
-main:    A───B───C───────────G   <- production, always correct
-                  \\         /
-your branch:       D───E───F     <- your commits, made safely
-`}
-              />
+              <BranchDiagram />
               <p>
                 You branch off main (after C), commit your work (D, E, F), and
                 eventually your branch is merged back (G) — through a process with

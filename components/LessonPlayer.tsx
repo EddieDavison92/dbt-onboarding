@@ -11,7 +11,7 @@ function CheckpointBlock({
   onAnswered,
 }: {
   check: Checkpoint;
-  onAnswered: () => void;
+  onAnswered: (correct: boolean) => void;
 }) {
   const [picked, setPicked] = useState<number | null>(null);
 
@@ -33,7 +33,7 @@ function CheckpointBlock({
               disabled={revealed}
               onClick={() => {
                 setPicked(oi);
-                onAnswered();
+                onAnswered(oi === check.answer);
               }}
               className={`rounded-lg border px-3.5 py-2 text-left text-sm transition disabled:cursor-default ${
                 revealed && isAnswer
@@ -100,8 +100,8 @@ export function LessonPlayer({
 
   // current step shown (1-based)
   const [pos, setPos] = useState(1);
-  // checkpoints answered (this visit, or restored from a previous one)
-  const [answered, setAnswered] = useState<Record<number, boolean>>({});
+  // checkpoint outcomes: right/wrong this visit, "done" when restored from storage
+  const [answered, setAnswered] = useState<Record<number, "right" | "wrong" | "done">>({});
   const [restored, setRestored] = useState(false);
 
   // resume at the furthest step reached previously
@@ -111,8 +111,8 @@ export function LessonPlayer({
       if (saved > 1) {
         const upTo = Math.min(saved, steps.length);
         setPos(upTo);
-        const pre: Record<number, boolean> = {};
-        for (let i = 0; i < upTo - 1; i++) pre[i] = true;
+        const pre: Record<number, "done"> = {};
+        for (let i = 0; i < upTo - 1; i++) pre[i] = "done";
         setAnswered(pre);
       }
       setRestored(true);
@@ -165,26 +165,34 @@ export function LessonPlayer({
         <h1 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-ink">
           {lessonTitle}
         </h1>
-        <div className="mt-4 flex gap-1" aria-label={`step ${pos} of ${steps.length}`}>
-          {steps.map((s, si) => (
-            <button
-              key={s.id}
-              type="button"
-              aria-label={`step ${si + 1}`}
-              disabled={si + 1 > Math.max(pos, ready ? getStep(lessonId) : 1)}
-              onClick={() => {
-                setPos(si + 1);
-                window.scrollTo({ top: 0 });
-              }}
-              className={`h-1.5 flex-1 rounded-full transition-colors disabled:cursor-default ${
-                si + 1 === pos
-                  ? "bg-flame"
-                  : si + 1 < pos || answered[si]
-                    ? "bg-flame/40 hover:bg-flame/70"
-                    : "bg-line"
-              }`}
-            />
-          ))}
+        <div className="mt-2 flex gap-1" aria-label={`step ${pos} of ${steps.length}`}>
+          {steps.map((s, si) => {
+            const reachable = si + 1 <= Math.max(pos, ready ? getStep(lessonId) : 1);
+            return (
+              <button
+                key={s.id}
+                type="button"
+                aria-label={`go to step ${si + 1}`}
+                title={s.title ?? `step ${si + 1}`}
+                disabled={!reachable}
+                onClick={() => {
+                  setPos(si + 1);
+                  window.scrollTo({ top: 0 });
+                }}
+                className="group flex-1 cursor-pointer py-2.5 disabled:cursor-default"
+              >
+                <span
+                  className={`block rounded-full transition-all duration-150 ${
+                    si + 1 === pos
+                      ? "h-2.5 bg-flame"
+                      : reachable
+                        ? "h-1.5 bg-flame/40 group-hover:h-2.5 group-hover:bg-flame/70"
+                        : "h-1.5 bg-line"
+                  }`}
+                />
+              </button>
+            );
+          })}
         </div>
       </header>
 
@@ -197,13 +205,29 @@ export function LessonPlayer({
         <div>{step.body}</div>
         {step.check &&
           (answered[i] ? (
-            <p className="!my-3 rounded-lg bg-paper-warm px-3.5 py-2 font-mono text-xs text-ink-faint">
-              ✓ checkpoint answered — continue when ready
+            <p
+              className={`!my-3 rounded-xl border px-4 py-3 text-sm font-medium ${
+                answered[i] === "wrong"
+                  ? "border-flame/40 bg-flame-soft !text-ink"
+                  : "border-layer-staging/40 bg-layer-staging/10 !text-ink"
+              }`}
+            >
+              {answered[i] === "right" && (
+                <>✓ <strong>Right</strong> — you&apos;ve got this one.</>
+              )}
+              {answered[i] === "wrong" && (
+                <>✗ <strong>Not quite</strong> — the answer was “{step.check.options[step.check.answer]}”. Worth a re-read before moving on.</>
+              )}
+              {answered[i] === "done" && (
+                <>✓ <strong>Answered</strong> on a previous visit.</>
+              )}
             </p>
           ) : (
             <CheckpointBlock
               check={step.check}
-              onAnswered={() => setAnswered((a) => ({ ...a, [i]: true }))}
+              onAnswered={(correct) =>
+                setAnswered((a) => ({ ...a, [i]: correct ? "right" : "wrong" }))
+              }
             />
           ))}
       </div>

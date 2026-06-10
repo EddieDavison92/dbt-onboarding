@@ -5,16 +5,16 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/85 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2.5">
+        <Link href="/" className="flex shrink-0 items-center gap-2.5">
           <Image src="/logos/dbt.svg" alt="" width={26} height={26} priority />
-          <span className="font-display text-[17px] font-extrabold tracking-tight">
+          <span className="hidden whitespace-nowrap font-display text-[17px] font-extrabold tracking-tight min-[480px]:inline">
             dbt onboarding
           </span>
           <span className="hidden rounded-full border border-line bg-paper-warm px-2 py-0.5 font-mono text-[10px] text-ink-faint sm:inline">
             WNL Analytics
           </span>
         </Link>
-        <nav className="ml-6 hidden items-center gap-4 sm:flex">
+        <nav className="ml-4 flex items-center gap-3 sm:ml-6 sm:gap-4">
           <Link
             href="/"
             className="font-display text-xs font-bold uppercase tracking-wider text-ink-soft transition hover:text-flame-deep"
@@ -44,7 +44,7 @@ export function Header() {
           href="https://github.com/wnl-icb-analytics/dbt-analytics"
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-lg border border-line px-3 py-1.5 font-mono text-xs text-ink-soft transition hover:border-ink hover:text-ink"
+          className="hidden rounded-lg border border-line px-3 py-1.5 font-mono text-xs text-ink-soft transition hover:border-ink hover:text-ink sm:block"
         >
           dbt-analytics ↗
         </a>
