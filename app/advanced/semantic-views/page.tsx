@@ -52,7 +52,12 @@ export default function Page() {
         <li>
           <strong>Which tables should join at all?</strong> Two tables sharing a
           column name is not evidence they are meant to be joined, but it is exactly
-          the evidence an agent uses.
+          the evidence an agent uses. Worse, tables that <em>do</em> share a key can
+          sit over very different populations — a <code>person_id</code> in a GP
+          registration table and the same column in an acute activity table cover
+          different people, on different inclusion rules. Join them naively and the
+          result is not “the population” but their accidental overlap, with no error
+          to tell you so.
         </li>
       </ul>
       <p>
