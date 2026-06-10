@@ -54,7 +54,7 @@ git push
       <CodeBlock
         lang="bash"
         code={`
-git checkout main
+git switch main
 git pull
 `}
       />

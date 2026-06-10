@@ -24,12 +24,12 @@ const COMMANDS: Cmd[] = [
   { group: "Project helpers", cmd: `dbt run-operation generate_model_yaml --args '{"model_names": ["my_model"], "upstream_descriptions": true}'`, desc: "Scaffold YAML for a built model" },
   { group: "Docs", cmd: "dbt docs generate", desc: "Build the documentation site" },
   { group: "Docs", cmd: "dbt docs serve", desc: "Open the docs site locally (lineage, search)" },
-  { group: "Git", cmd: "git checkout -b feat/my-change", desc: "Start a new branch off your current one" },
+  { group: "Git", cmd: "git switch -c feat/my-change", desc: "Create and switch to a new branch" },
   { group: "Git", cmd: "git status", desc: "What changed? Run before every commit" },
   { group: "Git", cmd: "git add path/to/file", desc: "Stage a file for commit" },
   { group: "Git", cmd: 'git commit -m "feat: description"', desc: "Commit staged files (conventional format)" },
-  { group: "Git", cmd: "git push -u origin feat/my-change", desc: "Push the branch to GitHub (first time)" },
-  { group: "Git", cmd: "git checkout main && git pull", desc: "Back to main and update after a merge" },
+  { group: "Git", cmd: "git push", desc: "Push your branch to GitHub" },
+  { group: "Git", cmd: "git switch main && git pull", desc: "Back to main and update after a merge" },
   { group: "Git", cmd: "gh pr create --fill", desc: "Open a pull request from the terminal" },
 ];
 

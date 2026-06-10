@@ -25,7 +25,7 @@ export default function Page() {
       <CodeBlock
         lang="bash"
         code={`
-git checkout -b feat/opening-hours-staging
+git switch -c feat/opening-hours-staging
 `}
       />
 
@@ -61,10 +61,14 @@ git commit -m "feat: add opening hours staging model"
       <CodeBlock
         lang="bash"
         code={`
-git push -u origin feat/opening-hours-staging
+git push
 gh pr create --title "feat: add opening hours staging model" --fill
 `}
       />
+      <p>
+        (If the first push on a new branch asks you to set an upstream, run the
+        command git suggests — it prints it for you.)
+      </p>
       <p>
         (No <code>gh</code>? GitHub prints a “Create a pull request” link when you push —
         clicking it does the same thing.)

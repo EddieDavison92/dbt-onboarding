@@ -10,7 +10,7 @@ const STEPS = [
   {
     name: "branch",
     desc: "Make a safe copy of main to work on",
-    cmd: "git checkout -b feat/diabetes-staging",
+    cmd: "git switch -c feat/diabetes-staging",
   },
   {
     name: "commit",
@@ -20,7 +20,7 @@ const STEPS = [
   {
     name: "push",
     desc: "Upload your branch to GitHub",
-    cmd: "git push -u origin feat/diabetes-staging",
+    cmd: "git push",
   },
   {
     name: "pull request",
