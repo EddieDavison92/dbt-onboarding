@@ -120,6 +120,12 @@ export const ADVANCED: NavItem[] = [
     blurb: "Declared keys, joins and metrics — so query tools stop guessing",
     minutes: 8,
   },
+  {
+    slug: "python-models",
+    title: "Python models",
+    blurb: "Python in the DAG, for the work SQL is bad at",
+    minutes: 8,
+  },
 ];
 
 export type Section = "learn" | "practice" | "advanced";

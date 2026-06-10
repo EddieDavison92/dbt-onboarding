@@ -166,6 +166,23 @@ python scripts/sources/run_all_source_generation.py
         </p>
       </Callout>
 
+      <h2>The third kind of input: seeds</h2>
+      <p>
+        Not everything comes through a feed. Small, slow-changing reference data that
+        the team itself owns — code lists, thresholds, standard population weights —
+        lives as CSV files in the repo&apos;s <code>seeds/</code> directory.{" "}
+        <code>dbt seed</code> loads them into Snowflake as tables, and models{" "}
+        <code>ref()</code> them like any other model. The project uses them for things
+        like <code>bp_thresholds</code> and <code>esp_2013</code> (European Standard
+        Population weights).
+      </p>
+      <p>
+        The advantage over an uploaded table: the values are version-controlled. A
+        change to a clinical threshold arrives as a reviewed pull request with history,
+        not a silent overwrite. The limit: seeds are for small, static data — a few
+        thousand rows of reference values, not a data feed.
+      </p>
+
       <h2>Understand what you found</h2>
       <p>Three questions to answer before you write your staging model:</p>
       <ol>

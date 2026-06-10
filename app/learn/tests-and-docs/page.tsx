@@ -102,6 +102,29 @@ models:
         </p>
       </Callout>
 
+      <h2>When YAML tests aren&apos;t enough: singular tests</h2>
+      <p>
+        The YAML tests above are <em>generic</em> — reusable rules applied to a column.
+        Some assertions are one-offs that only make sense as a query: “no waiting-list
+        pathway should have a decision date before its referral date”. For those,
+        write the query itself as a <code>.sql</code> file in the <code>tests/</code>{" "}
+        directory — a <strong>singular test</strong>. Same contract as every dbt test:
+        select the rows that violate the rule, and zero rows back means pass.
+      </p>
+      <CodeBlock
+        lang="sql"
+        title="tests/assert_decision_not_before_referral.sql (illustrative)"
+        code={`
+select *
+from {{ ref('int_wl_current') }}
+where decision_date < referral_request_received_date
+`}
+      />
+      <p>
+        Because it uses <code>ref()</code>, the test runs whenever the model it checks
+        is built — no registration needed beyond the file existing.
+      </p>
+
       <h2>Documentation is not optional here</h2>
       <p>
         Column <code>description:</code> fields end up in three places: the dbt docs
