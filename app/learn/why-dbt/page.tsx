@@ -51,6 +51,14 @@ export default function Page() {
         </li>
       </ul>
       <p>
+        None of this is anyone working badly. Each script was a sensible answer to a
+        real request, built with the tools available — and if your current setup looks
+        like the list above, it is because that is where every analytics team lands
+        without shared machinery. These are properties of the system, not of the
+        people in it; they only become visible as a problem when the team and the
+        estate grow.
+      </p>
+      <p>
         dbt (data build tool) addresses this with two ideas working together. First,{" "}
         <strong>a shared codebase</strong>: every transformation lives in one git
         repository, so there is one definition of each concept, full history of every
@@ -151,6 +159,26 @@ create or replace view DEV__MODELLING.DBT_STAGING.STG_CSDS_BRIDGING as (
           merge are triggered by GitHub Actions.
         </p>
       </Callout>
+
+      <h2>Couldn&apos;t we build this ourselves?</h2>
+      <p>
+        A fair question — Snowflake has stored procedures and tasks, and a determined
+        team can replicate much of what dbt does with them: chained procedures,
+        scheduled refreshes, even hand-rolled logging. The problem is not building it
+        once; it is what you have after building it fifty times. Every procedure is
+        bespoke — its own error handling, its own logging table, its own schedule, its
+        own documentation (or none) — and each one adds to a pile that someone has to
+        monitor, debug and remember.
+      </p>
+      <p>
+        This is the observability argument for dbt: <strong>visibility is a property
+        of the platform, not something each author rebuilds</strong>. Every model run
+        is logged and timed the same way; every test result is recorded nightly;
+        lineage is derived rather than documented; one failure surfaces in one place,
+        with the affected downstream models known immediately. The question “did last
+        night&apos;s build work, and if not, what is affected?” has a single answer —
+        not fifty procedures to check one by one.
+      </p>
 
       <h2>The bigger picture: the analytics development lifecycle</h2>
       <p>
