@@ -131,6 +131,41 @@ from {{ ref('stg_big_event_feed') }}
         </li>
       </ul>
 
+      <h2>The pitfalls that earn incremental its reputation</h2>
+      <p>
+        The pattern above looks simple; the failure modes are where the care goes:
+      </p>
+      <ul>
+        <li>
+          <strong>Late-arriving data.</strong> If Tuesday&apos;s rows arrive on
+          Thursday, a strict “newer than my max date” filter never picks them up. The
+          common fix is a reprocessing window — recompute the last N days every run
+          and let <code>unique_key</code> merge the overlap.
+        </li>
+        <li>
+          <strong>Logic changes don&apos;t propagate.</strong> Edit the SQL and only
+          new rows get the new logic; history silently keeps the old behaviour until a{" "}
+          <code>--full-refresh</code>. Easy to forget, hard to spot afterwards.
+        </li>
+        <li>
+          <strong>Schema changes need a decision.</strong> Adding a column to the
+          SELECT does not backfill it for existing rows — they hold null until a full
+          refresh. The <code>on_schema_change</code> config decides whether dbt adds
+          the column or fails loudly.
+        </li>
+        <li>
+          <strong>Dev tables drift.</strong> Your dev copy was built from whatever
+          existed when you last full-refreshed it. When dev results look stale or
+          impossible, full-refresh your dev table before debugging anything else.
+        </li>
+      </ul>
+      <p>
+        A reasonable decision rule: stay with <code>table</code> until the nightly
+        rebuild of a specific model is measurably slow or expensive, then make that
+        model incremental and write its <code>is_incremental()</code> filter with the
+        failure modes above in mind.
+      </p>
+
       <Callout kind="warn" title="Incremental is a performance tool, not a default">
         <p>
           Incremental models add real complexity: late-arriving data, schema changes and

@@ -124,6 +124,58 @@ from {{ ref('stg_olids_patient') }}
         </tbody>
       </table>
 
+      <h2>Writing your own</h2>
+      <p>
+        A macro definition is the SQL you would have written, with the varying parts
+        as parameters. A realistic small example — a standard “not yet ended” filter
+        used across effective-dated reference tables:
+      </p>
+      <CodeBlock
+        lang="sql"
+        title="macros/transformations/is_active_record.sql (illustrative)"
+        code={`
+{% macro is_active_record(start_date_col, end_date_col, as_of='current_date()') %}
+    {{ start_date_col }} <= {{ as_of }}
+    and ({{ end_date_col }} is null or {{ end_date_col }} > {{ as_of }})
+{% endmacro %}
+`}
+      />
+      <CodeBlock
+        lang="sql"
+        title="used in a model"
+        code={`
+select organisation_code, organisation_name
+from {{ ref('stg_dictionary_dbo_organisation') }}
+where {{ is_active_record('open_date', 'close_date') }}
+`}
+      />
+      <p>Practical notes when writing one:</p>
+      <ul>
+        <li>
+          <strong>Parameters arrive as text.</strong>{" "}
+          <code>start_date_col</code> is the string <code>open_date</code> pasted into
+          the SQL — the macro never sees data, only names. Defaults (like{" "}
+          <code>as_of</code> above) keep the common case short.
+        </li>
+        <li>
+          <strong>Debug with <code>dbt compile</code>.</strong> If a macro misbehaves,
+          read the rendered SQL — the mistake is usually visible immediately in the
+          expansion.
+        </li>
+        <li>
+          <strong>Navigate with the editor.</strong> In VS Code, go-to-definition on
+          any macro call opens its source — the fastest way to learn what the existing
+          macros actually do.
+        </li>
+        <li>
+          <strong>Place it with its peers.</strong> Shared macros live in{" "}
+          <code>macros/</code>, grouped by purpose (<code>transformations/</code>,{" "}
+          <code>governance/</code>, <code>qof_registers/</code>…). A macro used by one
+          model probably should not exist yet — inline it until the rule of three says
+          otherwise.
+        </li>
+      </ul>
+
       <Callout kind="tip" title="The rule of three">
         <p>
           Pasting the same logic into a third model is the signal to stop — it should

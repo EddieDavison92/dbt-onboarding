@@ -87,38 +87,38 @@ export const ADVANCED: NavItem[] = [
   {
     slug: "macros",
     title: "Macros",
-    blurb: "Reusable SQL — stop copy-pasting that CASE statement",
-    minutes: 5,
+    blurb: "Reusable SQL — define cleaning logic once, use it everywhere",
+    minutes: 7,
   },
   {
     slug: "materialisations",
     title: "Materialisations",
     blurb: "Views, tables, incremental models — and when each earns its keep",
-    minutes: 7,
+    minutes: 9,
   },
   {
     slug: "clustering",
     title: "Clustering",
-    blurb: "cluster_by — helping Snowflake skip the data you don't need",
-    minutes: 5,
+    blurb: "Choosing keys for how data is filtered and joined downstream",
+    minutes: 7,
   },
   {
     slug: "project-config",
     title: "Project configuration",
     blurb: "dbt_project.yml — where the defaults you've been relying on live",
-    minutes: 7,
+    minutes: 9,
   },
   {
     slug: "snapshots",
     title: "Snapshots",
     blurb: "Capturing history when the source only keeps the present",
-    minutes: 6,
+    minutes: 8,
   },
   {
     slug: "semantic-views",
     title: "Semantic views",
-    blurb: "Pre-defined facts, dimensions and metrics for the semantic layer",
-    minutes: 6,
+    blurb: "Declared keys, joins and metrics — so query tools stop guessing",
+    minutes: 8,
   },
 ];
 

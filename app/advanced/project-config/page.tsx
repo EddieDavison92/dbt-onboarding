@@ -118,6 +118,25 @@ dbt ls -s tag:reporting         # list models carrying a tag
 `}
       />
 
+      <h2>Variables: one value, overridable per run</h2>
+      <p>
+        Some values need to be consistent everywhere but changeable for a single run —
+        reference dates are the project&apos;s main example. The QOF reference date is
+        defined once and read through a macro; every register model calls{" "}
+        <code>{"{{ qof_reference_date() }}"}</code> rather than hardcoding a date. To
+        rebuild a register as of a different date, override it at the command line:
+      </p>
+      <CodeBlock
+        lang="bash"
+        code={`
+dbt build -s fct_person_diabetes_register --vars '{"qof_reference_date": "2025-03-31"}'
+`}
+      />
+      <p>
+        One definition in normal use, an explicit override when you need to rewind —
+        and the override is visible in the command, not hidden in an edited file.
+      </p>
+
       <h2>Post-hooks: governance on autopilot</h2>
       <p>
         The project-level <code>+post-hook</code> runs after every model build —

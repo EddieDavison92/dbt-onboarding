@@ -26,6 +26,45 @@ export default function Page() {
         metrics instead of guessing at joins.
       </p>
 
+      <h2>Joins are the hard part</h2>
+      <p>
+        To see why this matters, watch what happens when a tool — or an AI agent — is
+        pointed at the warehouse with no semantic layer. It can read table and column
+        names, so simple single-table queries usually work. Joins are where it breaks
+        down, because the information a correct join needs is not written anywhere it
+        can see:
+      </p>
+      <ul>
+        <li>
+          <strong>Which columns are the keys?</strong> Nothing in the schema says{" "}
+          <code>person_id</code> is the primary key of{" "}
+          <code>dim_person_demographics</code>. An agent guessing from column names
+          might join on <code>sk_patient_id</code> in one place and{" "}
+          <code>person_id</code> in another — both look plausible.
+        </li>
+        <li>
+          <strong>Which direction is one-to-many?</strong> Join a one-row-per-person
+          dimension to a many-rows-per-person observation table and count people:
+          every patient is now counted once per observation. The query runs, returns
+          confident numbers, and is wrong — the classic <strong>fan-out</strong>, and
+          nothing in the warehouse flags it.
+        </li>
+        <li>
+          <strong>Which tables should join at all?</strong> Two tables sharing a
+          column name is not evidence they are meant to be joined, but it is exactly
+          the evidence an agent uses.
+        </li>
+      </ul>
+      <p>
+        A human analyst avoids these traps with knowledge held in their head. The
+        semantic view moves that knowledge into the warehouse:{" "}
+        <code>PRIMARY KEY</code> declarations say what the grain is,{" "}
+        <code>RELATIONSHIPS</code> say what references what, and a consumer derives
+        joins from the declarations instead of guessing. The fan-out case stops being
+        possible to write by accident, because the metric&apos;s aggregation is
+        defined against the right grain.
+      </p>
+
       <h2>What one looks like</h2>
       <p>
         Semantic views live in <code>models/semantic/</code>, prefixed{" "}

@@ -130,6 +130,32 @@ select ...
         builds the table, so each nightly rebuild comes out freshly clustered.
       </p>
 
+      <h2>How to tell it is working</h2>
+      <p>
+        Clustering is measurable, not a matter of faith. Two checks, both in
+        Snowflake:
+      </p>
+      <ul>
+        <li>
+          <strong>Query Profile.</strong> Run a representative filtered query and open
+          its profile in Snowsight. The TableScan node shows{" "}
+          <em>partitions scanned</em> against <em>partitions total</em> — a
+          well-clustered table scans a small fraction; scanning nearly all of them
+          means the key is not helping that query.
+        </li>
+        <li>
+          <strong><code>system$clustering_information</code>.</strong> Pass it a table
+          and a candidate column list and it reports overlap depth — how jumbled the
+          data is with respect to that key — letting you evaluate a key before
+          committing to it.
+        </li>
+      </ul>
+      <p>
+        If a model is large, clustered, and its consumers still scan most partitions,
+        the key does not match how the table is actually queried — change the key, not
+        the queries.
+      </p>
+
       <Callout kind="info" title="Going deeper">
         <p>
           SELECT.dev&apos;s{" "}

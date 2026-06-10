@@ -47,6 +47,51 @@ sk_patient_id  practice_code  dbt_valid_from  dbt_valid_to
         from the PDS feed.
       </p>
 
+      <h2>How a snapshot is defined</h2>
+      <p>
+        Snapshot files look like models with extra configuration: a unique key, and a{" "}
+        <strong>strategy</strong> for detecting that a row has changed:
+      </p>
+      <CodeBlock
+        lang="sql"
+        title="snapshots/snapshot_patient_registration.sql (illustrative)"
+        code={`
+{% snapshot snapshot_patient_registration %}
+
+{{
+    config(
+        unique_key='person_id',
+        strategy='timestamp',
+        updated_at='updated_at'
+    )
+}}
+
+select person_id, practice_code, registration_status, updated_at
+from {{ ref('stg_pds_registration') }}
+
+{% endsnapshot %}
+`}
+      />
+      <ul>
+        <li>
+          <strong><code>timestamp</code> strategy</strong> — dbt compares an{" "}
+          <code>updated_at</code> column and processes only rows whose timestamp moved.
+          Fast; use it whenever the source has a reliable last-updated column.
+        </li>
+        <li>
+          <strong><code>check</code> strategy</strong> — dbt compares the values of a
+          configured column list. Slower, but the only option when the source has no
+          trustworthy timestamp.
+        </li>
+      </ul>
+      <Callout kind="info" title="Snapshots have their own command">
+        <p>
+          <code>dbt build</code> and <code>dbt run</code> do not execute snapshots —
+          they run via <code>dbt snapshot</code>, scheduled before the main nightly
+          build so downstream models always read the latest history.
+        </p>
+      </Callout>
+
       <h2>Querying a snapshot</h2>
       <CodeBlock
         lang="sql"
