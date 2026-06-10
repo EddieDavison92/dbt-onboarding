@@ -13,9 +13,25 @@ export default function Page() {
       slug="find-a-source"
       kicker="Do · Step 2"
       title="Find your source"
-      lede="Every model you write starts from a raw model. Step one is finding it — and understanding how it got there."
+      lede="Your machine is ready. Now pick something to build — ideally from data you already know well."
       minutes={8}
     >
+      <h2>Start with data you already know</h2>
+      <p>
+        The best first model is built on a table you have already worked with — a
+        reference dataset you maintain, a feed you have queried for reports, anything
+        where you could glance at the output and say “that looks right” or “that row
+        count is suspicious”. You will be learning dbt&apos;s mechanics; do not make
+        yourself learn an unfamiliar dataset at the same time. The judgement you
+        already have about the data is what tells you whether the dbt part worked.
+      </p>
+      <p>
+        Whatever you choose, the route is the same: every model starts from a raw
+        model, so step one is finding it — and understanding how it got there. (The
+        rest of this walkthrough uses a practice-opening-hours reference table as its
+        example; substitute your own.)
+      </p>
+
       <h2>Why a generation pipeline exists at all</h2>
       <p>
         Feeds arrive in the data lake (<code>DATA_LAKE</code> is the main source
