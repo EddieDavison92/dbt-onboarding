@@ -147,12 +147,12 @@ select ...
         </p>
       </Callout>
 
-      <Callout kind="tip" title="The review heuristic">
+      <Callout kind="tip" title="A useful self-check">
         <p>
-          Building a sizeable person-level model and not clustering on{" "}
-          <code>person_id</code>? Expect a review comment — it is one of the standard
-          checks on this project. The inverse also applies: clustering a tiny reference
-          table is noise.
+          Building a sizeable person-level model? Consider clustering on{" "}
+          <code>person_id</code> — it is the established pattern here, and reviewers
+          (including CodeRabbit) may suggest it. The inverse also applies: clustering a
+          tiny reference table adds noise without benefit.
         </p>
       </Callout>
 
