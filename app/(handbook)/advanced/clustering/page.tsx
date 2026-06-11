@@ -28,7 +28,7 @@ export default function Page() {
         skipped.
       </p>
       <p>
-        <code>cluster_by</code> tells dbt to sort the data as it builds the table, so
+        <code>cluster_by</code>{" "}tells dbt to sort the data as it builds the table, so
         values that are queried together are stored together.
       </p>
 
@@ -36,14 +36,14 @@ export default function Page() {
       <p>
         Without any <code>cluster_by</code>, Snowflake still micro-partitions
         everything — the data just sits in whatever order it was written. This{" "}
-        <strong>natural clustering</strong> is often adequate: data loaded or built in
+        <strong>natural clustering</strong>{" "}is often adequate: data loaded or built in
         date order prunes well for date filters; a table built from an ordered
         upstream inherits much of that ordering; small and medium tables scan quickly
         regardless. Snowflake manages the partitioning itself and does a reasonable
         job with no help.
       </p>
       <p>
-        So treat <code>cluster_by</code> as an <strong>optimisation, not a
+        So treat <code>cluster_by</code>{" "}as an <strong>optimisation, not a
         default</strong>. The reason to add it is a known access pattern on a large
         table — or a measured problem, a query profile showing scans touching far
         more partitions than the filter should need. Adding it to every model as
@@ -54,7 +54,7 @@ export default function Page() {
       <h2>The project pattern</h2>
       <p>
         You will see this constantly in reporting and published models — it is one line
-        in the same <code>config()</code> block you already know:
+        in the same <code>config()</code>{" "}block you already know:
       </p>
       <CodeBlock
         lang="sql"
@@ -95,26 +95,26 @@ select ...
           cluster by the columns the next consumer will filter or join on
         </strong>
         . Not what the model groups by internally, not its primary key for its own
-        sake — what the queries reading it will put in their <code>where</code> and{" "}
-        <code>on</code> clauses. That means the right key can change as the same data
+        sake — what the queries reading it will put in their <code>where</code>{" "}and{" "}
+        <code>on</code>{" "}clauses. That means the right key can change as the same data
         moves down the pipeline, because the consumer changes.
       </p>
       <p>The OLIDS observation pipeline is a worked example:</p>
       <ul>
         <li>
-          <strong>Upstream, cluster by clinical code.</strong> The concept-mapped
+          <strong>Upstream, cluster by clinical code.</strong>{" "}The concept-mapped
           observation data is clustered by SNOMED concept (for example{" "}
-          <code>stg_olids_concept_map</code> uses{" "}
+          <code>stg_olids_concept_map</code>{" "}uses{" "}
           <code>cluster_by=[&apos;source_concept_id&apos;]</code>), because the next
-          step — building <code>int_</code> models — filters to specific types of
+          step — building <code>int_</code>{" "}models — filters to specific types of
           observation: blood pressure readings, HbA1c results, diagnosis codes. Those
           code filters prune well against code-ordered data.
         </li>
         <li>
-          <strong>Downstream, cluster by person.</strong> Once an <code>int_</code>{" "}
+          <strong>Downstream, cluster by person.</strong>{" "}Once an <code>int_</code>{" "}
           model has extracted its observations, its consumers stop filtering by code —
           registers and demographics join and filter by patient. So the{" "}
-          <code>int_</code> outputs switch to{" "}
+          <code>int_</code>{" "}outputs switch to{" "}
           <code>cluster_by=[&apos;person_id&apos;, &apos;clinical_effective_date&apos;]</code>,
           and everything built on them joins efficiently.
         </li>
@@ -125,7 +125,7 @@ select ...
       </p>
       <ol>
         <li>
-          <strong>Ask who reads this model and what they filter or join on.</strong> If
+          <strong>Ask who reads this model and what they filter or join on.</strong>{" "}If
           you cannot answer, you are not ready to choose a key.
         </li>
         <li>
@@ -133,19 +133,19 @@ select ...
           A handful of columns is the ceiling — more dilutes the benefit.
         </li>
         <li>
-          <strong>Small tables don&apos;t need it.</strong> A 50,000-row lookup fits in
+          <strong>Small tables don&apos;t need it.</strong>{" "}A 50,000-row lookup fits in
           a few micro-partitions; there is nothing to prune. Clustering pays off on
           large person-level and event tables.
         </li>
         <li>
-          <strong>Cardinality matters at both extremes.</strong> A two-value flag
+          <strong>Cardinality matters at both extremes.</strong>{" "}A two-value flag
           barely narrows anything; a unique timestamp scatters grouping. Mid-cardinality
           columns — person, code, practice, date — sit in the useful range.
         </li>
       </ol>
       <p>
         Because our tables are rebuilt by dbt rather than continuously loaded,{" "}
-        <code>cluster_by</code> mostly costs nothing extra: dbt sorts the data as it
+        <code>cluster_by</code>{" "}mostly costs nothing extra: dbt sorts the data as it
         builds the table, so each nightly rebuild comes out freshly clustered.
       </p>
 
@@ -156,14 +156,14 @@ select ...
       </p>
       <ul>
         <li>
-          <strong>Query Profile.</strong> Run a representative filtered query and open
+          <strong>Query Profile.</strong>{" "}Run a representative filtered query and open
           its profile in Snowsight. The TableScan node shows{" "}
-          <em>partitions scanned</em> against <em>partitions total</em> — a
+          <em>partitions scanned</em>{" "}against <em>partitions total</em> — a
           well-clustered table scans a small fraction; scanning nearly all of them
           means the key is not helping that query.
         </li>
         <li>
-          <strong><code>system$clustering_information</code>.</strong> Pass it a table
+          <strong><code>system$clustering_information</code>.</strong>{" "}Pass it a table
           and a candidate column list and it reports overlap depth — how jumbled the
           data is with respect to that key — letting you evaluate a key before
           committing to it.

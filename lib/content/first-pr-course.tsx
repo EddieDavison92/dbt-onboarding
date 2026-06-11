@@ -50,7 +50,7 @@ export const FIRST_PR_COURSE: Course = {
             <>
               <ol>
                 <li>
-                  Install <strong>Git for Windows</strong> from git-scm.com
+                  Install <strong>Git for Windows</strong>{" "}from git-scm.com
                   (defaults are fine).
                 </li>
                 <li>
@@ -66,7 +66,7 @@ export const FIRST_PR_COURSE: Course = {
                 <li>Open the cloned folder in VS Code.</li>
               </ol>
               <p>
-                <strong>You should see:</strong> VS Code offers to install the
+                <strong>You should see:</strong>{" "}VS Code offers to install the
                 workspace&apos;s recommended extensions — say yes; that includes the
                 dbt extension, which gives you error-checking, autocomplete and
                 lineage as you write.
@@ -87,8 +87,8 @@ export const FIRST_PR_COURSE: Course = {
                 connection settings.
               </p>
               <p>
-                <strong>You should see:</strong> since this is your first run with
-                no <code>.env</code> file, it walks you through creating one —
+                <strong>You should see:</strong>{" "}since this is your first run with
+                no <code>.env</code>{" "}file, it walks you through creating one —
                 prompting for the account identifier, your username, role and
                 warehouse (the details from your team lead), then asking how to
                 authenticate. Pick option 1 (browser SSO) unless you have been given
@@ -97,7 +97,7 @@ export const FIRST_PR_COURSE: Course = {
               <Callout kind="warn" title="Why a .env file?">
                 <p>
                   Credentials never go in the repo — the repo is public. The{" "}
-                  <code>.env</code> file lives only on your machine and git is
+                  <code>.env</code>{" "}file lives only on your machine and git is
                   configured to ignore it. The script writes it for you; you never
                   paste secrets into project files.
                 </p>
@@ -124,14 +124,14 @@ export const FIRST_PR_COURSE: Course = {
           body: (
             <>
               <p>
-                Your <code>.env</code> is one of four names you will keep
+                Your <code>.env</code>{" "}is one of four names you will keep
                 meeting. Each has exactly one job — click through:
               </p>
               <ProjectFilesMap />
               <p>
-                One word trap: <code>target: dev</code> in{" "}
-                <code>profiles.yml</code> names a Snowflake connection, while{" "}
-                <code>target/</code> with a slash is the generated folder on
+                One word trap: <code>target: dev</code>{" "}in{" "}
+                <code>profiles.yml</code>{" "}names a Snowflake connection, while{" "}
+                <code>target/</code>{" "}with a slash is the generated folder on
                 your machine. Same word, different jobs — the slash is the
                 clue.
               </p>
@@ -189,15 +189,15 @@ git config --global commit.gpgsign true
             <>
               <CodeBlock lang="bash" code={`dbt debug`} />
               <p>
-                <strong>You should see:</strong> a series of checks ending in{" "}
+                <strong>You should see:</strong>{" "}a series of checks ending in{" "}
                 <strong>“All checks passed!”</strong> — possibly after a browser
                 window opens for Snowflake sign-in.
               </p>
               <p>
-                <strong>If it fails:</strong> the cause is almost always the{" "}
+                <strong>If it fails:</strong>{" "}the cause is almost always the{" "}
                 <code>.env</code> — a typo in the account identifier or a role you
                 don&apos;t have yet. Fix the value in <code>.env</code>, open a new
-                terminal (so it reloads), and run <code>dbt debug</code> again.
+                terminal (so it reloads), and run <code>dbt debug</code>{" "}again.
               </p>
               <p>
                 Green? Your machine is done — permanently. Everything from here is
@@ -226,7 +226,7 @@ git config --global commit.gpgsign true
       slug: "pick-your-table",
       title: "Pick your table",
       blurb: "Choose familiar data and state its grain",
-      minutes: 10,
+      minutes: 12,
       steps: [
         {
           id: "familiar",
@@ -252,13 +252,13 @@ git config --global commit.gpgsign true
           body: (
             <>
               <p>
-                Before any SQL, answer: <strong>one row per what?</strong> One row
+                Before any SQL, answer: <strong>one row per what?</strong>{" "}One row
                 per site per weekday? Per patient per referral per week? Write the
                 sentence down — it decides your tests later, and not being able to
                 say it is the signal you don&apos;t know the table well enough yet.
               </p>
               <p>
-                <strong>You should have:</strong> a table in mind, and its grain in
+                <strong>You should have:</strong>{" "}a table in mind, and its grain in
                 one sentence. The rest of the course uses a practice-opening-hours
                 reference table (“one row per site per day of week”) as its example —
                 substitute yours throughout.
@@ -279,6 +279,36 @@ git config --global commit.gpgsign true
             affirm: "one row per what — the grain sentence becomes your most important test.",
           },
         },
+        {
+          id: "branch",
+          title: "Do: branch from fresh main",
+          body: (
+            <>
+              <p>
+                You know what you are building, so create the branch before changing
+                project files. First make sure the working tree is clean, then update{" "}
+                <code>main</code>{" "}and branch from that latest commit:
+              </p>
+              <CodeBlock
+                lang="bash"
+                code={`git status
+git switch main
+git pull
+git switch -c feat/opening-hours-staging`}
+              />
+              <p>
+                Replace <code>opening-hours-staging</code>{" "}with a short description of
+                your model. From this point onward, every edit in the course should be
+                on that feature branch. If <code>git status</code>{" "}is not clean, stop
+                before pulling and work out what those existing changes are.
+              </p>
+              <p>
+                <strong>You should see:</strong>{" "}
+                <code>Switched to a new branch</code>, followed by your branch name.
+              </p>
+            </>
+          ),
+        },
       ],
     },
     // ------------------------------------------------------------------
@@ -297,7 +327,7 @@ git config --global commit.gpgsign true
                 1:1 view that renames a source table&apos;s columns to clean
                 snake_case (the why is in the handbook&apos;s sources page; short
                 version: supplier column names like{" "}
-                <code>&quot;UNIQUE SUBMISSION ID&quot;</code> are handled once, by a
+                <code>&quot;UNIQUE SUBMISSION ID&quot;</code>{" "}are handled once, by a
                 script, so nobody deals with them downstream).
               </p>
               <p>So step one is always: does the raw model already exist?</p>
@@ -310,12 +340,12 @@ git config --global commit.gpgsign true
           body: (
             <>
               <p>
-                In VS Code press <code>Ctrl+P</code> and type{" "}
-                <code>raw_</code> plus a guess at your table&apos;s name:
+                In VS Code press <code>Ctrl+P</code>{" "}and type{" "}
+                <code>raw_</code>{" "}plus a guess at your table&apos;s name:
               </p>
               <CodeBlock lang="text" code={`raw_reference_opening`} />
               <p>
-                <strong>If you find it:</strong> open it. The column list (already
+                <strong>If you find it:</strong>{" "}open it. The column list (already
                 cleaned) is what you have to work with. Preview real rows:
               </p>
               <CodeBlock lang="bash" code={`dbt show -s raw_reference_opening_hours`} />
@@ -335,7 +365,7 @@ git config --global commit.gpgsign true
                 The table exists in the Snowflake data lake but has no raw model.
                 There are exactly three cases, and one question decides:{" "}
                 <strong>is the table&apos;s schema already known to the project?</strong>{" "}
-                Open <code>source_mappings.yml</code> (repo root) and look for the
+                Open <code>source_mappings.yml</code>{" "}(repo root) and look for the
                 table&apos;s database and schema.
               </p>
               <table>
@@ -377,9 +407,9 @@ git config --global commit.gpgsign true
                 every table it finds — including yours.
               </p>
               <p>
-                <strong>You should see:</strong> a new entry in the schema&apos;s{" "}
-                <code>auto_*.yml</code> under <code>models/sources/</code>, and a new{" "}
-                <code>raw_…sql</code> file under <code>models/raw/&lt;domain&gt;/</code>.
+                <strong>You should see:</strong>{" "}a new entry in the schema&apos;s{" "}
+                <code>auto_*.yml</code>{" "}under <code>models/sources/</code>, and a new{" "}
+                <code>raw_…sql</code>{" "}file under <code>models/raw/&lt;domain&gt;/</code>.
                 Commit both generated files with your work.
               </p>
             </>
@@ -391,10 +421,10 @@ git config --global commit.gpgsign true
           body: (
             <>
               <p>
-                Schemas marked <code>manual: true</code> (like analyst-managed
+                Schemas marked <code>manual: true</code>{" "}(like analyst-managed
                 uploads) use a curated table list, so a stray upload can&apos;t
                 silently become a source. Add your table to the schema&apos;s{" "}
-                <code>manual_*.yml</code> in <code>models/sources/</code> — copy an
+                <code>manual_*.yml</code>{" "}in <code>models/sources/</code> — copy an
                 existing table block and edit the name and columns:
               </p>
               <CodeBlock
@@ -411,7 +441,7 @@ git config --global commit.gpgsign true
               />
               <p>
                 Then run the same pipeline command as case 1.{" "}
-                <strong>You should see:</strong> a generated raw model for your
+                <strong>You should see:</strong>{" "}a generated raw model for your
                 table; column types in your YAML are synced against the live schema,
                 and any mismatch prints a drift warning to fix.
               </p>
@@ -439,8 +469,8 @@ git config --global commit.gpgsign true
             <>
               <Callout kind="warn" title="Never hand-edit generated files">
                 <p>
-                  Everything under <code>models/raw/</code> and every{" "}
-                  <code>auto_*.yml</code> is regenerated on each pipeline run — hand
+                  Everything under <code>models/raw/</code>{" "}and every{" "}
+                  <code>auto_*.yml</code>{" "}is regenerated on each pipeline run — hand
                   edits are silently overwritten. Wrong column name? Fix it in the
                   generator config or the manual YAML, never in the output.
                 </p>
@@ -463,7 +493,7 @@ git config --global commit.gpgsign true
             <>
               <p>
                 In this project, the folder you put a file in is not tidiness — it{" "}
-                <strong>is</strong> configuration. The folder decides whether your
+                <strong>is</strong>{" "}configuration. The folder decides whether your
                 model builds as a view or table, which database and schema it lands
                 in, what tags and governance hooks it gets. Choose the folder and
                 you have configured the model.
@@ -518,7 +548,7 @@ git config --global commit.gpgsign true
                 code={`models/staging/shared/stg_reference_opening_hours.sql`}
               />
               <p>
-                <strong>You should have:</strong> an empty <code>.sql</code> file in
+                <strong>You should have:</strong>{" "}an empty <code>.sql</code>{" "}file in
                 the right folder. That empty file is already configured — the
                 staging folder will make it a view in the staging schema.
               </p>
@@ -592,9 +622,9 @@ from {{ ref('raw_reference_opening_hours') }}
               <p>
                 The split that matters: parse and compile only read and render
                 — they cannot touch Snowflake. Only execution does warehouse
-                work. That is why <code>dbt compile</code> is always safe, and
+                work. That is why <code>dbt compile</code>{" "}is always safe, and
                 why it is your window into what dbt generated whenever a{" "}
-                <code>ref()</code> or macro surprises you.
+                <code>ref()</code>{" "}or macro surprises you.
               </p>
             </>
           ),
@@ -620,15 +650,15 @@ dbt compile                                # render every model to plain SQL
 `}
               />
               <p>
-                <strong>You should see:</strong> five sensible-looking rows from{" "}
-                <code>dbt show</code>; and <code>dbt compile</code> finishing in
+                <strong>You should see:</strong>{" "}five sensible-looking rows from{" "}
+                <code>dbt show</code>; and <code>dbt compile</code>{" "}finishing in
                 seconds with no errors. While you type, the dbt extension is doing
                 the same checking live — a red underline now is an error{" "}
-                <code>dbt build</code> would have given you later.
+                <code>dbt build</code>{" "}would have given you later.
               </p>
               <p>
-                <strong>If show fails:</strong> read the message — a misspelled{" "}
-                <code>ref()</code> names the model it can&apos;t find; a SQL error
+                <strong>If show fails:</strong>{" "}read the message — a misspelled{" "}
+                <code>ref()</code>{" "}names the model it can&apos;t find; a SQL error
                 points at the line.
               </p>
             </>
@@ -661,7 +691,7 @@ dbt compile                                # render every model to plain SQL
           body: (
             <>
               <p>
-                Next to your <code>.sql</code> goes a <code>.yml</code> file with
+                Next to your <code>.sql</code>{" "}goes a <code>.yml</code>{" "}file with
                 the same name. It does three jobs: names an owner, documents the
                 columns, and declares <strong>tests</strong> — assertions checked on
                 every build, forever. CI requires it; more importantly, it is where
@@ -713,12 +743,12 @@ models:
                 </li>
                 <li>
                   <strong>the grain test</strong> — remember your one-sentence grain?{" "}
-                  <code>unique_combination_of_columns</code> on those columns is the
+                  <code>unique_combination_of_columns</code>{" "}on those columns is the
                   single most valuable test you can write: it fails the moment
                   anything duplicates rows.
                 </li>
                 <li>
-                  <strong>not_null</strong> on the key columns the grain depends on.
+                  <strong>not_null</strong>{" "}on the key columns the grain depends on.
                 </li>
               </ul>
               <p>
@@ -773,7 +803,7 @@ models:
             <>
               <CodeBlock lang="bash" code={`dbt build -s stg_reference_opening_hours`} />
               <p>
-                <code>build</code> = run the model <em>and</em> its tests, in
+                <code>build</code> = run the model <em>and</em>{" "}its tests, in
                 order, in the <strong>DEV__ databases</strong> — the shared
                 development copy of the warehouse. Nothing you do here touches
                 production.
@@ -806,8 +836,8 @@ Completed successfully
               </p>
               <CommandDAG />
               <p>
-                <code>run</code> creates without testing; <code>test</code>{" "}
-                tests without creating; <code>build</code> does both, in DAG
+                <code>run</code>{" "}creates without testing; <code>test</code>{" "}
+                tests without creating; <code>build</code>{" "}does both, in DAG
                 order, and stops downstream work when a test fails. For
                 everyday model work, build is the answer.
               </p>
@@ -835,7 +865,7 @@ Completed successfully
               <p>
                 A FAIL line prints the count of violating rows. This is not a
                 setback — <strong>your test just told you something true about the
-                data</strong> that nobody had written down. The usual first-model
+                data</strong>{" "}that nobody had written down. The usual first-model
                 discoveries:
               </p>
               <ul>
@@ -853,7 +883,7 @@ Completed successfully
               <p>
                 Investigate with <code>dbt show -s your_model --limit 20</code>, or
                 run the failing test&apos;s compiled SQL from{" "}
-                <code>target/compiled/</code> to see the exact offending rows.
+                <code>target/compiled/</code>{" "}to see the exact offending rows.
               </p>
             </>
           ),
@@ -880,7 +910,7 @@ Completed successfully
               <p>
                 Iterate — edit, <code>dbt build -s stg_reference_opening_hours</code>,
                 read — until everything passes.{" "}
-                <strong>You should have:</strong> a fully green build, and (worth the
+                <strong>You should have:</strong>{" "}a fully green build, and (worth the
                 30 seconds) a look at your actual table in Snowflake, sitting in the
                 DEV__ database for its layer.
               </p>
@@ -893,7 +923,7 @@ Completed successfully
           body: (
             <>
               <p>
-                You have been typing <code>-s your_model</code> all along —
+                You have been typing <code>-s your_model</code>{" "}all along —
                 that is a <strong>selector</strong>. The command says what to
                 do; the selector says which nodes to do it to. A <code>+</code>{" "}
                 extends the selection along the DAG:
@@ -925,7 +955,7 @@ Completed successfully
             <>
               <p>
                 Before running a selector wider than one model, see what it
-                catches — replace <code>build</code> with <code>ls</code>:
+                catches — replace <code>build</code>{" "}with <code>ls</code>:
               </p>
               <TryIt
                 stages={[
@@ -939,7 +969,7 @@ stg_reference_opening_hours`,
                 done="You saw the selection without running any of it."
               />
               <p>
-                <strong>You should see:</strong> just your model and its raw
+                <strong>You should see:</strong>{" "}just your model and its raw
                 parent. Cheap, instant, and there is nothing left to guess.
               </p>
             </>
@@ -993,21 +1023,24 @@ stg_reference_opening_hours`,
             <>
               <p>
                 Time for the git loop from the essentials course — for real this
-                time. If you have been working on <code>main</code> locally, no harm
-                done: creating the branch now takes your changes with it.
+                time. You should still be on the feature branch you created before
+                editing any project files. Confirm that before staging anything:
               </p>
               <CodeBlock
                 lang="bash"
-                code={`
-git switch -c feat/opening-hours-staging
-git status
-`}
+                code={`git status`}
               />
               <p>
-                <strong>You should see:</strong> your <code>.sql</code> and{" "}
+                <strong>You should see:</strong>{" "}your <code>.sql</code>{" "}and{" "}
                 <code>.yml</code>{" "}listed as untracked/modified — and nothing else.
                 If generated source files from earlier are listed, they belong in
                 this PR too. Anything you don&apos;t recognise: don&apos;t stage it.
+              </p>
+              <p>
+                If status says <code>On branch main</code>, create your feature branch
+                now with <code>git switch -c feat/opening-hours-staging</code>; your
+                uncommitted changes will move with you. Do not pull until those
+                changes are safely on a branch.
               </p>
               <CodeBlock
                 lang="bash"
@@ -1027,7 +1060,7 @@ git push
           body: (
             <>
               <p>
-                <strong>You should see:</strong> the push output includes a “Create a
+                <strong>You should see:</strong>{" "}the push output includes a “Create a
                 pull request” link — click it (or run <code>gh pr create</code>).
                 Write a description a stranger could follow:
               </p>
@@ -1058,7 +1091,7 @@ Needed for the access dashboard; nothing currently stages this table.
           body: (
             <>
               <p>
-                <strong>You should see, within a couple of minutes:</strong> checks
+                <strong>You should see, within a couple of minutes:</strong>{" "}checks
                 appearing at the bottom of the PR (compile, code quality, ownership)
                 and <strong>CodeRabbit</strong> — an automated reviewer — commenting
                 on your diff. A human reviewer is auto-assigned; once they are, the
@@ -1111,7 +1144,7 @@ git push
 `}
               />
               <p>
-                — and <strong>reply to the comment</strong> (“done in abc123”) so the
+                — and <strong>reply to the comment</strong>{" "}(“done in abc123”) so the
                 reviewer doesn&apos;t have to re-read your whole diff. Disagree with
                 a comment? Say why in the thread; reviewers are often missing
                 context you have.
@@ -1137,7 +1170,7 @@ git pull
 `}
               />
               <p>
-                <strong>You should see:</strong> your model in the pulled main — and
+                <strong>You should see:</strong>{" "}your model in the pulled main — and
                 shortly after the merge, the deploy workflow building it into
                 production Snowflake.
               </p>
@@ -1160,7 +1193,7 @@ git pull
                   your column descriptions are live in dbt docs and as Snowflake
                   comments;
                 </li>
-                <li>anyone can <code>ref()</code> your model and build on it.</li>
+                <li>anyone can <code>ref()</code>{" "}your model and build on it.</li>
               </ul>
               <p>
                 That is the full loop, and it is the same loop for everything from a

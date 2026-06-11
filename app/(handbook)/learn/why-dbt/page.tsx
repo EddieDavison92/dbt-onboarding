@@ -24,27 +24,27 @@ export default function Page() {
       </p>
       <ul>
         <li>
-          <strong>Order of operations is manual.</strong> The summary table is only
+          <strong>Order of operations is manual.</strong>{" "}The summary table is only
           right if the reference data refreshed first, which is only right if the feed
           loaded — and the person who knows the sequence runs it by hand. One step out
           of order and the numbers are wrong, with nothing to say so.
         </li>
         <li>
-          <strong>Nobody knows what depends on what.</strong> Renaming a column means
+          <strong>Nobody knows what depends on what.</strong>{" "}Renaming a column means
           guessing what might break.
         </li>
         <li>
-          <strong>Nothing is tested.</strong> A duplicate patient row appears, and the first
+          <strong>Nothing is tested.</strong>{" "}A duplicate patient row appears, and the first
           you hear is a dashboard looking wrong.
         </li>
         <li>
-          <strong>Everything is built end-to-end, every time.</strong> Each script
+          <strong>Everything is built end-to-end, every time.</strong>{" "}Each script
           runs the whole journey from source to product privately — the cleaning, the
           lookups, the business logic, all repeated per output and reused by nothing.
           The same column gets cleaned a dozen different ways across a dozen scripts.
         </li>
         <li>
-          <strong>Everyone works alone.</strong> Logic lives in personal worksheets and
+          <strong>Everyone works alone.</strong>{" "}Logic lives in personal worksheets and
           scripts, so five people hold five slightly different definitions of “current
           registration”, there is no history of who changed what, and work leaves when
           its author does.
@@ -63,14 +63,14 @@ export default function Page() {
         <strong>a shared codebase</strong>: every transformation lives in one git
         repository, so there is one definition of each concept, full history of every
         change, and a review step before anything ships. Second,{" "}
-        <strong>every transformation is a SELECT statement</strong> whose dependencies
+        <strong>every transformation is a SELECT statement</strong>{" "}whose dependencies
         dbt can read — so the order of operations is derived from the code itself,
         computed fresh on every run, and never something a person has to remember.
       </p>
 
       <h2>What a dbt model actually is</h2>
       <p>
-        A <em>model</em> is one <code>.sql</code> file containing one SELECT statement.
+        A <em>model</em>{" "}is one <code>.sql</code>{" "}file containing one SELECT statement.
         That is the whole definition. This is a real (small) model from our project:
       </p>
       <CodeBlock
@@ -90,13 +90,13 @@ from {{ ref('raw_csds_bridging') }}
       </p>
       <ol>
         <li>
-          <strong>Compile.</strong> dbt renders the template parts — here,{" "}
-          <code>{"{{ ref('raw_csds_bridging') }}"}</code> becomes the real
+          <strong>Compile.</strong>{" "}dbt renders the template parts — here,{" "}
+          <code>{"{{ ref('raw_csds_bridging') }}"}</code>{" "}becomes the real
           database-qualified table name for whichever environment you are in (the
           DEV__ databases while developing, production after merge).
         </li>
         <li>
-          <strong>Run.</strong> dbt wraps the compiled SELECT in the right DDL and
+          <strong>Run.</strong>{" "}dbt wraps the compiled SELECT in the right DDL and
           executes it in Snowflake. For this model that means, roughly:
         </li>
       </ol>
@@ -113,17 +113,17 @@ create or replace view DEV__MODELLING.DBT_STAGING.STG_CSDS_BRIDGING as (
 `}
       />
       <p>
-        Whether the wrapper is <code>create view</code> or <code>create table</code>,
+        Whether the wrapper is <code>create view</code>{" "}or <code>create table</code>,
         and which database it lands in, comes from project configuration — not from
         your file. Rebuilding is always safe because models are{" "}
         <code>create or replace</code>: run it again, get the same object again. You
         can see the compiled SQL for any model with <code>dbt compile</code>.
       </p>
       <p>
-        The <code>{"{{ ref('…') }}"}</code> call is the key mechanism — and remember, a
-        model is just another <code>.sql</code> file in the project. So instead of
+        The <code>{"{{ ref('…') }}"}</code>{" "}call is the key mechanism — and remember, a
+        model is just another <code>.sql</code>{" "}file in the project. So instead of
         hardcoding a table name, you point at a file: <code>ref(&apos;raw_csds_bridging&apos;)</code>{" "}
-        means “the table that <code>raw_csds_bridging.sql</code> builds, wherever that
+        means “the table that <code>raw_csds_bridging.sql</code>{" "}builds, wherever that
         is”. From those references dbt assembles the full dependency graph (the{" "}
         <strong>DAG</strong>) and always builds upstream models first.
       </p>
@@ -133,11 +133,11 @@ create or replace view DEV__MODELLING.DBT_STAGING.STG_CSDS_BRIDGING as (
       <ol>
         <li>
           <strong>Source data lands in Snowflake</strong> — in the{" "}
-          <code>DATA_LAKE</code> database (the main source) and{" "}
+          <code>DATA_LAKE</code>{" "}database (the main source) and{" "}
           <code>DATA_LAKE__NCL</code>: SUS, CSDS, OLIDS GP data, reference files.
         </li>
         <li>
-          <strong>dbt transforms it</strong> through five layers (next lesson) into
+          <strong>dbt transforms it</strong>{" "}through five layers (next lesson) into
           analytics-ready and published datasets.
         </li>
         <li>
@@ -236,26 +236,26 @@ create or replace view DEV__MODELLING.DBT_STAGING.STG_CSDS_BRIDGING as (
       </p>
       <ul>
         <li>
-          <strong>You start from finished work.</strong> Demographics, disease
+          <strong>You start from finished work.</strong>{" "}Demographics, disease
           registers, geography lookups, waiting lists — hundreds of tested models
           already exist. A new analysis usually begins by joining two or three{" "}
           <code>ref()</code>s, not by rebuilding a person spine from raw feeds. The
           weeks that used to go into “assemble the population” collapse into a SELECT.
         </li>
         <li>
-          <strong>The boilerplate writes itself.</strong> Source declarations and raw
+          <strong>The boilerplate writes itself.</strong>{" "}Source declarations and raw
           models are generated by scripts; documentation YAML is scaffolded by a
           command; age bands and organisation-code cleaning are one-line macro calls.
           The typing you do is the interesting part.
         </li>
         <li>
-          <strong>Mistakes surface in seconds, not days.</strong> The editor underlines
+          <strong>Mistakes surface in seconds, not days.</strong>{" "}The editor underlines
           a broken ref or a missing column as you type; compiling the whole project
           takes seconds. Compare that with discovering a typo when a scheduled script
           fails overnight.
         </li>
         <li>
-          <strong>Refreshes stop being your job.</strong> Whatever you build reruns
+          <strong>Refreshes stop being your job.</strong>{" "}Whatever you build reruns
           every night without you. No more Monday mornings re-running a chain of
           worksheets so a report is current.
         </li>

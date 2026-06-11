@@ -19,9 +19,9 @@ export default function Page() {
       <h2>SQL functions, written in Jinja</h2>
       <p>
         A macro is a reusable snippet of SQL with parameters. Anything between{" "}
-        <code>{"{% … %}"}</code> or <code>{"{{ … }}"}</code> in a model is Jinja — dbt
+        <code>{"{% … %}"}</code>{" "}or <code>{"{{ … }}"}</code>{" "}in a model is Jinja — dbt
         renders it to plain SQL before Snowflake sees it. You have been using macros
-        from the start: <code>ref()</code> and <code>source()</code> are macros. The
+        from the start: <code>ref()</code>{" "}and <code>source()</code>{" "}are macros. The
         project keeps shared ones in <code>macros/</code>.
       </p>
 
@@ -43,7 +43,7 @@ from {{ ref('stg_some_activity_feed') }}
 `}
       />
       <p>
-        <code>clean_organisation_id()</code> keeps the code if it is a recognised
+        <code>clean_organisation_id()</code>{" "}keeps the code if it is a recognised
         organisation, and otherwise falls back to the 3-character parent code. Every
         model that uses it resolves codes the same way — and when the rule needs to
         change, it changes in one place.
@@ -66,7 +66,7 @@ from {{ ref('stg_olids_patient') }}
       <p>
         One call expands into <code>age</code>, <code>age_band_5y</code>,{" "}
         <code>age_band_10y</code>, <code>age_band_nhs</code>, <code>age_band_ons</code>,{" "}
-        <code>life_stage</code> and school-age flags — consistent across every model,
+        <code>life_stage</code>{" "}and school-age flags — consistent across every model,
         with the band boundaries defined once.
       </p>
 
@@ -153,22 +153,22 @@ where {{ is_active_record('open_date', 'close_date') }}
       <ul>
         <li>
           <strong>Parameters arrive as text.</strong>{" "}
-          <code>start_date_col</code> is the string <code>open_date</code> pasted into
+          <code>start_date_col</code>{" "}is the string <code>open_date</code>{" "}pasted into
           the SQL — the macro never sees data, only names. Defaults (like{" "}
-          <code>as_of</code> above) keep the common case short.
+          <code>as_of</code>{" "}above) keep the common case short.
         </li>
         <li>
-          <strong>Debug with <code>dbt compile</code>.</strong> If a macro misbehaves,
+          <strong>Debug with <code>dbt compile</code>.</strong>{" "}If a macro misbehaves,
           read the rendered SQL — the mistake is usually visible immediately in the
           expansion.
         </li>
         <li>
-          <strong>Navigate with the editor.</strong> In VS Code, go-to-definition on
+          <strong>Navigate with the editor.</strong>{" "}In VS Code, go-to-definition on
           any macro call opens its source — the fastest way to learn what the existing
           macros actually do.
         </li>
         <li>
-          <strong>Place it with its peers.</strong> Shared macros live in{" "}
+          <strong>Place it with its peers.</strong>{" "}Shared macros live in{" "}
           <code>macros/</code>, grouped by purpose (<code>transformations/</code>,{" "}
           <code>governance/</code>, <code>qof_registers/</code>…). A macro used by one
           model probably should not exist yet — inline it until the rule of three says
@@ -179,7 +179,7 @@ where {{ is_active_record('open_date', 'close_date') }}
       <Callout kind="tip" title="The rule of three">
         <p>
           Pasting the same logic into a third model is the signal to stop — it should
-          become a macro (or an <code>int_</code> model, if it is more data than logic).
+          become a macro (or an <code>int_</code>{" "}model, if it is more data than logic).
           Ask in review if unsure; promoting logic later is harder than starting it in
           the right place.
         </p>
@@ -187,7 +187,7 @@ where {{ is_active_record('open_date', 'close_date') }}
 
       <Callout kind="warn">
         <p>
-          Macros are rendered <em>before</em> the SQL runs — they can respond to
+          Macros are rendered <em>before</em>{" "}the SQL runs — they can respond to
           arguments and project configuration, but not to data. Logic that needs to read
           rows to make decisions belongs in a model, not a macro.
         </p>

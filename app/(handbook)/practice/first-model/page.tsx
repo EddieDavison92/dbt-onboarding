@@ -21,8 +21,8 @@ export default function Page() {
 
       <h2>Place and name it</h2>
       <p>
-        Use <code>models/staging/&#123;domain&#125;/</code> and a{" "}
-        <code>stg_&#123;source&#125;_&#123;table&#125;.sql</code> filename. Folder
+        Use <code>models/staging/&#123;domain&#125;/</code>{" "}and a{" "}
+        <code>stg_&#123;source&#125;_&#123;table&#125;.sql</code>{" "}filename. Folder
         placement supplies project configuration, so check a neighbouring model before
         inventing a new path.
       </p>
@@ -48,7 +48,7 @@ from {{ ref('raw_reference_opening_hours') }}
       <ul>
         <li>
           Read one raw model with <code>ref()</code>. Do not call{" "}
-          <code>source()</code> or hardcode a database table.
+          <code>source()</code>{" "}or hardcode a database table.
         </li>
         <li>
           Select columns explicitly. Rename, trim and cast into project conventions.
@@ -58,7 +58,7 @@ from {{ ref('raw_reference_opening_hours') }}
         </li>
         <li>
           Move joins, derived business rules and analytical filters into an{" "}
-          <code>int_</code> model.
+          <code>int_</code>{" "}model.
         </li>
       </ul>
 
@@ -86,10 +86,10 @@ dbt compile -s stg_reference_opening_hours
       <Checklist
         id="first-model"
         items={[
-          { key: "file", label: <>Correct folder and <code>stg_</code> name</> },
-          { key: "ref", label: <>One raw <code>ref()</code> and explicit columns</> },
+          { key: "file", label: <>Correct folder and <code>stg_</code>{" "}name</> },
+          { key: "ref", label: <>One raw <code>ref()</code>{" "}and explicit columns</> },
           { key: "scope", label: <>No joins or business filters</> },
-          { key: "show", label: <><code>dbt show</code> returns sensible rows</> },
+          { key: "show", label: <><code>dbt show</code>{" "}returns sensible rows</> },
         ]}
       />
     </LessonShell>

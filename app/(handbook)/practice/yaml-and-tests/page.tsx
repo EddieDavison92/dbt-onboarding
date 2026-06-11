@@ -60,7 +60,7 @@ models:
           Put the grain in the model description: <em>one row per what?</em>
         </li>
         <li>
-          Test that grain with <code>unique</code> or{" "}
+          Test that grain with <code>unique</code>{" "}or{" "}
           <code>unique_combination_of_columns</code>.
         </li>
         <li>
@@ -76,7 +76,7 @@ models:
       <Callout kind="warn" title="Use the current YAML shape">
         <p>
           Use <code>data_tests:</code>, with package test arguments nested under{" "}
-          <code>arguments:</code>. The older <code>tests:</code> form has been migrated
+          <code>arguments:</code>. The older <code>tests:</code>{" "}form has been migrated
           out of this project.
         </p>
       </Callout>

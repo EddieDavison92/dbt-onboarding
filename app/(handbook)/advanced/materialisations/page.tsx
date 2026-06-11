@@ -69,7 +69,7 @@ export default function Page() {
 
       <h2>Overriding per model</h2>
       <p>
-        A <code>config()</code> block at the top of the model wins over the project
+        A <code>config()</code>{" "}block at the top of the model wins over the project
         default:
       </p>
       <CodeBlock
@@ -90,7 +90,7 @@ select ...
         A full rebuild of a multi-billion-row activity table every night is wasteful
         when yesterday is the only new data. An incremental model builds the full table
         once, then on later runs only processes rows matching the{" "}
-        <code>is_incremental()</code> filter and merges them in:
+        <code>is_incremental()</code>{" "}filter and merges them in:
       </p>
       <CodeBlock
         lang="sql"
@@ -118,14 +118,14 @@ from {{ ref('stg_big_event_feed') }}
       />
       <ul>
         <li>
-          <code>{"{{ this }}"}</code> refers to the already-built table itself.
+          <code>{"{{ this }}"}</code>{" "}refers to the already-built table itself.
         </li>
         <li>
-          <code>unique_key</code> lets dbt update changed rows rather than duplicate
+          <code>unique_key</code>{" "}lets dbt update changed rows rather than duplicate
           them.
         </li>
         <li>
-          <code>dbt build --full-refresh -s my_model</code> drops and rebuilds from
+          <code>dbt build --full-refresh -s my_model</code>{" "}drops and rebuilds from
           scratch — required after logic changes, so existing rows pick up the new
           logic.
         </li>
@@ -134,7 +134,7 @@ from {{ ref('stg_big_event_feed') }}
       <h2>The ones we deliberately don&apos;t use</h2>
       <p>
         Snowflake offers two further options you may read about:{" "}
-        <strong>dynamic tables</strong> (dbt supports{" "}
+        <strong>dynamic tables</strong>{" "}(dbt supports{" "}
         <code>materialized=&apos;dynamic_table&apos;</code>) and{" "}
         <strong>materialised views</strong>. Both are tables that Snowflake keeps
         fresh by itself — you declare a target lag or let Snowflake decide, and it
@@ -161,32 +161,32 @@ from {{ ref('stg_big_event_feed') }}
       </p>
       <ul>
         <li>
-          <strong>Late-arriving data.</strong> If Tuesday&apos;s rows arrive on
+          <strong>Late-arriving data.</strong>{" "}If Tuesday&apos;s rows arrive on
           Thursday, a strict “newer than my max date” filter never picks them up. The
           common fix is a reprocessing window — recompute the last N days every run
-          and let <code>unique_key</code> merge the overlap.
+          and let <code>unique_key</code>{" "}merge the overlap.
         </li>
         <li>
-          <strong>Logic changes don&apos;t propagate.</strong> Edit the SQL and only
+          <strong>Logic changes don&apos;t propagate.</strong>{" "}Edit the SQL and only
           new rows get the new logic; history silently keeps the old behaviour until a{" "}
           <code>--full-refresh</code>. Easy to forget, hard to spot afterwards.
         </li>
         <li>
-          <strong>Schema changes need a decision.</strong> Adding a column to the
+          <strong>Schema changes need a decision.</strong>{" "}Adding a column to the
           SELECT does not backfill it for existing rows — they hold null until a full
-          refresh. The <code>on_schema_change</code> config decides whether dbt adds
+          refresh. The <code>on_schema_change</code>{" "}config decides whether dbt adds
           the column or fails loudly.
         </li>
         <li>
-          <strong>Dev tables drift.</strong> Your dev copy was built from whatever
+          <strong>Dev tables drift.</strong>{" "}Your dev copy was built from whatever
           existed when you last full-refreshed it. When dev results look stale or
           impossible, full-refresh your dev table before debugging anything else.
         </li>
       </ul>
       <p>
-        A reasonable decision rule: stay with <code>table</code> until the nightly
+        A reasonable decision rule: stay with <code>table</code>{" "}until the nightly
         rebuild of a specific model is measurably slow or expensive, then make that
-        model incremental and write its <code>is_incremental()</code> filter with the
+        model incremental and write its <code>is_incremental()</code>{" "}filter with the
         failure modes above in mind.
       </p>
 
@@ -195,7 +195,7 @@ from {{ ref('stg_big_event_feed') }}
           Incremental models add real complexity: late-arriving data, schema changes and
           logic edits all need thought, and a model that silently misses updates is worse
           than a slow one. Reach for it when a table rebuild is measurably painful —
-          and expect the review to probe your <code>is_incremental()</code> filter.
+          and expect the review to probe your <code>is_incremental()</code>{" "}filter.
         </p>
       </Callout>
 

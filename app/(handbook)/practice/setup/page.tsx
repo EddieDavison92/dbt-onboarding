@@ -40,8 +40,8 @@ cd dbt-analytics
       />
       <p>
         Open the folder in VS Code. The integrated terminal runs{" "}
-        <code>start_dbt.ps1</code> automatically. On the first run it creates your
-        ignored <code>.env</code> file, installs the pinned tooling and tells you about
+        <code>start_dbt.ps1</code>{" "}automatically. On the first run it creates your
+        ignored <code>.env</code>{" "}file, installs the pinned tooling and tells you about
         any setup still outstanding.
       </p>
       <Callout kind="warn" title="Keep credentials local">
@@ -76,7 +76,7 @@ dbt show -s stg_csds_bridging
 `}
       />
       <p>
-        <code>dbt debug</code> should end with <strong>All checks passed!</strong>. The
+        <code>dbt debug</code>{" "}should end with <strong>All checks passed!</strong>. The
         second command is a useful final check that you can compile a project model and
         query the development environment.
       </p>
@@ -84,15 +84,15 @@ dbt show -s stg_csds_bridging
       <h2>If setup fails</h2>
       <ul>
         <li>
-          <strong>Connection or role error:</strong> check <code>.env</code>, then open a
+          <strong>Connection or role error:</strong>{" "}check <code>.env</code>, then open a
           fresh terminal so the values reload.
         </li>
         <li>
-          <strong>Browser sign-in does not open:</strong> rerun <code>dbt debug</code>{" "}
+          <strong>Browser sign-in does not open:</strong>{" "}rerun <code>dbt debug</code>{" "}
           and choose browser SSO unless your team supplied a token.
         </li>
         <li>
-          <strong>Access denied:</strong> this is usually an access request, not a local
+          <strong>Access denied:</strong>{" "}this is usually an access request, not a local
           code fix. Send the exact account, role and error to your team lead.
         </li>
       </ul>
@@ -101,8 +101,8 @@ dbt show -s stg_csds_bridging
         id="setup-verify"
         items={[
           { key: "ready", label: <>The setup script finishes with <strong>Ready!</strong></> },
-          { key: "debug", label: <><code>dbt debug</code> passes</> },
-          { key: "show", label: <><code>dbt show</code> returns rows</> },
+          { key: "debug", label: <><code>dbt debug</code>{" "}passes</> },
+          { key: "show", label: <><code>dbt show</code>{" "}returns rows</> },
         ]}
       />
     </LessonShell>

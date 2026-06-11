@@ -21,15 +21,15 @@ export default function Page() {
         When a patient moves practice, many feeds simply update the row — the old
         practice is gone. Next month someone asks “how many patients did practice X
         have in January?” and the source can no longer answer. A{" "}
-        <strong>snapshot</strong> solves this by checking the source on every run and
+        <strong>snapshot</strong>{" "}solves this by checking the source on every run and
         recording each change as a new row, building history the source never kept.
       </p>
 
       <h2>How it looks</h2>
       <p>
-        Snapshots live in <code>snapshots/</code> and use the same SELECT-plus-config
+        Snapshots live in <code>snapshots/</code>{" "}and use the same SELECT-plus-config
         shape as models. dbt adds bookkeeping columns; a row is “current” while{" "}
-        <code>dbt_valid_to</code> is null:
+        <code>dbt_valid_to</code>{" "}is null:
       </p>
       <CodeBlock
         lang="text"
@@ -41,16 +41,16 @@ sk_patient_id  practice_code  dbt_valid_from  dbt_valid_to
 `}
       />
       <p>
-        This is the classic <strong>slowly changing dimension (type 2)</strong> pattern.
+        This is the classic <strong>slowly changing dimension (type 2)</strong>{" "}pattern.
         The project uses it where history matters — for example{" "}
-        <code>dim_snapshot_person_pds_demographics</code> tracks demographic changes
+        <code>dim_snapshot_person_pds_demographics</code>{" "}tracks demographic changes
         from the PDS feed.
       </p>
 
       <h2>How a snapshot is defined</h2>
       <p>
         Snapshot files look like models with extra configuration: a unique key, and a{" "}
-        <strong>strategy</strong> for detecting that a row has changed:
+        <strong>strategy</strong>{" "}for detecting that a row has changed:
       </p>
       <CodeBlock
         lang="sql"
@@ -74,12 +74,12 @@ from {{ ref('stg_pds_registration') }}
       />
       <ul>
         <li>
-          <strong><code>timestamp</code> strategy</strong> — dbt compares an{" "}
-          <code>updated_at</code> column and processes only rows whose timestamp moved.
+          <strong><code>timestamp</code>{" "}strategy</strong> — dbt compares an{" "}
+          <code>updated_at</code>{" "}column and processes only rows whose timestamp moved.
           Fast and simple, when the source has a reliable last-updated column.
         </li>
         <li>
-          <strong><code>check</code> strategy</strong> — dbt compares the actual
+          <strong><code>check</code>{" "}strategy</strong> — dbt compares the actual
           values of a configured column list and records a new version when any of
           them change. Slower, but it works on data that has no timestamp at all —
           which makes it the natural choice for most of what we want to snapshot.
@@ -133,13 +133,13 @@ from {{ ref('fct_person_risk_stratification') }}
         their own history.
       </p>
       <p>
-        Keep <code>check_cols</code> to the columns that define the state: every
+        Keep <code>check_cols</code>{" "}to the columns that define the state: every
         column listed is a reason to write a new version, so incidental columns
         inflate the history.
       </p>
       <Callout kind="info" title="Snapshots have their own command">
         <p>
-          <code>dbt run</code> does not execute snapshots. <code>dbt build</code> can
+          <code>dbt run</code>{" "}does not execute snapshots. <code>dbt build</code>{" "}can
           execute a snapshot when its selector includes that snapshot, but this
           project runs them explicitly via <code>dbt snapshot</code>, scheduled before
           the main nightly model build so downstream models read the latest history.
@@ -162,7 +162,7 @@ where '2025-01-15' >= dbt_valid_from
       />
       <p>
         That “as of” pattern is common enough that the project wraps it in the{" "}
-        <code>temporal_join()</code> macro — reach for that before writing your own.
+        <code>temporal_join()</code>{" "}macro — reach for that before writing your own.
       </p>
 
       <Callout kind="warn" title="Snapshots only record what they observe">

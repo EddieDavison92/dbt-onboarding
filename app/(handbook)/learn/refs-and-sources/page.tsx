@@ -29,7 +29,7 @@ from {{ ref('stg_csds_bridging') }}
 `}
       />
       <p>
-        And not only in <code>from</code> — <code>ref()</code> goes anywhere a table
+        And not only in <code>from</code> — <code>ref()</code>{" "}goes anywhere a table
         name would: joins, CTEs, subqueries. A model reading two upstream models looks
         like this:
       </p>
@@ -48,12 +48,12 @@ left join {{ ref('stg_dictionary_dbo_specialties') }} dict
       <p>Each call does two things:</p>
       <ul>
         <li>
-          <strong>dbt resolves the location for you.</strong> Developing, it points at
+          <strong>dbt resolves the location for you.</strong>{" "}Developing, it points at
           the DEV__ databases; in production, the production ones. Same SQL, every
           environment.
         </li>
         <li>
-          <strong>dbt records the dependency.</strong> Your model now officially sits
+          <strong>dbt records the dependency.</strong>{" "}Your model now officially sits
           downstream of <code>stg_csds_bridging</code> — it appears in lineage, builds in
           the right order, and anyone changing that staging model can see you depend on
           it.
@@ -83,21 +83,21 @@ from {{ source('csds', 'ActiveSubmission') }}
 
       <h2>The DAG</h2>
       <p>
-        From every <code>ref()</code> and <code>source()</code> call, dbt assembles the
+        From every <code>ref()</code>{" "}and <code>source()</code>{" "}call, dbt assembles the
         whole project into a directed acyclic graph. This is a real slice of ours:
       </p>
       <Dag />
       <p>
-        The DAG is what makes <code>dbt build -s +my_model</code> possible: the{" "}
-        <code>+</code> means “and everything upstream”, and dbt knows exactly what that
+        The DAG is what makes <code>dbt build -s +my_model</code>{" "}possible: the{" "}
+        <code>+</code>{" "}means “and everything upstream”, and dbt knows exactly what that
         is. It is also why circular references are impossible — dbt refuses to compile
         them.
       </p>
 
       <Callout kind="smell" title="Spot the smell">
         <p>
-          A hardcoded <code>DATABASE.SCHEMA.TABLE</code> in a model, or a{" "}
-          <code>source()</code> call outside the raw layer, will draw a review comment.
+          A hardcoded <code>DATABASE.SCHEMA.TABLE</code>{" "}in a model, or a{" "}
+          <code>source()</code>{" "}call outside the raw layer, will draw a review comment.
           The fix is always the same: point at a model with <code>ref()</code> — and if
           no model exists yet, that missing model is the real gap to fill.
         </p>

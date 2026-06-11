@@ -87,7 +87,7 @@ export const HOW_DBT_THINKS_COURSE: Course = {
                 dbt does not move data into Snowflake — feeds land there
                 without it. And it does not query data for dashboards — that
                 happens downstream. dbt does exactly one job: it{" "}
-                <strong>transforms data already in the warehouse</strong> into
+                <strong>transforms data already in the warehouse</strong>{" "}into
                 clean, tested, analysis-ready tables.
               </p>
               <div className="my-6 flex flex-col items-center justify-center gap-2 sm:flex-row">
@@ -141,14 +141,14 @@ export const HOW_DBT_THINKS_COURSE: Course = {
             <>
               <p>
                 The unit of work in dbt is the <strong>model</strong>: one{" "}
-                <code>.sql</code> file containing one SELECT statement. That is
+                <code>.sql</code>{" "}file containing one SELECT statement. That is
                 the whole definition. Walk this one through what happens when
                 dbt builds it:
               </p>
               <ModelJourney />
               <p>
                 You describe the rows. dbt resolves the references, adds the{" "}
-                <code>CREATE VIEW</code> or <code>CREATE TABLE</code>, picks
+                <code>CREATE VIEW</code>{" "}or <code>CREATE TABLE</code>, picks
                 the right destination, and sends the finished SQL to Snowflake.
               </p>
             </>
@@ -249,8 +249,8 @@ from {{ ref('raw_people') }}
 `}
               />
               <p>
-                <code>ref(&apos;raw_people&apos;)</code> means “the table that{" "}
-                <code>raw_people.sql</code> builds, wherever that is”. Each
+                <code>ref(&apos;raw_people&apos;)</code>{" "}means “the table that{" "}
+                <code>raw_people.sql</code>{" "}builds, wherever that is”. Each
                 call does two jobs: it resolves to the right location for your
                 environment, and it <strong>records the dependency</strong> —
                 your model now officially sits downstream of{" "}
@@ -278,8 +278,8 @@ from {{ ref('raw_people') }}
           body: (
             <>
               <p>
-                From every <code>ref()</code> in the project, dbt assembles one
-                map — the <strong>DAG</strong> (directed acyclic graph). This
+                From every <code>ref()</code>{" "}in the project, dbt assembles one
+                map — the <strong>DAG</strong>{" "}(directed acyclic graph). This
                 is a real slice of ours. Hover over any node:
               </p>
               <Dag />
@@ -323,7 +323,7 @@ from {{ ref('raw_people') }}
               </p>
               <Callout kind="smell" title="Spot the smell">
                 <p>
-                  A hardcoded <code>DATABASE.SCHEMA.TABLE</code> in a model
+                  A hardcoded <code>DATABASE.SCHEMA.TABLE</code>{" "}in a model
                   compiles fine — and silently breaks dev/prod separation while
                   hiding the dependency from the map. It will draw a review
                   comment every time. The fix is always <code>ref()</code>.
@@ -395,9 +395,9 @@ from {{ ref('raw_people') }}
             <>
               <LayerCake />
               <p>
-                Two are worth pinning down now. <strong>Staging</strong> cleans
+                Two are worth pinning down now. <strong>Staging</strong>{" "}cleans
                 one source table — no joins, no business logic, ever.{" "}
-                <strong>Modelling</strong> is where joins and derivations live,
+                <strong>Modelling</strong>{" "}is where joins and derivations live,
                 and where most analyst work happens.
               </p>
             </>
@@ -480,7 +480,7 @@ from {{ ref('raw_people') }}
             <>
               <p>
                 Every table answers one question: <strong>one row per
-                what?</strong> That sentence is the table&apos;s{" "}
+                what?</strong>{" "}That sentence is the table&apos;s{" "}
                 <em>grain</em> — and the classic silent failure is a join that
                 breaks it. Watch it happen:
               </p>
@@ -584,7 +584,7 @@ from {{ ref('raw_people') }}
               <p>
                 This is the most useful thing to internalise before touching
                 the real project. There are exactly two environments:{" "}
-                <strong>dev</strong> and <strong>prod</strong>. While you
+                <strong>dev</strong>{" "}and <strong>prod</strong>. While you
                 develop, everything you build lands in the DEV__ databases —{" "}
                 <code>DEV__MODELLING</code>, <code>DEV__REPORTING</code> — and
                 no report or dashboard reads from them. Build nonsense, break
@@ -608,12 +608,12 @@ from {{ ref('raw_people') }}
             <>
               <p>
                 You now have the mental model: models are SELECTs,{" "}
-                <code>ref()</code> draws the map, layers give each model one
+                <code>ref()</code>{" "}draws the map, layers give each model one
                 job, tests guard the data nightly, and production sits behind a
                 merged PR.
               </p>
               <p>
-                <strong>Your first PR</strong> makes it real: you will set up
+                <strong>Your first PR</strong>{" "}makes it real: you will set up
                 your machine, learn the actual dbt commands at the moment you
                 need them, and take a model of your own down that whole path.
                 The handbook stays available for depth when you want it.
@@ -642,7 +642,7 @@ from {{ ref('raw_people') }}
         {
           id: "q-model",
           title: "1. The model",
-          body: <p>A colleague opens <code>stg_people.sql</code> for the first time.</p>,
+          body: <p>A colleague opens <code>stg_people.sql</code>{" "}for the first time.</p>,
           check: {
             prompt: "What do they find inside?",
             options: [
@@ -659,7 +659,7 @@ from {{ ref('raw_people') }}
         {
           id: "q-ref",
           title: "2. The arrow",
-          body: <p><code>dim_people.sql</code> contains <code>{"{{ ref('stg_people') }}"}</code>.</p>,
+          body: <p><code>dim_people.sql</code>{" "}contains <code>{"{{ ref('stg_people') }}"}</code>.</p>,
           check: {
             prompt: "What does dbt learn from that?",
             options: [
@@ -693,7 +693,7 @@ from {{ ref('raw_people') }}
         {
           id: "q-test",
           title: "4. The test",
-          body: <p>A <code>unique</code> test on <code>person_id</code> compiles and runs its query.</p>,
+          body: <p>A <code>unique</code>{" "}test on <code>person_id</code>{" "}compiles and runs its query.</p>,
           check: {
             prompt: "The query returns 3 rows. What happened?",
             options: [

@@ -18,8 +18,8 @@ export default function Page() {
       minutes={8}
     >
       <p>
-        Models in <code>dbt-analytics</code> are organised under{" "}
-        <code>models/</code> into layers. Data flows upward: raw renames, staging cleans,
+        Models in <code>dbt-analytics</code>{" "}are organised under{" "}
+        <code>models/</code>{" "}into layers. Data flows upward: raw renames, staging cleans,
         modelling builds blocks, reporting assembles, published governs. Click each layer:
       </p>
 
@@ -47,7 +47,7 @@ from {{ source('csds', 'ActiveSubmission') }}
       <p>
         One staging model per source table: rename to project conventions (for example{" "}
         <code>pseudo_nhs_number</code> → <code>sk_patient_id</code>), cast types, light
-        cleaning. <strong>No joins, no business logic.</strong> Staging is the stable
+        cleaning. <strong>No joins, no business logic.</strong>{" "}Staging is the stable
         foundation everything downstream relies on.
       </p>
 
@@ -55,7 +55,7 @@ from {{ source('csds', 'ActiveSubmission') }}
       <p>
         Prefixed <code>int_</code>. This is where real work happens: joins across staging
         models, derivations, focused logic that more than one downstream model can reuse.
-        For example <code>int_wl_current</code> filters the waiting list to the latest
+        For example <code>int_wl_current</code>{" "}filters the waiting list to the latest
         snapshot week, joins specialty and provider lookups, and derives{" "}
         <code>days_on_waiting_list</code>.
       </p>
@@ -65,8 +65,8 @@ from {{ source('csds', 'ActiveSubmission') }}
         Dimensions (<code>dim_</code>) and facts (<code>fct_</code>) that analysts query
         directly — like <code>dim_person_demographics</code>: one row per person, joined
         to gender, ethnicity, geography and practice lookups. You will also see{" "}
-        <code>pit_</code> (point-in-time), <code>obt_</code> (one big table) and{" "}
-        <code>dq_</code> (data quality) prefixes here.
+        <code>pit_</code>{" "}(point-in-time), <code>obt_</code>{" "}(one big table) and{" "}
+        <code>dq_</code>{" "}(data quality) prefixes here.
       </p>
       <p>
         This layer is where most of your work <em>starts</em>, not where it ends: when
@@ -78,7 +78,7 @@ from {{ source('csds', 'ActiveSubmission') }}
       <h3>Published — governed outputs</h3>
       <p>
         Datasets that power dashboards and external consumers, split by legal basis:{" "}
-        <code>direct_care/</code> and <code>secondary_use/</code>. Secondary-use models
+        <code>direct_care/</code>{" "}and <code>secondary_use/</code>. Secondary-use models
         apply national opt-out filtering via an inner join to{" "}
         <code>dim_person_secondary_use_allowed</code>. Governance (ownership grants,
         Snowflake tags) is applied automatically by post-hooks.
@@ -86,7 +86,7 @@ from {{ source('csds', 'ActiveSubmission') }}
 
       <Callout kind="info" title="There is a sixth layer">
         <p>
-          <code>models/semantic/</code> holds Snowflake Semantic Views (
+          <code>models/semantic/</code>{" "}holds Snowflake Semantic Views (
           <code>sem_</code>) — pre-defined facts, dimensions and metrics that give
           downstream query tools an agreed definition of the data. You will meet these
           in the Going further section; they follow the same ref() rules.
@@ -96,7 +96,7 @@ from {{ source('csds', 'ActiveSubmission') }}
       <h2>Why so strict?</h2>
       <p>
         Because every rule removes a question. If joins are banned in staging, you never
-        wonder whether <code>stg_csds_bridging</code> hides logic — it cannot. If only
+        wonder whether <code>stg_csds_bridging</code>{" "}hides logic — it cannot. If only
         published models feed dashboards, you know exactly what is safe to refactor.
         Layers turn “where should this go?” from a debate into a lookup:
       </p>
@@ -117,13 +117,13 @@ from {{ source('csds', 'ActiveSubmission') }}
           <tr>
             <td>Join staging models or derive a reusable measure</td>
             <td>
-              <code>modelling/</code> (<code>int_</code>)
+              <code>modelling/</code>{" "}(<code>int_</code>)
             </td>
           </tr>
           <tr>
             <td>Assemble a person/provider-level dataset for analysis</td>
             <td>
-              <code>reporting/</code> (<code>dim_</code>/<code>fct_</code>)
+              <code>reporting/</code>{" "}(<code>dim_</code>/<code>fct_</code>)
             </td>
           </tr>
           <tr>
@@ -138,7 +138,7 @@ from {{ source('csds', 'ActiveSubmission') }}
       <Callout kind="tip" title="Folders do real work">
         <p>
           In the OLIDS domain the Snowflake schema is derived from the folder path:{" "}
-          <code>models/modelling/olids/diagnoses/</code> builds into{" "}
+          <code>models/modelling/olids/diagnoses/</code>{" "}builds into{" "}
           <code>MODELLING.OLIDS_DIAGNOSES</code>. Create a folder and the schema follows —
           no config needed.
         </p>

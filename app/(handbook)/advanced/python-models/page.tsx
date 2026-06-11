@@ -27,7 +27,7 @@ export default function Page() {
 
       <h2>What a Python model is</h2>
       <p>
-        A <code>.py</code> file in <code>models/</code> that defines one function,{" "}
+        A <code>.py</code>{" "}file in <code>models/</code>{" "}that defines one function,{" "}
         <code>model(dbt, session)</code>, and returns a DataFrame. Where a SQL model
         ends in a final SELECT, a Python model ends in a final DataFrame — dbt saves
         whatever it returns as a table, exactly as it would the result of a SELECT.
@@ -50,21 +50,21 @@ def model(dbt, session):
       <ul>
         <li>
           <strong><code>dbt</code></strong> — the project context.{" "}
-          <code>dbt.ref()</code> and <code>dbt.source()</code> return DataFrames
+          <code>dbt.ref()</code>{" "}and <code>dbt.source()</code>{" "}return DataFrames
           pointing at upstream models and sources, so the Python model takes its place
-          in the DAG like any other. <code>dbt.config()</code> sets configuration;{" "}
-          <code>dbt.is_incremental</code> supports the incremental pattern.
+          in the DAG like any other. <code>dbt.config()</code>{" "}sets configuration;{" "}
+          <code>dbt.is_incremental</code>{" "}supports the incremental pattern.
         </li>
         <li>
           <strong><code>session</code></strong> — the connection to the platform&apos;s
-          Python runtime. On Snowflake this is a <strong>Snowpark</strong> session: the
+          Python runtime. On Snowflake this is a <strong>Snowpark</strong>{" "}session: the
           code executes inside Snowflake, next to the data. Nothing runs on your
           laptop, and the data never leaves the warehouse.
         </li>
       </ul>
       <p>
         Downstream models do not care that it was Python:{" "}
-        <code>{"{{ ref('my_python_model') }}"}</code> works from any SQL model, and
+        <code>{"{{ ref('my_python_model') }}"}</code>{" "}works from any SQL model, and
         the YAML file beside it carries the same description, owner and{" "}
         <code>data_tests</code>{" "}as everything else. Tests on a Python model&apos;s
         grain are exactly as valuable as on a SQL model&apos;s — arguably more,
@@ -89,7 +89,7 @@ def model(dbt, session):
       <p>
         On Snowflake, packages come from the Anaconda channel available inside
         Snowpark — most of the scientific Python stack is there. Two materialisations
-        are supported: <code>table</code> (default) and <code>incremental</code>.
+        are supported: <code>table</code>{" "}(default) and <code>incremental</code>.
         Python models cannot be views or ephemeral — they always write a table.
       </p>
 
@@ -121,7 +121,7 @@ def model(dbt, session):
       <p>Know the trade-offs before reaching for it:</p>
       <ul>
         <li>
-          <strong>Slower and costlier</strong> than the equivalent SQL — general
+          <strong>Slower and costlier</strong>{" "}than the equivalent SQL — general
           Python compute, and pandas-style code runs single-node unless written
           against the Snowpark DataFrame API.
         </li>
@@ -130,7 +130,7 @@ def model(dbt, session):
           which raises the bar on comments, tests and the PR description.
         </li>
         <li>
-          <strong>No <code>print()</code> debugging</strong> — the code runs remotely;
+          <strong>No <code>print()</code>{" "}debugging</strong> — the code runs remotely;
           debugging means platform logs or writing diagnostics into a column.
         </li>
       </ul>

@@ -166,7 +166,7 @@ export function CourseOverview({
           </p>
           <p id="restart-course-description" className="mt-1 text-sm text-ink-soft">
             This clears this course&apos;s completion and saved lesson positions, and
-            removes the learner name <strong className="text-ink">{name}</strong> so
+            removes the learner name <strong className="text-ink">{name}</strong>{" "}so
             a new one can be entered. Other completed courses are left alone.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">

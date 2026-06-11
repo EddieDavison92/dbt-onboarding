@@ -18,7 +18,7 @@ export default function Page() {
     >
       <h2>The YAML next to your SQL</h2>
       <p>
-        Beside <code>stg_csds_bridging.sql</code> sits{" "}
+        Beside <code>stg_csds_bridging.sql</code>{" "}sits{" "}
         <code>stg_csds_bridging.yml</code>. This one file does three jobs at once —
         ownership, documentation and testing:
       </p>
@@ -50,9 +50,9 @@ models:
 
       <h2>How tests work</h2>
       <p>
-        Each entry under <code>data_tests:</code> compiles to a SQL query that searches
+        Each entry under <code>data_tests:</code>{" "}compiles to a SQL query that searches
         for <strong>rows that break the rule</strong>. Zero rows back = pass.{" "}
-        <code>unique</code> on <code>person_id</code>{" "}literally runs “group by person_id
+        <code>unique</code>{" "}on <code>person_id</code>{" "}literally runs “group by person_id
         having count(*) &gt; 1”. Tests run when you <code>dbt build</code>, in CI on your
         pull request, and in the nightly production build — so a problem in a feed is
         caught by the pipeline rather than discovered by a dashboard user.
@@ -96,8 +96,8 @@ models:
       <Callout kind="tip" title="Test the grain, always">
         <p>
           The single most valuable test is the one that asserts your model&apos;s grain.
-          If <code>int_wl_current</code> is “one row per patient per pathway per week”,
-          a <code>unique_combination_of_columns</code> on those columns catches the
+          If <code>int_wl_current</code>{" "}is “one row per patient per pathway per week”,
+          a <code>unique_combination_of_columns</code>{" "}on those columns catches the
           classic silent failure: a join that fans out and doubles your counts.
         </p>
       </Callout>
@@ -107,7 +107,7 @@ models:
         The YAML tests above are <em>generic</em> — reusable rules applied to a column.
         Some assertions are one-offs that only make sense as a query: “no waiting-list
         pathway should have a decision date before its referral date”. For those,
-        write the query itself as a <code>.sql</code> file in the <code>tests/</code>{" "}
+        write the query itself as a <code>.sql</code>{" "}file in the <code>tests/</code>{" "}
         directory — a <strong>singular test</strong>. Same contract as every dbt test:
         select the rows that violate the rule, and zero rows back means pass.
       </p>
@@ -127,10 +127,10 @@ where decision_date < referral_request_received_date
 
       <h2>Documentation is not optional here</h2>
       <p>
-        Column <code>description:</code> fields end up in three places: the dbt docs
+        Column <code>description:</code>{" "}fields end up in three places: the dbt docs
         site, Snowflake column comments (we persist docs to the warehouse), and in front
         of the next analyst deciding whether they can trust your column. The{" "}
-        <code>owner</code> block is enforced by CI — every model must name a human.
+        <code>owner</code>{" "}block is enforced by CI — every model must name a human.
       </p>
 
       <h2>Don&apos;t write YAML by hand</h2>

@@ -20,7 +20,7 @@ export default function Page() {
       <p>
         A reporting table answers questions if you already know how to query it: which
         column is the grain, which flags are QOF registers, how tables join. A{" "}
-        <strong>Snowflake semantic view</strong> writes that knowledge down as part of
+        <strong>Snowflake semantic view</strong>{" "}writes that knowledge down as part of
         the pipeline. Once defined, any consumer — BI tools, or the semantic layer chat
         interface the team is developing — can compose correct queries from named
         metrics instead of guessing at joins.
@@ -36,24 +36,24 @@ export default function Page() {
       </p>
       <ul>
         <li>
-          <strong>Which columns are the keys?</strong> Nothing in the schema says{" "}
-          <code>person_id</code> is the primary key of{" "}
+          <strong>Which columns are the keys?</strong>{" "}Nothing in the schema says{" "}
+          <code>person_id</code>{" "}is the primary key of{" "}
           <code>dim_person_demographics</code>. An agent guessing from column names
-          might join on <code>sk_patient_id</code> in one place and{" "}
-          <code>person_id</code> in another — both look plausible.
+          might join on <code>sk_patient_id</code>{" "}in one place and{" "}
+          <code>person_id</code>{" "}in another — both look plausible.
         </li>
         <li>
-          <strong>Which direction is one-to-many?</strong> Join a one-row-per-person
+          <strong>Which direction is one-to-many?</strong>{" "}Join a one-row-per-person
           dimension to a many-rows-per-person observation table and count people:
           every patient is now counted once per observation. The query runs, returns
           confident numbers, and is wrong — the classic <strong>fan-out</strong>, and
           nothing in the warehouse flags it.
         </li>
         <li>
-          <strong>Which tables should join at all?</strong> Two tables sharing a
+          <strong>Which tables should join at all?</strong>{" "}Two tables sharing a
           column name is not evidence they are meant to be joined, but it is exactly
-          the evidence an agent uses. Worse, tables that <em>do</em> share a key can
-          sit over very different populations — a <code>person_id</code> in a GP
+          the evidence an agent uses. Worse, tables that <em>do</em>{" "}share a key can
+          sit over very different populations — a <code>person_id</code>{" "}in a GP
           registration table and the same column in an acute activity table cover
           different people, on different inclusion rules. Join them naively and the
           result is not “the population” but their accidental overlap, with no error
@@ -63,7 +63,7 @@ export default function Page() {
       <p>
         A human analyst avoids these traps with knowledge held in their head. The
         semantic view moves that knowledge into the warehouse:{" "}
-        <code>PRIMARY KEY</code> declarations say what the grain is,{" "}
+        <code>PRIMARY KEY</code>{" "}declarations say what the grain is,{" "}
         <code>RELATIONSHIPS</code>{" "}say what references what, and a consumer derives
         joins from the declarations instead of guessing. The fan-out case stops being
         possible to write by accident, because the metric&apos;s aggregation is

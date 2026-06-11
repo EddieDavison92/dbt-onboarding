@@ -9,12 +9,13 @@ import type { Checkpoint, Step } from "@/lib/course-types";
 
 function CheckpointBlock({
   check,
-  onAnswered,
+  onCorrect,
 }: {
   check: Checkpoint;
-  onAnswered: (correct: boolean) => void;
+  onCorrect: () => void;
 }) {
   const [picked, setPicked] = useState<number | null>(null);
+  const correct = picked === check.answer;
 
   return (
     <div className="my-5 rounded-2xl border-2 border-ink bg-paper p-5 shadow-[4px_4px_0_0_var(--color-flame)]">
@@ -34,10 +35,10 @@ function CheckpointBlock({
               disabled={revealed}
               onClick={() => {
                 setPicked(oi);
-                onAnswered(oi === check.answer);
+                if (oi === check.answer) onCorrect();
               }}
               className={`rounded-lg border px-3.5 py-2 text-left text-sm transition disabled:cursor-default ${
-                revealed && isAnswer
+                correct && isAnswer
                   ? "border-layer-staging bg-layer-staging/10 text-ink"
                   : chosen
                     ? "border-flame bg-flame-soft text-ink"
@@ -50,25 +51,36 @@ function CheckpointBlock({
                 {String.fromCharCode(97 + oi)}
               </span>
               {opt}
-              {revealed && isAnswer && <span className="ml-2">✓</span>}
+              {correct && isAnswer && <span className="ml-2">✓</span>}
               {revealed && chosen && !isAnswer && <span className="ml-2">✗</span>}
             </button>
           );
         })}
       </div>
       {picked !== null && (
-        <p
+        <div
           className={`!mb-0 !mt-2.5 rounded-lg px-3.5 py-2 text-sm leading-relaxed ${
-            picked === check.answer
+            correct
               ? "bg-layer-staging/10 text-ink-soft"
               : "bg-flame-soft text-ink-soft"
           }`}
         >
-          <strong className="font-semibold text-ink">
-            {picked === check.answer ? "Right. " : "Not quite. "}
-          </strong>
-          {check.explain}
-        </p>
+          <p className="!my-0 text-sm leading-relaxed">
+            <strong className="font-semibold text-ink">
+              {correct ? "Right. " : "Not quite. "}
+            </strong>
+            {check.explain}
+          </p>
+          {!correct && (
+            <button
+              type="button"
+              onClick={() => setPicked(null)}
+              className="mt-2 rounded-lg border border-flame bg-paper px-3 py-1.5 font-display text-xs font-extrabold uppercase tracking-widest text-flame-deep transition hover:bg-flame hover:text-white"
+            >
+              Try again
+            </button>
+          )}
+        </div>
       )}
     </div>
   );
@@ -101,8 +113,8 @@ export function LessonPlayer({
 
   // current step shown (1-based)
   const [pos, setPos] = useState(1);
-  // checkpoint outcomes: right/wrong this visit, "done" when restored from storage
-  const [answered, setAnswered] = useState<Record<number, "right" | "wrong" | "done">>({});
+  // checkpoint outcomes: right this visit, "done" when restored from storage
+  const [answered, setAnswered] = useState<Record<number, "right" | "done">>({});
   // interaction-gated steps the learner has completed this visit (or previously)
   const [interacted, setInteracted] = useState<Record<number, boolean>>({});
   const [restored, setRestored] = useState(false);
@@ -221,18 +233,9 @@ export function LessonPlayer({
         </InteractionContext.Provider>
         {step.check &&
           (answered[i] ? (
-            <p
-              className={`!my-3 rounded-xl border px-4 py-3 text-sm font-medium ${
-                answered[i] === "wrong"
-                  ? "border-flame/40 bg-flame-soft !text-ink"
-                  : "border-layer-staging/40 bg-layer-staging/10 !text-ink"
-              }`}
-            >
+            <p className="!my-3 rounded-xl border border-layer-staging/40 bg-layer-staging/10 px-4 py-3 text-sm font-medium !text-ink">
               {answered[i] === "right" && (
                 <>✓ <strong>Right</strong> — {step.check.affirm ?? "you've got this one."}</>
-              )}
-              {answered[i] === "wrong" && (
-                <>✗ <strong>Not quite</strong> — {step.check.affirm ?? `the answer was “${step.check.options[step.check.answer]}”.`} Worth a re-read before moving on.</>
               )}
               {answered[i] === "done" && (
                 <>✓ {step.check.affirm ?? "Answered on a previous visit."}</>
@@ -241,9 +244,7 @@ export function LessonPlayer({
           ) : (
             <CheckpointBlock
               check={step.check}
-              onAnswered={(correct) =>
-                setAnswered((a) => ({ ...a, [i]: correct ? "right" : "wrong" }))
-              }
+              onCorrect={() => setAnswered((a) => ({ ...a, [i]: "right" }))}
             />
           ))}
       </div>

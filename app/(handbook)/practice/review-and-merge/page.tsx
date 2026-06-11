@@ -44,7 +44,7 @@ git push
       <h2>Merge and sync</h2>
       <p>
         Merge once approvals are present and every required check is green. The project
-        uses squash merge, so the branch lands on <code>main</code> as one tidy commit.
+        uses squash merge, so the branch lands on <code>main</code>{" "}as one tidy commit.
       </p>
       <CodeBlock
         lang="bash"
@@ -72,7 +72,7 @@ git branch -d feat/short-description
         items={[
           { key: "review", label: <>Review threads answered and required checks green</> },
           { key: "merged", label: <>PR squash-merged and remote branch deleted</> },
-          { key: "local", label: <>Local <code>main</code> pulled and feature branch removed</> },
+          { key: "local", label: <>Local <code>main</code>{" "}pulled and feature branch removed</> },
           { key: "prod", label: <>Production result checked after deployment</> },
         ]}
       />

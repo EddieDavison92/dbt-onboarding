@@ -104,7 +104,7 @@ export function GrainFanout() {
 group by person_id having count(*) > 1`}</pre>
           </div>
           <div className="bg-layer-staging/10 px-5 py-3 text-sm text-ink-soft">
-            <strong className="text-ink">1 row returned → FAIL.</strong> The test
+            <strong className="text-ink">1 row returned → FAIL.</strong>{" "}The test
             spotted the fan-out the moment the model was built — before anyone
             counted anything. That is what asserting the grain buys you, every
             night, forever.

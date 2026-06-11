@@ -65,15 +65,15 @@ dbt compile -s my_model
       <h2>Common first-model failures</h2>
       <ul>
         <li>
-          <strong>Grain test:</strong> check whether the stated grain is wrong, the
+          <strong>Grain test:</strong>{" "}check whether the stated grain is wrong, the
           source contains duplicates, or a join multiplied rows.
         </li>
         <li>
-          <strong>not_null:</strong> inspect the null rows before weakening the test.
+          <strong>not_null:</strong>{" "}inspect the null rows before weakening the test.
           Null may be valid, or it may reveal a feed problem.
         </li>
         <li>
-          <strong>Missing model:</strong> compare the name inside <code>ref()</code>{" "}
+          <strong>Missing model:</strong>{" "}compare the name inside <code>ref()</code>{" "}
           with the actual filename.
         </li>
       </ul>
@@ -87,7 +87,7 @@ dbt compile -s my_model
       <Checklist
         id="build"
         items={[
-          { key: "green", label: <><code>dbt build -s your_model</code> is green</> },
+          { key: "green", label: <><code>dbt build -s your_model</code>{" "}is green</> },
           { key: "downstream", label: <>Existing contracts were checked downstream where needed</> },
           { key: "finding", label: <>Any unexpected data condition is documented</> },
         ]}

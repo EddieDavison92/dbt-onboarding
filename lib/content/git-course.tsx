@@ -48,8 +48,8 @@ analysis_v2_FINAL_jw_comments.sql
           body: (
             <>
               <p>
-                Git solves this with one idea: keep <strong>one</strong> set of
-                files, and record <strong>snapshots</strong> of them over time. Each
+                Git solves this with one idea: keep <strong>one</strong>{" "}set of
+                files, and record <strong>snapshots</strong>{" "}of them over time. Each
                 snapshot stores what every file looked like at that moment, who took
                 it, when, and a one-line description of what changed.
               </p>
@@ -88,8 +88,8 @@ analysis_v2_FINAL_jw_comments.sql
               </p>
               <p>
                 The repo lives in two kinds of place at once: on{" "}
-                <strong>GitHub</strong> (the shared copy everyone can see) and as a{" "}
-                <strong>clone</strong> on each person&apos;s machine (your private
+                <strong>GitHub</strong>{" "}(the shared copy everyone can see) and as a{" "}
+                <strong>clone</strong>{" "}on each person&apos;s machine (your private
                 working copy). You work locally; sharing happens when you choose to
                 send your snapshots up.
               </p>
@@ -138,12 +138,13 @@ analysis_v2_FINAL_jw_comments.sql
           body: (
             <>
               <p>
-                Every repo has a default line of history called{" "}
-                <code>main</code>. In our project, <strong>main is production</strong>:
-                what is on main is what builds in Snowflake every night. So main has
-                to stay correct at all times — which means you never edit it
-                directly. It is locked; even administrators cannot push straight to
-                it.
+                Every repo has a default branch, but its name is configurable. Some
+                repositories still call it <code>master</code>; many now use{" "}
+                <code>main</code>. <strong>Our default branch is main</strong>, and in
+                this project it is the production branch: what is on main is what
+                builds in Snowflake every night. So main has to stay correct at all
+                times — which means you never edit it directly. It is locked; even
+                administrators cannot push straight to it.
               </p>
             </>
           ),
@@ -241,8 +242,8 @@ docs: describe waiting list snapshot logic
     {
       slug: "the-daily-commands",
       title: "The daily commands",
-      blurb: "Five commands, introduced one at a time",
-      minutes: 14,
+      blurb: "Six commands, introduced one at a time",
+      minutes: 16,
       steps: [
         {
           id: "intro",
@@ -250,8 +251,8 @@ docs: describe waiting list snapshot logic
             <>
               <p>
                 Git has hundreds of commands. Daily work here uses{" "}
-                <strong>five</strong>. This lesson introduces them one at a time —
-                and you will <em>run</em> each one in a simulated terminal, so you
+                <strong>six</strong>. This lesson introduces them one at a time —
+                and you will <em>run</em>{" "}each one in a simulated terminal, so you
                 see exactly what your real machine will say back. Nothing to
                 install; type the command (or use “type it for me”) and press Enter.
               </p>
@@ -259,47 +260,64 @@ docs: describe waiting list snapshot logic
           ),
         },
         {
-          id: "status",
-          title: "1 · git status — where am I?",
+          id: "pull",
+          title: "1 · git pull — start from fresh main",
           body: (
             <>
               <p>
-                The scenario for this lesson: you have edited one model file and
-                created its documentation file. Start by asking git where things
-                stand:
+                Before starting new work, return to <code>main</code>{" "}and update it
+                from GitHub. Your new branch will begin from exactly that fresh
+                version of the project:
               </p>
               <TryIt
                 stages={[
                   {
-                    cmd: "git status",
-                    out: `On branch main
-Changes not staged for commit:
-  (use "git add <file>..." to update what will be committed)
-        modified:   models/staging/shared/stg_opening_hours.sql
-
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-        models/staging/shared/stg_opening_hours.yml`,
+                    cmd: "git switch main",
+                    out: `Switched to branch 'main'
+Your branch is up to date with 'origin/main'.`,
+                    prompt: "first, return to the project's default branch",
+                  },
+                  {
+                    cmd: "git pull",
+                    out: `Updating a17c9b2..e43d0af
+Fast-forward
+ models/staging/shared/stg_specialties.sql | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)`,
+                    prompt: "download and apply anything merged since your last update",
                   },
                 ]}
-                done="Branch, changed files, and a suggestion for what to do next — status changes nothing, it only reports."
+                done="Your local main now matches origin/main, so the next branch starts from the team's latest work."
               />
               <p>
-                Read it top to bottom: you are on <code>main</code> (a problem —
-                next command fixes that), one file is modified, one is brand new
-                (“untracked”). <strong>When in doubt, run this.</strong>
+                <code>origin/main</code>{" "}means the copy of <code>main</code>{" "}on
+                GitHub. <code>git pull</code>{" "}brings commits from that remote branch
+                into your local <code>main</code>. Do this before creating each new
+                branch, not halfway through work on an existing one.
               </p>
             </>
           ),
+          check: {
+            prompt: "Why pull main before creating a new branch?",
+            options: [
+              "So the branch starts from the team's latest merged work",
+              "Because pull creates the new branch for you",
+              "So your uncommitted changes are uploaded to GitHub",
+              "Because branches cannot be created from an older commit",
+            ],
+            answer: 0,
+            explain:
+              "A branch begins at your current commit. Updating local main first means the branch begins at the latest origin/main commit, reducing avoidable conflicts and duplicated work.",
+            affirm: "fresh main first, then branch from the team's latest work.",
+          },
         },
         {
           id: "switch",
-          title: "2 · git switch — get off main",
+          title: "2 · git switch — create the branch",
           body: (
             <>
               <p>
-                You should never work on <code>main</code> — and status just showed
-                you are. Create a branch; your edits come with you:
+                Main is fresh. Now create the safe branch where the work will
+                happen:
               </p>
               <TryIt
                 stages={[
@@ -311,9 +329,9 @@ Untracked files:
                 done="One quiet line — you're now on a safe parallel line of history, edits intact."
               />
               <p>
-                The <code>-c</code> flag (<em>create</em>) makes the branch as it
+                The <code>-c</code>{" "}flag (<em>create</em>) makes the branch as it
                 moves you onto it. Without <code>-c</code>, switch moves between
-                branches that already exist — <code>git switch main</code> takes you
+                branches that already exist — <code>git switch main</code>{" "}takes you
                 back.
               </p>
             </>
@@ -333,14 +351,47 @@ Untracked files:
           },
         },
         {
+          id: "status",
+          title: "3 · git status — what changed?",
+          body: (
+            <>
+              <p>
+                Now imagine you have edited one model file and created its
+                documentation file. Ask git where things stand:
+              </p>
+              <TryIt
+                stages={[
+                  {
+                    cmd: "git status",
+                    out: `On branch feat/opening-hours
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+        modified:   models/staging/shared/stg_opening_hours.sql
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        models/staging/shared/stg_opening_hours.yml`,
+                  },
+                ]}
+                done="Branch, changed files, and a suggestion for what to do next — status changes nothing, it only reports."
+              />
+              <p>
+                Read it top to bottom: you are safely on your feature branch, one
+                file is modified, and one is brand new (“untracked”).{" "}
+                <strong>When in doubt, run status.</strong>
+              </p>
+            </>
+          ),
+        },
+        {
           id: "add",
-          title: "3 · git add — choose what goes in the snapshot",
+          title: "4 · git add — choose what goes in the snapshot",
           body: (
             <>
               <p>
                 The step that surprises newcomers: editing a file does{" "}
-                <strong>not</strong> put it in your next commit. You explicitly{" "}
-                <em>stage</em> what you want included. Stage both files, then check
+                <strong>not</strong>{" "}put it in your next commit. You explicitly{" "}
+                <em>stage</em>{" "}what you want included. Stage both files, then check
                 what changed:
               </p>
               <TryIt
@@ -369,7 +420,7 @@ Changes to be committed:
               <p>
                 Why the extra step? Because you often change more than you mean to
                 share — staging lets you commit exactly what you intend and nothing
-                else. Note that <code>git add</code> prints nothing when it works;
+                else. Note that <code>git add</code>{" "}prints nothing when it works;
                 status is how you confirm.
               </p>
             </>
@@ -391,7 +442,7 @@ Changes to be committed:
         },
         {
           id: "commit",
-          title: "4 · git commit — take the snapshot",
+          title: "5 · git commit — take the snapshot",
           body: (
             <>
               <p>
@@ -422,11 +473,11 @@ nothing to commit, working tree clean`,
                   in the branch&apos;s history — that is the whole event.
                 </li>
                 <li>
-                  <code>3f2a1c9</code> is the snapshot&apos;s id: a short reference
+                  <code>3f2a1c9</code>{" "}is the snapshot&apos;s id: a short reference
                   you (or anyone) can use to look at exactly this version forever.
                 </li>
                 <li>
-                  <code>2 files changed, 34 insertions(+)</code> summarises the
+                  <code>2 files changed, 34 insertions(+)</code>{" "}summarises the
                   difference this snapshot records against the previous one.
                 </li>
                 <li>
@@ -446,7 +497,7 @@ nothing to commit, working tree clean`,
         },
         {
           id: "push",
-          title: "5 · git push — share it",
+          title: "6 · git push — share it",
           body: (
             <>
               <TryIt
@@ -482,17 +533,20 @@ To https://github.com/wnl-icb-analytics/dbt-analytics.git
                 lang="bash"
                 title="the daily rhythm"
                 code={`
-git switch -c feat/my-change   # 1. start a branch
+git switch main                 # 1. return to main
+git pull                        # 2. update it from origin/main
+git switch -c feat/my-change    # 3. branch from fresh main
 # ...edit files...
-git status                     # 2. what did I change?
-git add -u                     # 3. stage it
-git commit -m "feat: ..."      # 4. snapshot it
-git push                       # 5. share it
+git status                      # 4. what did I change?
+git add -u                      # 5. stage it
+git commit -m "feat: ..."       # 6. snapshot it
+git push                        # share the branch
 `}
               />
               <p>
-                That is the entire daily vocabulary. Branch once per piece of work;
-                status, add, commit as you go; push when you want it shared.
+                That is the daily rhythm. Freshen main, branch once per piece of
+                work, then status, add and commit as you go; push when you want the
+                branch shared.
               </p>
             </>
           ),
@@ -525,7 +579,7 @@ git push                       # 5. share it
             <>
               <p>
                 Your branch is pushed. To get it into <code>main</code> — into
-                production — you open a <strong>pull request</strong> (PR): a
+                production — you open a <strong>pull request</strong>{" "}(PR): a
                 proposal, on GitHub, that says “merge this branch into main”. The PR
                 shows every line you changed, side by side with what it replaces.
               </p>
@@ -562,7 +616,7 @@ git push                       # 5. share it
             <>
               <p>
                 The moment a PR opens, robots get to work — this is{" "}
-                <strong>CI</strong> (continuous integration). In our project the
+                <strong>CI</strong>{" "}(continuous integration). In our project the
                 checks compile every model, lint the code, verify ownership and
                 descriptions, build your changed models against real data in a dev
                 environment, and an automated reviewer (CodeRabbit) comments on the
@@ -607,7 +661,7 @@ git pull          # bring main up to date, now including your work
 `}
               />
               <p>
-                <code>git pull</code> is the counterpart of push — it downloads what
+                <code>git pull</code>{" "}is the counterpart of push — it downloads what
                 changed on GitHub. Do this whenever you start something new, so your
                 next branch starts from the latest main.
               </p>
@@ -647,9 +701,9 @@ git pull          # bring main up to date, now including your work
               </p>
               <ul>
                 <li>changed files appear as a list — that is <code>git status</code></li>
-                <li>the <strong>+</strong> next to a file stages it — <code>git add</code></li>
+                <li>the <strong>+</strong>{" "}next to a file stages it — <code>git add</code></li>
                 <li>the message box and ✓ button — <code>git commit</code></li>
-                <li><strong>Sync / Publish branch</strong> — <code>git push</code> and <code>pull</code></li>
+                <li><strong>Sync / Publish branch</strong> — <code>git push</code>{" "}and <code>pull</code></li>
                 <li>the branch name in the status bar switches branches — <code>git switch</code></li>
               </ul>
             </>
@@ -694,7 +748,7 @@ git pull          # bring main up to date, now including your work
               <p>
                 Repo, branch, commit, push, PR, merge — that is the entire mental
                 model this project requires, and you now have it. Next,{" "}
-                <strong>How dbt thinks</strong> shows you what dbt is and why the
+                <strong>How dbt thinks</strong>{" "}shows you what dbt is and why the
                 project is shaped the way it is — all pictures and questions, nothing
                 to install. After that, Your first PR puts both skills together on
                 the real repository, including the one-off signed-commit setup.

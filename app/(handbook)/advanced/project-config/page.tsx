@@ -18,7 +18,7 @@ export default function Page() {
     >
       <h2>One file, all the defaults</h2>
       <p>
-        <code>dbt_project.yml</code> at the repo root configures every model by{" "}
+        <code>dbt_project.yml</code>{" "}at the repo root configures every model by{" "}
         <strong>folder path</strong>. An abridged view of ours:
       </p>
       <CodeBlock
@@ -57,7 +57,7 @@ models:
       />
       <p>
         Read it top-down: settings cascade from project → folder → subfolder, with
-        deeper levels winning. The <code>+</code> prefix marks a config property (as
+        deeper levels winning. The <code>+</code>{" "}prefix marks a config property (as
         opposed to a folder name).
       </p>
 
@@ -74,7 +74,7 @@ models:
         <tbody>
           <tr>
             <td>
-              <code>config()</code> in the model file
+              <code>config()</code>{" "}in the model file
             </td>
             <td>
               <code>{"{{ config(materialized='view') }}"}</code>
@@ -106,7 +106,7 @@ models:
 
       <h2>Tags drive the schedules</h2>
       <p>
-        Those <code>+tags</code> are not decoration. The nightly build selects models by
+        Those <code>+tags</code>{" "}are not decoration. The nightly build selects models by
         tag — <code>daily</code>-tagged layers rebuild every night; heavier marts run on
         their own cadence. You can use them too:
       </p>
@@ -123,7 +123,7 @@ dbt ls -s tag:reporting         # list models carrying a tag
         Some values need to be consistent everywhere but changeable for a single run —
         reference dates are the project&apos;s main example. The QOF reference date is
         defined once and read through a macro; every register model calls{" "}
-        <code>{"{{ qof_reference_date() }}"}</code> rather than hardcoding a date. To
+        <code>{"{{ qof_reference_date() }}"}</code>{" "}rather than hardcoding a date. To
         rebuild a register as of a different date, override it at the command line:
       </p>
       <CodeBlock
@@ -139,7 +139,7 @@ dbt build -s fct_person_diabetes_register --vars '{"qof_reference_date": "2025-0
 
       <h2>Post-hooks: governance on autopilot</h2>
       <p>
-        The project-level <code>+post-hook</code> runs after every model build —
+        The project-level <code>+post-hook</code>{" "}runs after every model build —
         transferring ownership so the right roles can manage the object. Published
         models add hooks for Snowflake governance tags. You get all of this without
         writing a line: it is the layer doing the work.
@@ -147,10 +147,10 @@ dbt build -s fct_person_diabetes_register --vars '{"qof_reference_date": "2025-0
 
       <Callout kind="info" title="Schemas from folders (OLIDS)">
         <p>
-          In the OLIDS domain a custom <code>generate_schema_name</code> macro derives
+          In the OLIDS domain a custom <code>generate_schema_name</code>{" "}macro derives
           the schema from the folder path —{" "}
-          <code>models/modelling/olids/diagnoses/</code> builds into{" "}
-          <code>MODELLING.OLIDS_DIAGNOSES</code> with no config at all. Creating a
+          <code>models/modelling/olids/diagnoses/</code>{" "}builds into{" "}
+          <code>MODELLING.OLIDS_DIAGNOSES</code>{" "}with no config at all. Creating a
           folder is creating a schema.
         </p>
       </Callout>

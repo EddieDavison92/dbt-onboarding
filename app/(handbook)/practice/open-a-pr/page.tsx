@@ -23,6 +23,8 @@ export default function Page() {
       <CodeBlock
         lang="bash"
         code={`
+git switch main
+git pull
 git switch -c feat/short-description
 git status
 git add path/to/model.sql path/to/model.yml
@@ -33,9 +35,11 @@ gh pr create --fill
 `}
       />
       <p>
-        If you already edited files on <code>main</code>, create the branch now; your
-        uncommitted changes move with you. On the first push, run the upstream command
-        Git prints if needed.
+        Normally, update <code>main</code>{" "}before creating the branch so your work
+        starts from the latest <code>origin/main</code>. If you already edited files
+        on <code>main</code>, do not pull over them: create the branch immediately;
+        your uncommitted changes move with you. On the first push, run the upstream
+        command Git prints if needed.
       </p>
 
       <Callout kind="warn" title="The repository and PR are public">

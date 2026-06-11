@@ -46,10 +46,10 @@ export default function Page() {
     >
       <h2>The mental model</h2>
       <p>
-        <code>main</code> is the production branch — what runs every night. You never
+        <code>main</code>{" "}is the production branch — what runs every night. You never
         edit it directly (it is locked). Instead you take a <strong>branch</strong>: a
         parallel copy where you can work freely. When your work is ready, a{" "}
-        <strong>pull request (PR)</strong> proposes merging your changes into{" "}
+        <strong>pull request (PR)</strong>{" "}proposes merging your changes into{" "}
         <code>main</code>. Between proposal and merge sit the two safety nets: a human
         review and automated CI checks.
       </p>
@@ -76,9 +76,9 @@ export default function Page() {
         ))}
       </div>
 
-      <h2>The five commands you actually need</h2>
+      <h2>The six commands you actually need</h2>
       <p>
-        Git has hundreds of commands; daily work here uses about five. The one idea to
+        Git has hundreds of commands; daily work here uses about six. The one idea to
         understand is <strong>staging</strong>: a commit only includes what you have
         explicitly added to it. That is a feature — you choose exactly which files go
         into each snapshot, even if other files have changed.
@@ -87,7 +87,9 @@ export default function Page() {
         lang="bash"
         title="the whole daily loop"
         code={`
-git switch -c feat/my-change      # start a branch
+git switch main                   # return to the production branch
+git pull                          # update it from origin/main
+git switch -c feat/my-change      # branch from the latest main
 git status                        # what have I changed?
 git add models/staging/my_model.sql    # stage the files you mean to commit
 git add models/staging/my_model.yml
@@ -96,7 +98,10 @@ git push                          # upload the branch to GitHub
 `}
       />
       <p>
-        Run <code>git status</code> whenever unsure — it shows what is changed, what is
+        Run the first three commands before starting each new piece of work. A branch
+        begins from whichever commit you are currently on, so pull <code>main</code>{" "}
+        first to avoid starting from an old version. Run <code>git status</code>{" "}
+        whenever unsure — it shows what is changed, what is
         staged, and usually suggests the command you need next.
       </p>
 
@@ -114,8 +119,8 @@ git push                          # upload the branch to GitHub
       <h2>Project conventions</h2>
       <h3>Branch names</h3>
       <p>
-        <code>feat/short-description</code> for new work, <code>fix/short-description</code>{" "}
-        for bug fixes, <code>docs/short-description</code> for documentation. Lowercase,
+        <code>feat/short-description</code>{" "}for new work, <code>fix/short-description</code>{" "}
+        for bug fixes, <code>docs/short-description</code>{" "}for documentation. Lowercase,
         hyphens, no spaces.
       </p>
       <h3>Commit messages</h3>
@@ -133,7 +138,7 @@ git commit -m "docs: describe waiting list snapshot logic"
       />
       <p>
         Pre-commit hooks validate the format locally, and commits must be{" "}
-        <strong>signed</strong> (your SSH key — set up once during machine setup, then
+        <strong>signed</strong>{" "}(your SSH key — set up once during machine setup, then
         forget about it).
       </p>
 
@@ -210,17 +215,17 @@ git commit -m "docs: describe waiting list snapshot logic"
       </p>
       <ul>
         <li>
-          <strong>No patient or person-level data, anywhere.</strong> Not in comments
+          <strong>No patient or person-level data, anywhere.</strong>{" "}Not in comments
           (“e.g. NHS number 943…”), not in test fixtures, not in seed CSVs, not in
           query results pasted to show your model works.
         </li>
         <li>
-          <strong>No row-level outputs in PRs.</strong> Describe what you checked
+          <strong>No row-level outputs in PRs.</strong>{" "}Describe what you checked
           (“grain verified unique on site_code + day_of_week”) instead of attaching
           screenshots or extracts of results. Aggregate counts are fine; rows are not.
         </li>
         <li>
-          <strong>No credentials.</strong> Tokens, passwords and account details live
+          <strong>No credentials.</strong>{" "}Tokens, passwords and account details live
           in your local <code>.env</code>, which git ignores. If a secret ever lands in
           a commit, tell the team immediately so it can be rotated — do not quietly
           delete it.
@@ -240,15 +245,15 @@ git commit -m "docs: describe waiting list snapshot logic"
       <h2>Review etiquette</h2>
       <ul>
         <li>
-          <strong>Keep PRs small.</strong> One model (plus its YAML) reviews in minutes;
+          <strong>Keep PRs small.</strong>{" "}One model (plus its YAML) reviews in minutes;
           ten models sit for a week.
         </li>
         <li>
-          <strong>Write the description for a stranger.</strong> What changed, why, and
+          <strong>Write the description for a stranger.</strong>{" "}What changed, why, and
           how you checked the numbers.
         </li>
         <li>
-          <strong>Review comments are about the code.</strong> “Could this join fan
+          <strong>Review comments are about the code.</strong>{" "}“Could this join fan
           out?” is the reviewer doing their job — and soon it will be you asking.
         </li>
       </ul>
