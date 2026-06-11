@@ -7,6 +7,7 @@ import { LayerSorter } from "@/components/LayerSorter";
 import { ModelJourney } from "@/components/ModelJourney";
 import { ScriptChaos } from "@/components/ScriptChaos";
 import { TestProbe } from "@/components/TestProbe";
+import { GrainFanout } from "@/components/GrainFanout";
 import { BranchToProd } from "@/components/BranchToProd";
 
 export const HOW_DBT_THINKS_COURSE: Course = {
@@ -37,6 +38,7 @@ export const HOW_DBT_THINKS_COURSE: Course = {
               <ScriptChaos />
             </>
           ),
+          interact: true,
         },
         {
           id: "two-ideas",
@@ -62,16 +64,17 @@ export const HOW_DBT_THINKS_COURSE: Course = {
             </>
           ),
           check: {
-            prompt: "How does dbt know which order to build things in?",
+            prompt:
+              "The analyst who knew the run order leaves, and their notes are lost. The team is on dbt. What breaks?",
             options: [
-              "It reads the references in each SQL file and derives the order",
-              "From a run-order file someone maintains",
-              "Alphabetically, by file name",
-              "You schedule each model by hand",
+              "Nothing — every model names its inputs, so dbt re-derives the order from the code on every run",
+              "The nightly run, until someone reconstructs the order",
+              "Only the models the analyst wrote",
+              "dbt keeps working from the last order it remembers",
             ],
             answer: 0,
             explain:
-              "There is no run-order config anywhere. dbt reads the references inside the SQL and works the sequence out itself, every time.",
+              "There is no run-order knowledge to lose. The order is recomputed from the SQL itself every time — nothing lives in anyone's head.",
             affirm: "the order lives in the SQL, and dbt derives it.",
           },
         },
@@ -109,16 +112,17 @@ export const HOW_DBT_THINKS_COURSE: Course = {
             </>
           ),
           check: {
-            prompt: "Which of these does dbt itself do?",
+            prompt:
+              "A brand-new feed needs to start landing in Snowflake every night. Is that dbt work?",
             options: [
-              "Loads source feeds into Snowflake",
-              "Transforms data that is already in Snowflake",
-              "Renders the dashboards",
-              "All three",
+              "No — loading happens upstream of dbt; dbt transforms the data once it has landed",
+              "Yes — dbt loads and transforms",
+              "Yes, as long as the feed is declared in YAML first",
+              "Only if the feed arrives as SQL",
             ],
-            answer: 1,
+            answer: 0,
             explain:
-              "dbt is the T in ELT. Loading happens before it; dashboards consume what it builds.",
+              "dbt is the T in ELT. Getting the feed into the warehouse is a different job; once it lands, dbt takes over.",
             affirm: "dbt transforms what is already in the warehouse — nothing else.",
           },
         },
@@ -149,6 +153,7 @@ export const HOW_DBT_THINKS_COURSE: Course = {
               </p>
             </>
           ),
+          interact: true,
         },
         {
           id: "whats-missing",
@@ -165,16 +170,17 @@ export const HOW_DBT_THINKS_COURSE: Course = {
             </>
           ),
           check: {
-            prompt: "A dbt model is…",
+            prompt:
+              "A colleague pastes their old worksheet script — CREATE TABLE, INSERTs, a DROP — into a new model file. What needs to change?",
             options: [
-              "A .sql file containing a single SELECT statement",
-              "A .sql file with the CREATE TABLE and INSERT statements",
-              "A YAML file defining a table's columns",
-              "Any SQL file in the repo",
+              "Strip it back to one SELECT — dbt supplies the CREATE and the destination itself",
+              "Nothing — dbt runs whatever SQL it finds",
+              "Add the schema name so dbt knows where to build it",
+              "Swap the DROP for TRUNCATE",
             ],
             answer: 0,
             explain:
-              "One file, one SELECT. dbt generates the surrounding DDL itself, so the model stays a pure description of the rows.",
+              "A model is a description of rows, nothing more. The DDL around it is dbt's job — that is exactly what makes rebuilds safe and environments interchangeable.",
             affirm: "one file, one SELECT — dbt writes the DDL.",
           },
         },
@@ -361,8 +367,10 @@ from {{ ref('raw_people') }}
                 The project fixes this by giving every model exactly one{" "}
                 <strong>job</strong>, and stacking the jobs in layers: clean
                 once near the bottom, build reusable blocks in the middle,
-                assemble finished datasets at the top. Each layer only reads
-                from the layers beneath it.
+                assemble finished datasets at the top. Data flows broadly
+                upward — though not rigidly: a modelling block can also build
+                on reporting facts and dims rather than repeat their logic.
+                The rule that never bends is the job.
               </p>
             </>
           ),
@@ -426,6 +434,7 @@ from {{ ref('raw_people') }}
               </p>
             </>
           ),
+          interact: true,
         },
       ],
     },
@@ -449,6 +458,7 @@ from {{ ref('raw_people') }}
               <TestProbe />
             </>
           ),
+          interact: true,
           check: {
             prompt: "A dbt test passes when its query returns…",
             options: [
@@ -470,18 +480,19 @@ from {{ ref('raw_people') }}
             <>
               <p>
                 Every table answers one question: <strong>one row per
-                what?</strong> One row per person? Per person per referral per
-                week? That sentence is the table&apos;s <em>grain</em> — and a
-                test asserting it catches the classic silent failure: a join
-                that fans out and quietly doubles your counts.
+                what?</strong> That sentence is the table&apos;s{" "}
+                <em>grain</em> — and the classic silent failure is a join that
+                breaks it. Watch it happen:
               </p>
+              <GrainFanout />
               <p>
-                If the grain is “one row per site per weekday”, neither column
-                is unique on its own. The test goes on the{" "}
-                <strong>combination</strong>.
+                When the grain is more than one column — say “one row per site
+                per weekday” — neither column is unique on its own, so the
+                test goes on the <strong>combination</strong>.
               </p>
             </>
           ),
+          interact: true,
           check: {
             prompt: "Grain: one row per site per weekday. Which test catches a join that duplicates rows?",
             options: [
@@ -550,6 +561,7 @@ from {{ ref('raw_people') }}
               <BranchToProd />
             </>
           ),
+          interact: true,
           check: {
             prompt: "What is the only way a change reaches production?",
             options: [

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useInteractionDone } from "@/lib/interaction";
 
 const ROWS = [
   { person_id: "10291", postcode: "W10 4AA" },
@@ -34,8 +35,17 @@ const TESTS = [
 
 /** run a data test against a tiny table and watch which rows it catches */
 export function TestProbe() {
+  const interactionDone = useInteractionDone();
   const [active, setActive] = useState<(typeof TESTS)[number] | null>(null);
+  const [tried, setTried] = useState<string[]>([]);
   const caught = active ? ROWS.filter((r) => active.violates(r)).length : 0;
+
+  const run = (t: (typeof TESTS)[number]) => {
+    setActive(t);
+    const next = tried.includes(t.id) ? tried : [...tried, t.id];
+    setTried(next);
+    if (next.length === TESTS.length) interactionDone();
+  };
 
   return (
     <figure className="my-6 overflow-hidden rounded-2xl border-2 border-ink bg-paper shadow-[5px_5px_0_0_var(--color-layer-staging)]">
@@ -49,7 +59,7 @@ export function TestProbe() {
               key={t.id}
               type="button"
               aria-pressed={active?.id === t.id}
-              onClick={() => setActive(t)}
+              onClick={() => run(t)}
               className={`rounded-lg border-2 px-2.5 py-1 font-mono text-[11px] transition ${
                 active?.id === t.id
                   ? "border-ink bg-ink text-paper"

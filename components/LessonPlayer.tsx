@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useProgress } from "@/lib/progress";
+import { InteractionContext } from "@/lib/interaction";
 import type { Checkpoint, Step } from "@/lib/course-types";
 
 function CheckpointBlock({
@@ -102,6 +103,8 @@ export function LessonPlayer({
   const [pos, setPos] = useState(1);
   // checkpoint outcomes: right/wrong this visit, "done" when restored from storage
   const [answered, setAnswered] = useState<Record<number, "right" | "wrong" | "done">>({});
+  // interaction-gated steps the learner has completed this visit (or previously)
+  const [interacted, setInteracted] = useState<Record<number, boolean>>({});
   const [restored, setRestored] = useState(false);
 
   // resume at the furthest step reached previously
@@ -112,8 +115,13 @@ export function LessonPlayer({
         const upTo = Math.min(saved, steps.length);
         setPos(upTo);
         const pre: Record<number, "done"> = {};
-        for (let i = 0; i < upTo - 1; i++) pre[i] = "done";
+        const preInteract: Record<number, boolean> = {};
+        for (let i = 0; i < upTo - 1; i++) {
+          pre[i] = "done";
+          preInteract[i] = true;
+        }
         setAnswered(pre);
+        setInteracted(preInteract);
       }
       setRestored(true);
     }
@@ -126,8 +134,14 @@ export function LessonPlayer({
 
   const i = pos - 1;
   const step = steps[i];
-  const blocked = !!step.check && !answered[i];
+  const needsAnswer = !!step.check && !answered[i];
+  const needsInteract = !!step.interact && !interacted[i];
+  const blocked = needsAnswer || needsInteract;
   const atEnd = pos >= steps.length;
+
+  const markInteracted = useCallback(() => {
+    setInteracted((a) => (a[pos - 1] ? a : { ...a, [pos - 1]: true }));
+  }, [pos]);
   const finished = ready && isDone(`course/${lessonId}`);
 
   const goBack = () => {
@@ -202,7 +216,9 @@ export function LessonPlayer({
             {step.title}
           </h2>
         )}
-        <div>{step.body}</div>
+        <InteractionContext.Provider value={markInteracted}>
+          <div>{step.body}</div>
+        </InteractionContext.Provider>
         {step.check &&
           (answered[i] ? (
             <p
@@ -252,7 +268,9 @@ export function LessonPlayer({
           }`}
         >
           {blocked
-            ? "Answer the question to continue"
+            ? needsAnswer
+              ? "Answer the question to continue"
+              : "Try it above to continue"
             : atEnd
               ? finished
                 ? `Next: ${nextLabel} →`

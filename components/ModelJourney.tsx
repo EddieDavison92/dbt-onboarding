@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useInteractionDone } from "@/lib/interaction";
 
 type Stage = 0 | 1 | 2;
 
@@ -20,6 +21,7 @@ const CTA = ["Compile it →", "Run it →", "Start again"] as const;
 
 /** one model, walked through compile and execute */
 export function ModelJourney() {
+  const interactionDone = useInteractionDone();
   const [stage, setStage] = useState<Stage>(0);
   const [reached, setReached] = useState<Stage>(0);
 
@@ -31,6 +33,7 @@ export function ModelJourney() {
     const next = (stage + 1) as Stage;
     setStage(next);
     setReached((r) => (next > r ? next : r));
+    if (next === 2) interactionDone();
   };
 
   const line = (

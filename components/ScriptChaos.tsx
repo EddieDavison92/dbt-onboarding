@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useInteractionDone } from "@/lib/interaction";
 
 const SCRIPTS = [
   { id: "lookup", file: "update_specialty_lookup.sql" },
@@ -13,6 +14,7 @@ const SCRIPTS = [
 const ORDERED = ["base", "lookup", "waits", "report"] as const;
 
 export function ScriptChaos() {
+  const interactionDone = useInteractionDone();
   const [picked, setPicked] = useState<string[]>([]);
   const [revealed, setRevealed] = useState(false);
   const phase = revealed ? "revealed" : picked.length === SCRIPTS.length ? "punchline" : "guess";
@@ -114,7 +116,10 @@ export function ScriptChaos() {
             </button>
             <button
               type="button"
-              onClick={() => setRevealed(true)}
+              onClick={() => {
+                setRevealed(true);
+                interactionDone();
+              }}
               className="rounded-lg border-2 border-ink bg-ink px-3 py-1.5 font-display text-xs font-extrabold uppercase tracking-wider text-paper transition hover:border-flame hover:bg-flame"
             >
               Let dbt read the SQL →

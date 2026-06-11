@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useInteractionDone } from "@/lib/interaction";
 
 const STAGES = [
   {
@@ -39,8 +40,17 @@ const STAGES = [
 
 /** the only path a change can take to production */
 export function BranchToProd() {
+  const interactionDone = useInteractionDone();
   const [active, setActive] = useState(0);
+  const [viewed, setViewed] = useState<number[]>([0]);
   const stage = STAGES[active];
+
+  const view = (i: number) => {
+    setActive(i);
+    const next = viewed.includes(i) ? viewed : [...viewed, i];
+    setViewed(next);
+    if (next.length === STAGES.length) interactionDone();
+  };
 
   return (
     <figure className="my-6 overflow-hidden rounded-2xl border-2 border-ink bg-paper shadow-[5px_5px_0_0_var(--color-layer-reporting)]">
@@ -49,7 +59,7 @@ export function BranchToProd() {
           <button
             key={item.id}
             type="button"
-            onClick={() => setActive(index)}
+            onClick={() => view(index)}
             aria-pressed={active === index}
             className={`relative border-b border-r border-line px-3 py-4 text-left transition sm:border-b-0 ${
               active === index ? "bg-ink text-paper" : "bg-paper hover:bg-paper-warm"

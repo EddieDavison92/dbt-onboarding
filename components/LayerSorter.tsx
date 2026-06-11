@@ -2,13 +2,21 @@
 
 import { useState } from "react";
 import { LAYERS, SORTER_ITEMS } from "@/lib/layers";
+import { useInteractionDone } from "@/lib/interaction";
 
 /** Assign each model description to the layer it belongs in. */
 export function LayerSorter() {
+  const interactionDone = useInteractionDone();
   const [assigned, setAssigned] = useState<Record<number, string>>({});
   const answered = Object.keys(assigned).length;
   const correct = SORTER_ITEMS.filter((it, i) => assigned[i] === it.layer).length;
   const finished = answered === SORTER_ITEMS.length;
+
+  const assign = (i: number, layerId: string) => {
+    const next = { ...assigned, [i]: layerId };
+    setAssigned(next);
+    if (Object.keys(next).length === SORTER_ITEMS.length) interactionDone();
+  };
 
   return (
     <section className="my-8 max-w-[76ch] rounded-2xl border-2 border-ink bg-paper p-5 shadow-[5px_5px_0_0_var(--color-layer-modelling)]">
@@ -38,7 +46,7 @@ export function LayerSorter() {
                       key={l.id}
                       type="button"
                       disabled={revealed}
-                      onClick={() => setAssigned((a) => ({ ...a, [i]: l.id }))}
+                      onClick={() => assign(i, l.id)}
                       style={
                         revealed && isAnswer
                           ? { backgroundColor: l.color, borderColor: l.color }

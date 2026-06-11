@@ -16,6 +16,8 @@ export type Step = {
   body: ReactNode;
   /** a question the learner must answer before continuing */
   check?: Checkpoint;
+  /** the step's widget must signal completion (useInteractionDone) before continuing */
+  interact?: boolean;
 };
 
 export type Lesson = {
