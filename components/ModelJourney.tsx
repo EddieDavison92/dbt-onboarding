@@ -14,7 +14,7 @@ const STAGES = [
 const CAPTIONS = [
   "Your file only describes the rows. No CREATE, no destination — just the SELECT.",
   "dbt resolved ref('raw_people') to the real table — the DEV__ copy, because you are developing. Nothing has touched Snowflake yet.",
-  "dbt wrapped your SELECT in the DDL and sent it. Snowflake created the view, in your dev environment.",
+  "dbt wrapped your SELECT in the DDL and sent it. Snowflake created the view, in the shared dev environment.",
 ] as const;
 
 const CTA = ["Compile it →", "Run it →", "Start again"] as const;

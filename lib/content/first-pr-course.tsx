@@ -774,8 +774,9 @@ models:
               <CodeBlock lang="bash" code={`dbt build -s stg_reference_opening_hours`} />
               <p>
                 <code>build</code> = run the model <em>and</em> its tests, in
-                order, in <strong>your dev schema</strong> — a sandbox copy of the
-                warehouse keyed to you. Nothing you do here touches production.
+                order, in the <strong>DEV__ databases</strong> — the shared
+                development copy of the warehouse. Nothing you do here touches
+                production.
               </p>
               <p>
                 <strong>You should see:</strong>
@@ -880,8 +881,8 @@ Completed successfully
                 Iterate — edit, <code>dbt build -s stg_reference_opening_hours</code>,
                 read — until everything passes.{" "}
                 <strong>You should have:</strong> a fully green build, and (worth the
-                30 seconds) a look at your actual table in Snowflake, sitting in your
-                dev schema.
+                30 seconds) a look at your actual table in Snowflake, sitting in the
+                DEV__ database for its layer.
               </p>
             </>
           ),

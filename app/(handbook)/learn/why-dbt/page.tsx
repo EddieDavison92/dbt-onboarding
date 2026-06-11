@@ -92,8 +92,8 @@ from {{ ref('raw_csds_bridging') }}
         <li>
           <strong>Compile.</strong> dbt renders the template parts — here,{" "}
           <code>{"{{ ref('raw_csds_bridging') }}"}</code> becomes the real
-          database-qualified table name for whichever environment you are in (your dev
-          schema while developing, production after merge).
+          database-qualified table name for whichever environment you are in (the
+          DEV__ databases while developing, production after merge).
         </li>
         <li>
           <strong>Run.</strong> dbt wraps the compiled SELECT in the right DDL and
@@ -202,7 +202,7 @@ create or replace view DEV__MODELLING.DBT_STAGING.STG_CSDS_BRIDGING as (
           </tr>
           <tr>
             <td>Develop</td>
-            <td>Models on a branch, in your own dev schema</td>
+            <td>Models on a branch, built into the shared DEV__ databases</td>
           </tr>
           <tr>
             <td>Test</td>

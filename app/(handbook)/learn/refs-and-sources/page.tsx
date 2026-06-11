@@ -48,8 +48,8 @@ left join {{ ref('stg_dictionary_dbo_specialties') }} dict
       <p>Each call does two things:</p>
       <ul>
         <li>
-          <strong>dbt resolves the location for you.</strong> In your dev environment it
-          points at your dev schema; in production, the production one. Same SQL, every
+          <strong>dbt resolves the location for you.</strong> Developing, it points at
+          the DEV__ databases; in production, the production ones. Same SQL, every
           environment.
         </li>
         <li>

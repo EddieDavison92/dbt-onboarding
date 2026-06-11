@@ -568,29 +568,32 @@ from {{ ref('raw_people') }}
               "Running dbt build from your machine",
               "A pull request that passes its checks and is merged to main",
               "Asking an administrator to copy it across",
-              "Waiting — dev schemas sync to production nightly",
+              "Waiting — the dev environment syncs to production nightly",
             ],
             answer: 1,
             explain:
-              "Your local commands only ever touch your own dev schema. Production is written by the deployment that follows a merged, reviewed PR — there is no other door.",
+              "Your local commands only ever touch the shared DEV__ databases. Production is written by the deployment that follows a merged, reviewed PR — there is no other door.",
             affirm: "production is only reachable through a merged PR.",
           },
         },
         {
           id: "freedom",
-          title: "Which means: you can't break it",
+          title: "Which means: you can't break production",
           body: (
             <>
               <p>
                 This is the most useful thing to internalise before touching
                 the real project. While you develop, everything you build lands
-                in a sandbox schema keyed to you. Build nonsense, break your
-                own tables, rebuild from scratch — nobody else can tell.
+                in the <strong>DEV__</strong> databases —{" "}
+                <code>DEV__MODELLING</code>, <code>DEV__REPORTING</code> — a
+                working copy of the warehouse the whole team shares. Build
+                nonsense, break a model, rebuild it: dev is disposable, and no
+                report or dashboard reads from it.
               </p>
               <p>
-                Between your sandbox and production stand the compile check,
-                the test suite, an automated reviewer and a human one. The
-                safety comes from the path, not from you being careful.
+                Between that dev environment and production stand the compile
+                check, the test suite, an automated reviewer and a human one.
+                The safety comes from the path, not from you being careful.
               </p>
             </>
           ),
@@ -703,19 +706,20 @@ from {{ ref('raw_people') }}
         },
         {
           id: "q-dev",
-          title: "5. The sandbox",
+          title: "5. The dev environment",
           body: <p>While developing, you build a model with a bad join and ruin its output.</p>,
           check: {
-            prompt: "Who is affected?",
+            prompt: "Which reports or dashboards show wrong numbers?",
             options: [
-              "Only you — it built into your own dev schema",
-              "Everyone — models share one schema",
-              "Dashboard users, from tonight",
-              "Nobody, because dbt refused to build it",
+              "None — it built into the shared DEV__ databases, and nothing downstream reads from dev",
+              "Any dashboard on that model, immediately",
+              "Any dashboard on that model, from tonight's build",
+              "None, because dbt refused to build it",
             ],
             answer: 0,
-            explain: "Local builds land in a sandbox keyed to you. Production sits behind a reviewed, merged PR — your experiments can't reach it.",
-            affirm: "local builds touch only your sandbox.",
+            explain:
+              "Local builds land in the DEV__ databases — the team's shared, disposable copy of the warehouse. Production, which dashboards read, sits behind a reviewed, merged PR.",
+            affirm: "local builds touch only the shared dev environment — never production.",
           },
         },
         {

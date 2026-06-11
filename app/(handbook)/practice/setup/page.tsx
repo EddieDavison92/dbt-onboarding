@@ -78,7 +78,7 @@ dbt show -s stg_csds_bridging
       <p>
         <code>dbt debug</code> should end with <strong>All checks passed!</strong>. The
         second command is a useful final check that you can compile a project model and
-        query your development schema.
+        query the development environment.
       </p>
 
       <h2>If setup fails</h2>

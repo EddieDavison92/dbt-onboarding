@@ -14,10 +14,10 @@ const STAGES = [
   },
   {
     id: "dev",
-    label: "2. Your dev schema",
+    label: "2. The dev environment",
     verb: "Build and test it",
-    body: "dbt build creates the model in a sandbox schema keyed to you. Break it, rebuild it, nobody else notices.",
-    touches: "Only your sandbox",
+    body: "dbt build creates the model in the shared DEV__ databases — the team's working copy of the warehouse, completely separate from production.",
+    touches: "Only the shared dev environment",
     color: "var(--layer-staging)",
   },
   {
