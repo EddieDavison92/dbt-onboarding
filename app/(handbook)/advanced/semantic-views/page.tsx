@@ -64,7 +64,7 @@ export default function Page() {
         A human analyst avoids these traps with knowledge held in their head. The
         semantic view moves that knowledge into the warehouse:{" "}
         <code>PRIMARY KEY</code> declarations say what the grain is,{" "}
-        <code>RELATIONSHIPS</code> say what references what, and a consumer derives
+        <code>RELATIONSHIPS</code>{" "}say what references what, and a consumer derives
         joins from the declarations instead of guessing. The fan-out case stops being
         possible to write by accident, because the metric&apos;s aggregation is
         defined against the right grain.

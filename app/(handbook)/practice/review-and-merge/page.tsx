@@ -3,6 +3,7 @@ import { LessonShell } from "@/components/LessonShell";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Callout } from "@/components/Callout";
 import { Checklist } from "@/components/Checklist";
+import { GuidedCourseLink } from "@/components/GuidedCourseLink";
 
 export const metadata: Metadata = { title: "Review & merge" };
 
@@ -11,90 +12,68 @@ export default function Page() {
     <LessonShell
       section="practice"
       slug="review-and-merge"
-      kicker="Do · Step 7"
+      kicker="Field guide · 7"
       title="Review & merge"
-      lede="Feedback arrives, you respond with commits, and your model lands on main — running in production by tomorrow morning."
-      minutes={5}
+      lede="Respond in the existing PR, merge when review and checks agree, then bring your local checkout up to date."
+      minutes={4}
     >
-      <h2>Responding to review</h2>
-      <p>
-        Review comments come in two kinds: questions (“is this grain right when a site
-        closes mid-week?”) and requests (“rename to match the <code>sk_</code>{" "}
-        convention”). For both, the loop is the same:
-      </p>
+      <GuidedCourseLink href="/courses/first-pr/merge-and-after" />
+
+      <h2>Respond to review</h2>
       <CodeBlock
         lang="bash"
         code={`
-# make the change locally, then:
+# make the requested change, then
 git add -u
-git commit -m "fix: rename site identifier to match conventions"
+git commit -m "fix: address review feedback"
 git push
 `}
       />
       <p>
-        The PR updates automatically; reply to the comment so the reviewer knows it is
-        addressed. Disagree? Say why in the thread — “I kept X because…” is a perfectly
-        good answer, and reviewers are often missing context you have.
+        Reply in the review thread with what changed. If you disagree, explain the data
+        or design reason there; a review comment is a discussion, not an instruction
+        that must be accepted silently.
       </p>
-
-      <Callout kind="tip" title="Resolve conversations, don't just push">
+      <Callout kind="tip" title="Close the loop in the thread">
         <p>
-          A pushed fix without a reply leaves the reviewer re-reading your diff to work
-          out what changed. One line — “done in abc1234” — saves them minutes and gets
-          you re-approved faster.
+          A short reply such as “done in abc1234” tells the reviewer where to look and
+          preserves the reasoning for the next person reading the PR.
         </p>
       </Callout>
 
-      <h2>Merging</h2>
+      <h2>Merge and sync</h2>
       <p>
-        Approval + green checks = the merge button unlocks. We squash-merge: your
-        branch&apos;s commits collapse into one tidy commit on <code>main</code>. After
-        merging, delete the branch (GitHub offers a button) and pull main locally:
+        Merge once approvals are present and every required check is green. The project
+        uses squash merge, so the branch lands on <code>main</code> as one tidy commit.
       </p>
       <CodeBlock
         lang="bash"
         code={`
 git switch main
 git pull
+git branch -d feat/short-description
 `}
       />
 
-      <h2>What happens next</h2>
+      <h2>After the merge</h2>
       <ul>
-        <li>
-          <strong>The deploy workflow</strong> (GitHub Actions) picks up the merge and
-          builds your changed models, plus everything downstream of them, in production
-          Snowflake.
-        </li>
-        <li>
-          <strong>The nightly build</strong> now includes your model and runs your tests
-          every day. If the feed changes in six months, your grain test will surface it.
-        </li>
-        <li>
-          <strong>dbt docs</strong> and Snowflake column comments update with your
-          descriptions.
-        </li>
+        <li>The deploy workflow builds the selected production models.</li>
+        <li>The nightly build continues running the model and its tests.</li>
+        <li>dbt docs and Snowflake comments pick up the merged descriptions.</li>
       </ul>
-
       <p>
-        That is the full cycle. Every change from now on — a one-line fix or a new
-        disease register — follows the same path: branch, model, YAML, build, PR,
-        review, merge. That consistency is what lets the team trust every number the
-        pipeline produces.
-      </p>
-      <p>
-        It also gets fast. The first time through, this track is an afternoon; once
-        the tools are familiar, a routine change — branch, edit, build, PR — is a
-        loop measured in minutes, with most of the elapsed time being review rather
-        than your effort. The process feels heavyweight exactly once.
+        If production fails, keep the PR link and failing job together when asking for
+        help. The useful question is not only “what failed?” but “did this also fail in
+        the PR environment, or is production different?”
       </p>
 
       <Checklist
         id="merge"
         items={[
-          { key: "merged", label: <>PR approved and squash-merged</> },
-          { key: "branch", label: <>Branch deleted, local main pulled</> },
-          { key: "prod", label: <>Model visible in production after the deploy/nightly run</> },
+          { key: "review", label: <>Review threads answered and required checks green</> },
+          { key: "merged", label: <>PR squash-merged and remote branch deleted</> },
+          { key: "local", label: <>Local <code>main</code> pulled and feature branch removed</> },
+          { key: "prod", label: <>Production result checked after deployment</> },
         ]}
       />
     </LessonShell>

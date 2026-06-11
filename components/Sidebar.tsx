@@ -85,7 +85,7 @@ export function Sidebar() {
         </div>
       </div>
       <Section heading="Learn" base="learn" items={LEARN} />
-      <Section heading="Do · your first PR" base="practice" items={PRACTICE} />
+      <Section heading="First PR field guide" base="practice" items={PRACTICE} />
       <Section heading="Going further" base="advanced" items={ADVANCED} />
       <div>
         <p className="mb-1.5 px-3 font-display text-[11px] font-extrabold uppercase tracking-[0.18em] text-ink-faint">

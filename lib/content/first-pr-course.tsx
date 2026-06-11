@@ -48,7 +48,7 @@ export const FIRST_PR_COURSE: Course = {
                   (defaults are fine).
                 </li>
                 <li>
-                  Install <strong>VS Code</strong> if you don&apos;t have it.
+                  Install <strong>VS Code</strong>{" "}if you don&apos;t have it.
                 </li>
                 <li>
                   Clone the repo — in a terminal:
@@ -818,7 +818,7 @@ git status
               />
               <p>
                 <strong>You should see:</strong> your <code>.sql</code> and{" "}
-                <code>.yml</code> listed as untracked/modified — and nothing else.
+                <code>.yml</code>{" "}listed as untracked/modified — and nothing else.
                 If generated source files from earlier are listed, they belong in
                 this PR too. Anything you don&apos;t recognise: don&apos;t stage it.
               </p>

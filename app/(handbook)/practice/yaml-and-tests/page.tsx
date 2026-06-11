@@ -3,6 +3,7 @@ import { LessonShell } from "@/components/LessonShell";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Callout } from "@/components/Callout";
 import { Checklist } from "@/components/Checklist";
+import { GuidedCourseLink } from "@/components/GuidedCourseLink";
 
 export const metadata: Metadata = { title: "Add the YAML" };
 
@@ -11,13 +12,14 @@ export default function Page() {
     <LessonShell
       section="practice"
       slug="yaml-and-tests"
-      kicker="Do · Step 4"
+      kicker="Field guide · 4"
       title="Add the YAML"
-      lede="Owner, descriptions, tests. CI will not let a model in without them — and the generator writes most of it for you."
-      minutes={8}
+      lede="Generate the boilerplate, then add the ownership, meaning and assertions only you can supply."
+      minutes={5}
     >
-      <h2>Scaffold it</h2>
-      <p>Build your model first (the generator reads its columns from the warehouse):</p>
+      <GuidedCourseLink href="/courses/first-pr/describe-and-test" />
+
+      <h2>Generate the starting point</h2>
       <CodeBlock
         lang="bash"
         code={`
@@ -26,84 +28,66 @@ dbt run-operation generate_model_yaml --args '{"model_names": ["stg_reference_op
 `}
       />
       <p>
-        Paste the output into <code>stg_reference_opening_hours.yml</code> next to your
-        SQL file, then make it yours:
+        Save the output beside the SQL as <code>stg_reference_opening_hours.yml</code>.
+        The generator knows the columns; it does not know what they mean or what must be
+        true about the data.
       </p>
+
+      <h2>Add the decisions</h2>
       <CodeBlock
         lang="yaml"
-        title="stg_reference_opening_hours.yml"
+        title="the parts to review"
         code={`
 models:
   - name: stg_reference_opening_hours
-    description: Site opening hours reference, one row per site per day of week
+    description: Site opening hours, one row per site per weekday
     config:
       meta:
         owner:
           name: Your Name
     data_tests:
-      - dbt_expectations.expect_table_row_count_to_be_between:
-          arguments:
-            min_value: 1
       - dbt_utils.unique_combination_of_columns:
           arguments:
-            combination_of_columns:
-              - site_code
-              - day_of_week
+            combination_of_columns: [site_code, day_of_week]
     columns:
       - name: site_code
         description: Standardised site identifier
-        data_tests:
-          - not_null
-      - name: day_of_week
-        description: ISO day of week (1 = Monday)
-        data_tests:
-          - not_null
-      - name: opens_at
-        description: Opening time, local
+        data_tests: [not_null]
 `}
       />
+      <ul>
+        <li>
+          Put the grain in the model description: <em>one row per what?</em>
+        </li>
+        <li>
+          Test that grain with <code>unique</code> or{" "}
+          <code>unique_combination_of_columns</code>.
+        </li>
+        <li>
+          Add <code>not_null</code>{" "}only where null would break the model&apos;s
+          contract.
+        </li>
+        <li>
+          Describe units, codes, source quirks and what null means. Avoid repeating the
+          column name in prose.
+        </li>
+      </ul>
 
-      <h2>What to actually test</h2>
-      <ol>
-        <li>
-          <strong>The grain</strong> — here, one row per site per weekday → a{" "}
-          <code>unique_combination_of_columns</code> on both.
-        </li>
-        <li>
-          <strong>Not-null on the keys</strong> the grain depends on.
-        </li>
-        <li>
-          <strong>Row count &gt; 0</strong> — the simplest early warning that a feed
-          has stopped arriving.
-        </li>
-      </ol>
-      <p>
-        Three tests is a reasonable number for a staging model. Twenty assertions on a
-        staging view adds noise without adding protection; the grain test is the one
-        that matters most.
-      </p>
-
-      <Callout kind="warn" title="data_tests, not tests">
+      <Callout kind="warn" title="Use the current YAML shape">
         <p>
-          The YAML key is <code>data_tests:</code> — the old <code>tests:</code> key is
-          deprecated and the repo has been migrated. Same for arguments: nest them under{" "}
-          <code>arguments:</code> as shown above.
-        </p>
-      </Callout>
-
-      <Callout kind="tip" title="Descriptions people thank you for">
-        <p>
-          Write what a stranger needs: units, source quirks, what null means. “ISO day
-          of week (1 = Monday)” beats “the day of the week” forever.
+          Use <code>data_tests:</code>, with package test arguments nested under{" "}
+          <code>arguments:</code>. The older <code>tests:</code> form has been migrated
+          out of this project.
         </p>
       </Callout>
 
       <Checklist
         id="yaml"
         items={[
-          { key: "owner", label: <>Owner block has your name</> },
-          { key: "grain", label: <>Grain is tested (unique or unique_combination_of_columns)</> },
-          { key: "desc", label: <>Model + key columns have real descriptions</> },
+          { key: "owner", label: <>Owner names a real person</> },
+          { key: "grain", label: <>Description states the grain and a test enforces it</> },
+          { key: "nulls", label: <>Key null assumptions are tested</> },
+          { key: "desc", label: <>Descriptions add meaning, units or source context</> },
         ]}
       />
     </LessonShell>

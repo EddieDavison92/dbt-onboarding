@@ -3,6 +3,7 @@ import { LessonShell } from "@/components/LessonShell";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Callout } from "@/components/Callout";
 import { Checklist } from "@/components/Checklist";
+import { GuidedCourseLink } from "@/components/GuidedCourseLink";
 
 export const metadata: Metadata = { title: "Write a staging model" };
 
@@ -11,23 +12,26 @@ export default function Page() {
     <LessonShell
       section="practice"
       slug="first-model"
-      kicker="Do · Step 3"
+      kicker="Field guide · 3"
       title="Write a staging model"
-      lede="One file, one SELECT, project conventions throughout. This is the smallest real contribution you can make — which is exactly why it's the first."
-      minutes={10}
+      lede="The staging contract: an explicit SELECT that cleans one raw input without adding business logic."
+      minutes={5}
     >
-      <h2>Create the file</h2>
+      <GuidedCourseLink href="/courses/first-pr/write-the-model" />
+
+      <h2>Place and name it</h2>
       <p>
-        Staging models live under <code>models/staging/&#123;domain&#125;/</code> and are
-        named <code>stg_&#123;source&#125;_&#123;table&#125;.sql</code>. For our practice
-        example:
+        Use <code>models/staging/&#123;domain&#125;/</code> and a{" "}
+        <code>stg_&#123;source&#125;_&#123;table&#125;.sql</code> filename. Folder
+        placement supplies project configuration, so check a neighbouring model before
+        inventing a new path.
       </p>
       <CodeBlock
-        lang="bash"
+        lang="text"
         code={`models/staging/shared/stg_reference_opening_hours.sql`}
       />
 
-      <h2>Write the SELECT</h2>
+      <h2>Use the staging contract</h2>
       <CodeBlock
         lang="sql"
         title="stg_reference_opening_hours.sql"
@@ -37,90 +41,54 @@ select
     upper(trim(site_code)) as site_code,
     day_of_week,
     opens_at::time as opens_at,
-    closes_at::time as closes_at,
-    is_open_24h::boolean as is_open_24h
+    closes_at::time as closes_at
 from {{ ref('raw_reference_opening_hours') }}
 `}
       />
-      <p>What makes this a good staging model:</p>
       <ul>
         <li>
-          <strong>Refs the raw model</strong>, never <code>source()</code>, never a
-          hardcoded table.
+          Read one raw model with <code>ref()</code>. Do not call{" "}
+          <code>source()</code> or hardcode a database table.
         </li>
         <li>
-          <strong>Explicit columns</strong> — no <code>select *</code>. You are defining
-          the interface downstream models rely on.
+          Select columns explicitly. Rename, trim and cast into project conventions.
         </li>
         <li>
-          <strong>Light cleaning only</strong>: trims, casts, renames to conventions
-          (e.g. pseudo NHS number columns always become <code>sk_patient_id</code>).
+          Keep every source row unless removing it is basic technical cleaning.
         </li>
         <li>
-          <strong>No joins, no filters with business meaning.</strong> If you are tempted
-          to join — that is an <code>int_</code> model, next layer up.
-        </li>
-        <li>
-          <strong>Lowercase keywords</strong> — SQLFluff in CI enforces it.
+          Move joins, derived business rules and analytical filters into an{" "}
+          <code>int_</code> model.
         </li>
       </ul>
 
-      <Callout kind="smell" title="Three common staging-model mistakes">
+      <Callout kind="smell" title="Stop if the model is doing two jobs">
         <p>
-          1) <code>select *</code> (interface undefined), 2) a join “just to add the
-          name column” (business logic in staging), 3) filtering out rows someone might
-          need (“I removed closed sites” — downstream models decide that).
+          A staging model should be easy to describe as “this source table, cleaned”.
+          If the sentence needs “joined with”, “only active records” or “calculated
+          eligibility”, the logic belongs in the modelling layer.
         </p>
       </Callout>
 
-      <h2>Bigger models: use CTEs</h2>
-      <p>
-        Staging rarely needs them, but from the modelling layer up the house style is
-        named CTEs that read like a pipeline:
-      </p>
-      <CodeBlock
-        lang="sql"
-        title="the shape of an int_ model"
-        code={`
-with most_recent_week as (
-    select max(week_ending_date) as max_date
-    from {{ ref('stg_wl_wl_openpathways_data') }}
-),
-
-current_snapshot as (
-    select wl.*
-    from {{ ref('stg_wl_wl_openpathways_data') }} wl
-    inner join most_recent_week mrw
-        on wl.week_ending_date = mrw.max_date
-)
-
-select
-    week_ending_date,
-    sk_patient_id,
-    datediff(day, referral_request_received_date::date, week_ending_date::date)
-        as days_on_waiting_list
-from current_snapshot
-`}
-      />
-
-      <h2>Preview as you go</h2>
+      <h2>Check as you write</h2>
       <CodeBlock
         lang="bash"
         code={`
-dbt show -s stg_reference_opening_hours    # first 5 rows
-dbt compile                                 # compile everything - seconds on Fusion
+dbt show -s stg_reference_opening_hours
+dbt compile -s stg_reference_opening_hours
 `}
       />
       <p>
-        In VS Code the dbt extension gives you both on a click, plus live lineage of
-        your new model sitting on top of its raw parent.
+        Read the sample rows, not just the green status. Check the grain, nulls, casing
+        and type conversions against what you know about the source.
       </p>
 
       <Checklist
         id="first-model"
         items={[
-          { key: "file", label: <>File created in the right folder with a <code>stg_</code> name</> },
-          { key: "ref", label: <>Reads from <code>ref()</code>, explicit column list</> },
+          { key: "file", label: <>Correct folder and <code>stg_</code> name</> },
+          { key: "ref", label: <>One raw <code>ref()</code> and explicit columns</> },
+          { key: "scope", label: <>No joins or business filters</> },
           { key: "show", label: <><code>dbt show</code> returns sensible rows</> },
         ]}
       />

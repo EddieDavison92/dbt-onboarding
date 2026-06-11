@@ -169,6 +169,35 @@ body {
   vertical-align: top;
 }
 
+@media (max-width: 640px) {
+  .lesson code:not(pre code) {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .lesson table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+
+  .lesson th,
+  .lesson td {
+    min-width: 8rem;
+  }
+
+  .lesson th:first-child,
+  .lesson td:first-child {
+    min-width: 6rem;
+  }
+
+  .lesson td code {
+    word-break: break-word;
+  }
+}
+
 /* staggered page-load reveal */
 @keyframes rise {
   from {

@@ -52,7 +52,7 @@ models:
       <p>
         Each entry under <code>data_tests:</code> compiles to a SQL query that searches
         for <strong>rows that break the rule</strong>. Zero rows back = pass.{" "}
-        <code>unique</code> on <code>person_id</code> literally runs “group by person_id
+        <code>unique</code> on <code>person_id</code>{" "}literally runs “group by person_id
         having count(*) &gt; 1”. Tests run when you <code>dbt build</code>, in CI on your
         pull request, and in the nightly production build — so a problem in a feed is
         caught by the pipeline rather than discovered by a dashboard user.

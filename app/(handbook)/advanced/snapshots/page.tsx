@@ -98,7 +98,7 @@ from {{ ref('stg_pds_registration') }}
         because the transition only exists as a difference between two builds.
       </p>
       <p>
-        That is exactly what <code>check</code> strategy captures: snapshot the
+        That is exactly what <code>check</code>{" "}strategy captures: snapshot the
         stratification model and list the columns that define the state — dbt notices
         when a person&apos;s computed values differ from the last recorded version and
         writes a new row:

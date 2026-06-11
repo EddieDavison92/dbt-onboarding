@@ -66,7 +66,7 @@ def model(dbt, session):
         Downstream models do not care that it was Python:{" "}
         <code>{"{{ ref('my_python_model') }}"}</code> works from any SQL model, and
         the YAML file beside it carries the same description, owner and{" "}
-        <code>data_tests</code> as everything else. Tests on a Python model&apos;s
+        <code>data_tests</code>{" "}as everything else. Tests on a Python model&apos;s
         grain are exactly as valuable as on a SQL model&apos;s — arguably more,
         because reviewers are less able to eyeball the logic.
       </p>

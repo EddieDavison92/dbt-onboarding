@@ -42,7 +42,7 @@ export function Callout({
       >
         {title ?? s.label}
       </span>
-      <div className="text-[15px] leading-relaxed text-ink-soft [&>p]:my-1 [&_code]:whitespace-nowrap [&_code]:rounded [&_code]:border [&_code]:border-line [&_code]:bg-paper [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.85em]">
+      <div className="text-[15px] leading-relaxed text-ink-soft [&>p]:my-1 [&_code]:break-words [&_code]:whitespace-normal sm:[&_code]:whitespace-nowrap [&_code]:rounded [&_code]:border [&_code]:border-line [&_code]:bg-paper [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.85em]">
         {children}
       </div>
     </aside>

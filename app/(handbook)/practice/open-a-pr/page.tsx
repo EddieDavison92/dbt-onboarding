@@ -3,6 +3,7 @@ import { LessonShell } from "@/components/LessonShell";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Callout } from "@/components/Callout";
 import { Checklist } from "@/components/Checklist";
+import { GuidedCourseLink } from "@/components/GuidedCourseLink";
 
 export const metadata: Metadata = { title: "Open your pull request" };
 
@@ -11,112 +12,73 @@ export default function Page() {
     <LessonShell
       section="practice"
       slug="open-a-pr"
-      kicker="Do · Step 6"
+      kicker="Field guide · 6"
       title="Open your pull request"
-      lede="Branch, commit, push, propose. From here the project's automation takes over and runs its checks against your change."
-      minutes={10}
+      lede="The repeatable branch-to-PR sequence, plus the checks worth making before code leaves your machine."
+      minutes={5}
     >
-      <h2>Branch first (if you haven&apos;t)</h2>
-      <p>
-        Ideally you branched before writing code. If you forgot and worked on{" "}
-        <code>main</code> — no harm done locally, just branch now; your changes come with
-        you:
-      </p>
+      <GuidedCourseLink href="/courses/first-pr/open-the-pr" />
+
+      <h2>The command sequence</h2>
       <CodeBlock
         lang="bash"
         code={`
-git switch -c feat/opening-hours-staging
-`}
-      />
-
-      <h2>Stage and commit</h2>
-      <CodeBlock
-        lang="bash"
-        code={`
-git status                       # see what changed — expect your .sql and .yml
-git add models/staging/shared/stg_reference_opening_hours.sql
-git add models/staging/shared/stg_reference_opening_hours.yml
-git commit -m "feat: add opening hours staging model"
-`}
-      />
-      <Callout kind="tip" title="git status is your friend">
-        <p>
-          Run it before every commit. If you see files you did not mean to touch (a
-          stray <code>target/</code> artefact, an edited file you were only reading),
-          do not <code>git add</code> them. Commit exactly what your PR is about.
-        </p>
-      </Callout>
-
-      <Callout kind="warn" title="This repo is public — check your diff for data">
-        <p>
-          Before committing, read your diff once with one question in mind: does any
-          line contain patient or person-level data, real identifiers in comments or
-          examples, query result extracts, or credentials? None of those ever go in —
-          and the same applies to the PR itself: no screenshots or attachments of
-          row-level results. Describe checks in words and aggregates instead.
-        </p>
-      </Callout>
-
-      <h2>Push and open the PR</h2>
-      <CodeBlock
-        lang="bash"
-        code={`
+git switch -c feat/short-description
+git status
+git add path/to/model.sql path/to/model.yml
+git diff --staged
+git commit -m "feat: add short description"
 git push
-gh pr create --title "feat: add opening hours staging model" --fill
+gh pr create --fill
 `}
       />
       <p>
-        (If the first push on a new branch asks you to set an upstream, run the
-        command git suggests — it prints it for you.)
-      </p>
-      <p>
-        (No <code>gh</code>? GitHub prints a “Create a pull request” link when you push —
-        clicking it does the same thing.)
+        If you already edited files on <code>main</code>, create the branch now; your
+        uncommitted changes move with you. On the first push, run the upstream command
+        Git prints if needed.
       </p>
 
-      <h2>Write a description worth reading</h2>
+      <Callout kind="warn" title="The repository and PR are public">
+        <p>
+          Check the staged diff for credentials, identifiers, row-level outputs and
+          screenshots of real data. Describe validation with aggregate counts or words;
+          never attach patient or person-level results.
+        </p>
+      </Callout>
+
+      <h2>Use a useful description</h2>
       <CodeBlock
         lang="text"
-        title="PR description template"
+        title="PR description"
         code={`
 ## What
 Adds stg_reference_opening_hours: one row per site per weekday.
 
 ## Why
-Needed for the access dashboard; nothing currently stages this table.
+Needed for the access dashboard; no staging model exists today.
 
 ## Checks
 - dbt build -s stg_reference_opening_hours green locally
-- Grain verified: unique on (site_code, day_of_week)
-- Noticed ~40 rows with null closes_at where is_open_24h = true — kept them, flagged in column description
+- Grain verified on (site_code, day_of_week)
+- Null closes_at retained where is_open_24h is true
 `}
       />
 
-      <h2>Then: watch CI</h2>
-      <p>
-        Within a minute the checks appear at the bottom of your PR: compile, code
-        quality, ownership. <strong>CodeRabbit posts an automated review</strong> —
-        expect line-level comments on conventions and likely issues before anyone has
-        looked at it. The heavier PR validation (which builds your changed models in
-        Snowflake DEV) starts once a reviewer is assigned. While checks run, review
-        your own diff in the “Files changed” tab — self-review catches issues
-        surprisingly often.
-      </p>
-
-      <Callout kind="warn" title="If a check goes red">
-        <p>
-          Details → read the log from the bottom. Fix locally, commit, push to the same
-          branch — the PR updates and CI re-runs. Do not open a new PR for a fix.
-        </p>
-      </Callout>
+      <h2>If CI goes red</h2>
+      <ol>
+        <li>Open the failed check and read the log from the bottom.</li>
+        <li>Reproduce the failure locally where possible.</li>
+        <li>Fix, commit and push to the same branch.</li>
+        <li>Keep the same PR; the checks rerun and the review history stays intact.</li>
+      </ol>
 
       <Checklist
         id="pr"
         items={[
-          { key: "branch", label: <>Work is on a <code>feat/…</code> branch, not main</> },
-          { key: "clean", label: <><code>git status</code> clean — only intended files committed</> },
-          { key: "pr", label: <>PR open with a what/why/checks description</> },
-          { key: "ci", label: <>All CI checks green (or you understand the red one)</> },
+          { key: "branch", label: <>Work is on a named branch, not <code>main</code></> },
+          { key: "diff", label: <>Staged diff contains only intended, non-sensitive changes</> },
+          { key: "build", label: <>Relevant local build is green</> },
+          { key: "pr", label: <>PR explains what changed, why, and how it was checked</> },
         ]}
       />
     </LessonShell>

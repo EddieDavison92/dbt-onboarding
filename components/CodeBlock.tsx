@@ -75,13 +75,15 @@ export function CodeBlock({
   return (
     <figure className="group my-5 max-w-[76ch] overflow-hidden rounded-xl border border-graphite-deep bg-graphite-deep shadow-[0_8px_30px_-12px_rgb(27_30_41/0.5)]">
       <figcaption className="flex items-center gap-2 border-b border-white/10 px-4 py-2">
-        <span className="flex gap-1.5">
+        <span className="flex shrink-0 gap-1.5">
           <i className="size-2.5 rounded-full bg-white/15" />
           <i className="size-2.5 rounded-full bg-white/15" />
           <i className="size-2.5 rounded-full bg-flame/80" />
         </span>
         {title && (
-          <span className="ml-1 font-mono text-xs text-white/50">{title}</span>
+          <span className="ml-1 min-w-0 truncate font-mono text-xs text-white/50" title={title}>
+            {title}
+          </span>
         )}
         <button
           type="button"
@@ -91,7 +93,7 @@ export function CodeBlock({
               setTimeout(() => setCopied(false), 1600);
             });
           }}
-          className="ml-auto rounded-md border border-white/15 px-2 py-0.5 font-mono text-[11px] text-white/60 transition hover:border-flame hover:text-flame"
+          className="ml-auto shrink-0 rounded-md border border-white/15 px-2 py-0.5 font-mono text-[11px] text-white/60 transition hover:border-flame hover:text-flame"
         >
           {copied ? "copied ✓" : "copy"}
         </button>

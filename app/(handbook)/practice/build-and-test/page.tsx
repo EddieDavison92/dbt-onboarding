@@ -3,6 +3,7 @@ import { LessonShell } from "@/components/LessonShell";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Callout } from "@/components/Callout";
 import { Checklist } from "@/components/Checklist";
+import { GuidedCourseLink } from "@/components/GuidedCourseLink";
 
 export const metadata: Metadata = { title: "Build & test locally" };
 
@@ -11,114 +12,84 @@ export default function Page() {
     <LessonShell
       section="practice"
       slug="build-and-test"
-      kicker="Do · Step 5"
+      kicker="Field guide · 5"
       title="Build & test locally"
-      lede="One command builds your model and runs its tests in your dev schema. A clean local build means CI should pass first time."
-      minutes={8}
+      lede="Choose the smallest useful build, then treat failures as information about either the code or the data."
+      minutes={5}
     >
-      <h2>dbt build</h2>
-      <CodeBlock
-        lang="bash"
-        code={`
-dbt build -s stg_reference_opening_hours
-`}
-      />
-      <p>
-        <code>build</code> = run the model <em>and</em> its tests, in order. Output you
-        want to see:
-      </p>
-      <CodeBlock
-        lang="text"
-        code={`
-1 of 4 OK created sql view model DBT_STAGING.stg_reference_opening_hours  [SUCCESS]
-2 of 4 PASS not_null_stg_reference_opening_hours_site_code                [PASS]
-3 of 4 PASS dbt_utils_unique_combination_of_columns_...                   [PASS]
-4 of 4 PASS expect_table_row_count_to_be_between_...                      [PASS]
-Completed successfully
-`}
-      />
+      <GuidedCourseLink href="/courses/first-pr/build-and-test" />
 
-      <h2>Selection syntax you&apos;ll use daily</h2>
+      <h2>Daily selectors</h2>
       <table>
         <thead>
           <tr>
             <th>Command</th>
-            <th>Builds</th>
+            <th>Use it when</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>
-              <code>dbt build -s my_model</code>
-            </td>
-            <td>Just your model + its tests</td>
+            <td><code>dbt build -s my_model</code></td>
+            <td>You changed one model and its tests.</td>
           </tr>
           <tr>
-            <td>
-              <code>dbt build -s +my_model</code>
-            </td>
-            <td>Everything upstream first, then your model</td>
+            <td><code>dbt build -s +my_model</code></td>
+            <td>You also need its upstream dependencies built first.</td>
           </tr>
           <tr>
-            <td>
-              <code>dbt build -s my_model+</code>
-            </td>
-            <td>Your model, then everything downstream of it</td>
+            <td><code>dbt build -s my_model+</code></td>
+            <td>You changed an existing contract and need to test downstream impact.</td>
           </tr>
           <tr>
-            <td>
-              <code>.\build_changed.ps1</code>
-            </td>
-            <td>Only what you changed on your branch (project helper)</td>
+            <td><code>.\build_changed.ps1</code></td>
+            <td>You want the project helper to select branch changes.</td>
           </tr>
         </tbody>
       </table>
 
-      <h2>When a test fails</h2>
-      <p>
-        A failure prints the test name and a count. To see the offending rows, compile
-        the test and run its SQL — or quicker, ask dbt to show you:
-      </p>
+      <h2>Triage a failure</h2>
+      <ol>
+        <li>Read the first failing node and the final error, not the whole log at once.</li>
+        <li>Fix compilation and missing-reference errors before investigating tests.</li>
+        <li>For a failed test, inspect the rows that break the assertion.</li>
+        <li>Decide whether the code is wrong or the test exposed a real source condition.</li>
+      </ol>
       <CodeBlock
         lang="bash"
         code={`
-# the compiled test query lives here after a build:
-target/compiled/wnl_analytics/models/.../stg_reference_opening_hours.yml/...
-
-# run it in Snowflake, or preview the model and eyeball the duplicates:
-dbt show -s stg_reference_opening_hours --limit 20
+dbt show -s my_model --limit 20
+dbt compile -s my_model
 `}
       />
-      <p>Typical first-model failures, in order of likelihood:</p>
+
+      <h2>Common first-model failures</h2>
       <ul>
         <li>
-          <strong>Grain test fails</strong> — the source has duplicates you did not
-          expect. Decide: is the grain wrong, or does the source need deduplication
-          (and is that a conversation)?
+          <strong>Grain test:</strong> check whether the stated grain is wrong, the
+          source contains duplicates, or a join multiplied rows.
         </li>
         <li>
-          <strong>not_null fails</strong> — nulls are real in the feed. Either the column
-          is not as mandatory as you assumed, or the rows are junk worth flagging.
+          <strong>not_null:</strong> inspect the null rows before weakening the test.
+          Null may be valid, or it may reveal a feed problem.
         </li>
         <li>
-          <strong>Compilation error</strong> — a typo in a <code>ref()</code> name. The
-          error message names the missing model.
+          <strong>Missing model:</strong> compare the name inside <code>ref()</code>{" "}
+          with the actual filename.
         </li>
       </ul>
-
-      <Callout kind="tip" title="Failing tests are findings">
+      <Callout kind="tip" title="Write down what the failure taught you">
         <p>
-          Your test failing on real data is the system working — you just learned
-          something about the feed nobody had written down. Mention it in your PR
-          description; that observation is half the value of the change.
+          If the data surprised you, capture that decision in a description, test or PR
+          note. A green build without the reasoning is only half the work.
         </p>
       </Callout>
 
       <Checklist
         id="build"
         items={[
-          { key: "green", label: <><code>dbt build -s your_model</code> is fully green</> },
-          { key: "downstream", label: <>If you changed an existing model: <code>dbt build -s your_model+</code> still green</> },
+          { key: "green", label: <><code>dbt build -s your_model</code> is green</> },
+          { key: "downstream", label: <>Existing contracts were checked downstream where needed</> },
+          { key: "finding", label: <>Any unexpected data condition is documented</> },
         ]}
       />
     </LessonShell>
