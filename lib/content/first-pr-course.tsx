@@ -2,14 +2,20 @@ import type { Course } from "@/lib/course-types";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Callout } from "@/components/Callout";
 import { FolderPicker } from "@/components/FolderPicker";
+import { TryIt } from "@/components/TryIt";
+import { DbtExecutionFlow } from "@/components/DbtExecutionFlow";
+import { CommandDAG } from "@/components/CommandDAG";
+import { CommandLab } from "@/components/CommandLab";
+import { SelectorPlayground } from "@/components/SelectorPlayground";
+import { ProjectFilesMap } from "@/components/ProjectFilesMap";
 
 export const FIRST_PR_COURSE: Course = {
   slug: "first-pr",
   title: "Your first PR",
   tagline: "A guided build: from a blank machine to a merged model in production",
   audience:
-    "Hands-on, at your own machine. Assumes Git essentials and dbt fundamentals (or equivalent experience). Best done with real access — work through it your first week.",
-  hours: "~3 hrs hands-on",
+    "Hands-on, at your own machine. Assumes Git essentials and How dbt thinks (or equivalent experience). The dbt commands are taught here, at the moment you need them. Best done with real access — work through it your first week.",
+  hours: "~3.5 hrs hands-on",
   accent: "var(--layer-reporting)",
   lessons: [
     // ------------------------------------------------------------------
@@ -17,7 +23,7 @@ export const FIRST_PR_COURSE: Course = {
       slug: "set-up-your-machine",
       title: "Set up your machine",
       blurb: "Tools, credentials and a green dbt debug",
-      minutes: 25,
+      minutes: 30,
       steps: [
         {
           id: "before",
@@ -110,6 +116,34 @@ export const FIRST_PR_COURSE: Course = {
             explain:
               "Anything committed to this repo is on the public internet. Connection details and tokens live in .env, which .gitignore keeps out of every commit automatically.",
             affirm: "secrets live in .env on your machine — never in the repo.",
+          },
+        },
+        {
+          id: "files-map",
+          title: "The four files around the project",
+          body: (
+            <>
+              <p>
+                Your <code>.env</code> is one of four names you will keep
+                meeting. Each has exactly one job — click through:
+              </p>
+              <ProjectFilesMap />
+              <p>
+                One word trap: <code>target: dev</code> in{" "}
+                <code>profiles.yml</code> names a Snowflake connection, while{" "}
+                <code>target/</code> with a slash is the generated folder on
+                your machine. Same word, different jobs — the slash is the
+                clue.
+              </p>
+            </>
+          ),
+          check: {
+            prompt: "You want to inspect the SQL dbt actually compiled on your machine. Where do you look?",
+            options: [".env", "profiles.yml", "target/compiled/", "dbt_project.yml"],
+            answer: 2,
+            explain:
+              "target/ is dbt's generated output folder; compiled SQL sits under target/compiled/. You inspect it, never edit it.",
+            affirm: "target/ holds generated output — compiled SQL included.",
           },
         },
         {
@@ -498,7 +532,7 @@ git config --global commit.gpgsign true
       slug: "write-the-model",
       title: "Write the model",
       blurb: "One SELECT, project style, previewed as you go",
-      minutes: 20,
+      minutes: 25,
       steps: [
         {
           id: "write",
@@ -544,6 +578,34 @@ from {{ ref('raw_reference_opening_hours') }}
               </ul>
             </>
           ),
+        },
+        {
+          id: "inside-a-command",
+          title: "What a dbt command actually does",
+          body: (
+            <>
+              <p>
+                You are about to run dbt against your model, so it is worth
+                seeing the three moves inside every command. Click each one:
+              </p>
+              <DbtExecutionFlow />
+              <p>
+                The split that matters: parse and compile only read and render
+                — they cannot touch Snowflake. Only execution does warehouse
+                work. That is why <code>dbt compile</code> is always safe, and
+                why it is your window into what dbt generated whenever a{" "}
+                <code>ref()</code> or macro surprises you.
+              </p>
+            </>
+          ),
+          check: {
+            prompt: "Which command shows the rendered SQL without building anything?",
+            options: ["dbt build", "dbt compile", "dbt test", "dbt debug"],
+            answer: 1,
+            explain:
+              "compile stops after rendering: templates become plain SQL, and nothing is created in Snowflake.",
+            affirm: "compile reveals the SQL dbt generated — nothing is built.",
+          },
         },
         {
           id: "preview",
@@ -702,8 +764,8 @@ models:
     {
       slug: "build-and-test",
       title: "Build it",
-      blurb: "One command runs the model and its tests in your dev schema",
-      minutes: 15,
+      blurb: "run, test, build and selectors — learned on your own model",
+      minutes: 35,
       steps: [
         {
           id: "build",
@@ -730,6 +792,39 @@ Completed successfully
               />
             </>
           ),
+        },
+        {
+          id: "run-test-build",
+          title: "Why build, and not run?",
+          body: (
+            <>
+              <p>
+                Three commands sound alike. The quickest way to tell them apart
+                is to watch the same small project react to each — run all
+                three:
+              </p>
+              <CommandDAG />
+              <p>
+                <code>run</code> creates without testing; <code>test</code>{" "}
+                tests without creating; <code>build</code> does both, in DAG
+                order, and stops downstream work when a test fails. For
+                everyday model work, build is the answer.
+              </p>
+            </>
+          ),
+          check: {
+            prompt: "dbt run -s your_model finishes green. What has it proved?",
+            options: [
+              "The model was created — but its data tests have not run",
+              "The model and all its tests passed",
+              "The whole project is healthy",
+              "Nothing — run is a dry run",
+            ],
+            answer: 0,
+            explain:
+              "run only creates. A green run with a broken grain is still broken — which is why build, which adds the tests, is the everyday command.",
+            affirm: "run creates; build creates and tests.",
+          },
         },
         {
           id: "fail",
@@ -788,6 +883,97 @@ Completed successfully
                 30 seconds) a look at your actual table in Snowflake, sitting in your
                 dev schema.
               </p>
+            </>
+          ),
+        },
+        {
+          id: "selectors",
+          title: "Choose what runs: selectors",
+          body: (
+            <>
+              <p>
+                You have been typing <code>-s your_model</code> all along —
+                that is a <strong>selector</strong>. The command says what to
+                do; the selector says which nodes to do it to. A <code>+</code>{" "}
+                extends the selection along the DAG:
+              </p>
+              <SelectorPlayground />
+              <p>
+                To leave something out, there is no bare <code>-</code>{" "}
+                operator — say it explicitly:
+              </p>
+              <CodeBlock
+                lang="bash"
+                code={`dbt build -s int_current_waits+ --exclude weekly_waits`}
+              />
+            </>
+          ),
+          check: {
+            prompt: "Which selector means a model and everything upstream of it?",
+            options: ["my_model+", "+my_model", "-my_model", "my_model --up"],
+            answer: 1,
+            explain:
+              "A plus before the name walks upstream; after it, downstream. You'll use +my_model when your model needs fresh parents.",
+            affirm: "prefix + goes upstream; suffix + goes downstream.",
+          },
+        },
+        {
+          id: "ls-first",
+          title: "Do: look before a broad build",
+          body: (
+            <>
+              <p>
+                Before running a selector wider than one model, see what it
+                catches — replace <code>build</code> with <code>ls</code>:
+              </p>
+              <TryIt
+                stages={[
+                  {
+                    cmd: "dbt ls -s +stg_reference_opening_hours",
+                    out: `source:reference.opening_hours
+raw_reference_opening_hours
+stg_reference_opening_hours`,
+                  },
+                ]}
+                done="You saw the selection without running any of it."
+              />
+              <p>
+                <strong>You should see:</strong> just your model and its raw
+                parent. Cheap, instant, and there is nothing left to guess.
+              </p>
+            </>
+          ),
+        },
+        {
+          id: "daily-loop",
+          title: "Your daily loop",
+          body: (
+            <>
+              <p>
+                That is the whole toolkit. From your second model on, the loop
+                is: use the smallest command that proves the next thing.
+              </p>
+              <div className="my-6 flex flex-col gap-2">
+                {[
+                  ["1", "dbt compile -s my_model", "Does the SQL make sense?"],
+                  ["2", "dbt show -s my_model", "Do a few rows look right?"],
+                  ["3", "dbt build -s my_model", "Can it be created and pass its tests?"],
+                  ["4", "dbt ls -s my_model+", "What downstream work might be affected?"],
+                ].map(([number, command, question]) => (
+                  <div key={number} className="flex items-center gap-3 rounded-xl border border-line bg-paper px-4 py-3">
+                    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-ink font-display text-sm font-bold text-paper">{number}</span>
+                    <div className="min-w-0">
+                      <code className="!whitespace-normal">{command}</code>
+                      <span className="mt-1 block text-xs text-ink-faint">{question}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p>
+                Five quick situations to lock it in — choose the smallest
+                useful command for each:
+              </p>
+              <CommandLab />
             </>
           ),
         },
