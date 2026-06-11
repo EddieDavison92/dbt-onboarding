@@ -141,8 +141,9 @@ export default function Home() {
         </div>
         <p className="mt-4 max-w-[64ch] text-sm leading-relaxed text-ink-faint">
           Start with Git essentials if version control is new — everything else
-          assumes it. Already fluent in git? Go straight to Your first PR. Progress
-          and certificates are saved in your browser.
+          assumes it. Already fluent in git? Start with dbt fundamentals, then use
+          Your first PR as the practical capstone. Progress and certificates are saved
+          in your browser.
         </p>
       </section>
 

@@ -139,9 +139,10 @@ from {{ ref('fct_person_risk_stratification') }}
       </p>
       <Callout kind="info" title="Snapshots have their own command">
         <p>
-          <code>dbt build</code> and <code>dbt run</code> do not execute snapshots —
-          they run via <code>dbt snapshot</code>, scheduled before the main nightly
-          build so downstream models always read the latest history.
+          <code>dbt run</code> does not execute snapshots. <code>dbt build</code> can
+          execute a snapshot when its selector includes that snapshot, but this
+          project runs them explicitly via <code>dbt snapshot</code>, scheduled before
+          the main nightly model build so downstream models read the latest history.
         </p>
       </Callout>
 

@@ -693,12 +693,11 @@ git pull          # bring main up to date, now including your work
             <>
               <p>
                 Repo, branch, commit, push, PR, merge — that is the entire mental
-                model this project requires, and you now have it. One thing was left
-                out deliberately: this repo also requires commits to be{" "}
-                <em>signed</em> (a one-off key setup proving commits are really
-                yours). That is part of machine setup in the{" "}
-                <strong>Your first PR</strong> course, which picks up exactly where
-                this leaves off.
+                model this project requires, and you now have it. Next,{" "}
+                <strong>dbt fundamentals</strong> teaches what happens inside the dbt
+                commands you will commit and review. After that, Your first PR puts
+                both skills together on the real repository, including the one-off
+                signed-commit setup.
               </p>
             </>
           ),

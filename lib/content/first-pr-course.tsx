@@ -8,7 +8,7 @@ export const FIRST_PR_COURSE: Course = {
   title: "Your first PR",
   tagline: "A guided build: from a blank machine to a merged model in production",
   audience:
-    "Hands-on, at your own machine. Assumes the Git essentials course (or equivalent git experience). Best done with real access — work through it your first week.",
+    "Hands-on, at your own machine. Assumes Git essentials and dbt fundamentals (or equivalent experience). Best done with real access — work through it your first week.",
   hours: "~3 hrs hands-on",
   accent: "var(--layer-reporting)",
   lessons: [
