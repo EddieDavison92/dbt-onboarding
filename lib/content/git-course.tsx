@@ -297,16 +297,16 @@ Fast-forward
             </>
           ),
           check: {
-            prompt: "Why pull main before creating a new branch?",
+            prompt: "Why run `git pull` on `main` before creating a new branch?",
             options: [
               "So the branch starts from the team's latest merged work",
-              "Because pull creates the new branch for you",
+              "Because `git pull` creates the new branch for you",
               "So your uncommitted changes are uploaded to GitHub",
               "Because branches cannot be created from an older commit",
             ],
             answer: 0,
             explain:
-              "A branch begins at your current commit. Updating local main first means the branch begins at the latest origin/main commit, reducing avoidable conflicts and duplicated work.",
+              "A branch begins at your current commit. Updating local `main` first means the branch begins at the latest `origin/main` commit, reducing avoidable conflicts and duplicated work.",
             affirm: "fresh main first, then branch from the team's latest work.",
           },
         },
@@ -337,16 +337,16 @@ Fast-forward
             </>
           ),
           check: {
-            prompt: "What does git switch -c feat/new-model do?",
+            prompt: "What does `git switch -c feat/new-model` do?",
             options: [
-              "Creates a branch called feat/new-model and moves you onto it",
-              "Copies your files into a folder called feat/new-model",
-              "Commits your changes to a branch called feat/new-model",
-              "Switches to an existing branch called feat/new-model",
+              "Creates a branch called `feat/new-model` and moves you onto it",
+              "Copies your files into a folder called `feat/new-model`",
+              "Commits your changes to a branch called `feat/new-model`",
+              "Switches to an existing branch called `feat/new-model`",
             ],
             answer: 0,
             explain:
-              "-c is create. Without it, switch moves to a branch that already exists. Nothing is committed yet — you've just opened a fresh line to work on.",
+              "`-c` is create. Without it, `git switch` moves to a branch that already exists. Nothing is committed yet — you've just opened a fresh line to work on.",
             affirm: "switch -c creates the branch and moves you onto it — nothing is committed yet.",
           },
         },
@@ -551,11 +551,11 @@ git push                        # share the branch
             </>
           ),
           check: {
-            prompt: "Right after git commit, where does your work exist?",
+            prompt: "Right after `git commit`, where does your work exist?",
             options: [
               "On GitHub, visible to the team",
               "Only on your machine, on your branch",
-              "On main, ready for tonight's build",
+              "On `main`, ready for tonight's build",
               "In the staging area, waiting to be pushed",
             ],
             answer: 1,
@@ -631,7 +631,7 @@ git push                        # share the branch
           check: {
             prompt: "A CI check on your PR goes red. The right response is…",
             options: [
-              "Fix the issue locally, commit, and push to the same branch — checks re-run",
+              "Fix the issue locally, commit, and `git push` to the same branch — checks re-run",
               "Open a new PR so the checks start fresh",
               "Ask someone to merge it anyway — checks are advisory",
               "Delete the branch and start again",
@@ -668,9 +668,9 @@ git pull          # bring main up to date, now including your work
             </>
           ),
           check: {
-            prompt: "What is the only route by which code reaches main?",
+            prompt: "What is the only route by which code reaches `main`?",
             options: [
-              "git push, once the branch is tested",
+              "`git push`, once the branch is tested",
               "A reviewed, CI-green pull request being merged",
               "An administrator copying changes across",
               "The nightly build promotes approved branches",

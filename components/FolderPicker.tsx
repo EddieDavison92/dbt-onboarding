@@ -107,13 +107,15 @@ export function FolderPicker() {
 
       {path && (
         <div className="rise mt-4 rounded-xl bg-graphite-deep px-4 py-3">
-          <p className="!my-0 font-mono text-[11px] text-white/50">your model lives in</p>
-          <p className="!my-0 break-all font-mono text-sm text-[#7ee2c0]">{path}</p>
-          <p className="!mb-0 !mt-1.5 font-mono text-xs text-white/70">
-            file name starts with <span className="text-[#ff9a82]">{job!.prefix}</span>
+          <p className="!my-0 font-mono text-[11px] !text-white/75">
+            your model lives in
+          </p>
+          <p className="!my-0 break-all font-mono text-sm !text-[#a7f3d0]">{path}</p>
+          <p className="!mb-0 !mt-1.5 font-mono text-xs !text-white/85">
+            file name starts with <span className="!text-[#ffb4a3]">{job!.prefix}</span>
           </p>
           {domain!.id === "olids" && job!.layer !== "staging" && (
-            <p className="!mb-0 !mt-1.5 text-xs text-white/60">
+            <p className="!mb-0 !mt-1.5 text-xs !text-white/75">
               OLIDS adds one more level: a topic subfolder (diagnoses, observations,
               programme…) — and that folder name becomes the Snowflake schema
               automatically.

@@ -7,6 +7,21 @@ import { useProgress } from "@/lib/progress";
 import { InteractionContext } from "@/lib/interaction";
 import type { Checkpoint, Step } from "@/lib/course-types";
 
+function InlineCheckpointText({ text }: { text: string }) {
+  return text.split(/(`[^`]+`)/g).map((part, index) =>
+    part.startsWith("`") && part.endsWith("`") ? (
+      <code
+        key={index}
+        className="rounded-md border border-ink/15 bg-paper-warm px-1.5 py-0.5 font-mono text-[0.88em] font-medium !text-graphite"
+      >
+        {part.slice(1, -1)}
+      </code>
+    ) : (
+      part
+    ),
+  );
+}
+
 function CheckpointBlock({
   check,
   onCorrect,
@@ -22,7 +37,9 @@ function CheckpointBlock({
       <p className="!my-0 font-display text-[11px] font-extrabold uppercase tracking-[0.18em] text-flame">
         Check your understanding
       </p>
-      <p className="!mb-3 !mt-1.5 text-[15px] font-medium !text-ink">{check.prompt}</p>
+      <p className="!mb-3 !mt-1.5 text-[15px] font-medium !text-ink">
+        <InlineCheckpointText text={check.prompt} />
+      </p>
       <div className="flex flex-col gap-1.5">
         {check.options.map((opt, oi) => {
           const chosen = picked === oi;
@@ -50,7 +67,7 @@ function CheckpointBlock({
               <span className="mr-2 font-mono text-xs text-ink-faint">
                 {String.fromCharCode(97 + oi)}
               </span>
-              {opt}
+              <InlineCheckpointText text={opt} />
               {correct && isAnswer && <span className="ml-2">✓</span>}
               {revealed && chosen && !isAnswer && <span className="ml-2">✗</span>}
             </button>
@@ -69,7 +86,7 @@ function CheckpointBlock({
             <strong className="font-semibold text-ink">
               {correct ? "Right. " : "Not quite. "}
             </strong>
-            {check.explain}
+            <InlineCheckpointText text={check.explain} />
           </p>
           {!correct && (
             <button

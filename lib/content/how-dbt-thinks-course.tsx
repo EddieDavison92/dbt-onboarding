@@ -259,7 +259,7 @@ from {{ ref('raw_people') }}
             </>
           ),
           check: {
-            prompt: "What does ref('raw_people') give dbt besides a table name?",
+            prompt: "What does `ref('raw_people')` give dbt besides a table name?",
             options: [
               "A dependency arrow, so dbt knows the build order",
               "A copy of every row",
@@ -332,7 +332,7 @@ from {{ ref('raw_people') }}
             </>
           ),
           check: {
-            prompt: "Why is hardcoding MODELLING.DBT_STAGING.STG_X in a model a problem?",
+            prompt: "Why is hardcoding `MODELLING.DBT_STAGING.STG_X` in a model a problem?",
             options: [
               "dbt refuses to compile it",
               "It breaks dev/prod separation and hides the dependency from the DAG",
@@ -460,7 +460,7 @@ from {{ ref('raw_people') }}
           ),
           interact: true,
           check: {
-            prompt: "A dbt test passes when its query returns…",
+            prompt: "A `dbt test` passes when its query returns…",
             options: [
               "All the rows that satisfy the rule",
               "A single row containing true",
@@ -496,9 +496,9 @@ from {{ ref('raw_people') }}
           check: {
             prompt: "Grain: one row per site per weekday. Which test catches a join that duplicates rows?",
             options: [
-              "unique on site_code",
-              "unique on the combination of site_code and day_of_week",
-              "not_null on both columns",
+              "`unique` on `site_code`",
+              "`unique` on the combination of `site_code` and `day_of_week`",
+              "`not_null` on both columns",
               "A row-count test with a generous range",
             ],
             answer: 1,
@@ -565,8 +565,8 @@ from {{ ref('raw_people') }}
           check: {
             prompt: "What is the only way a change reaches production?",
             options: [
-              "Running dbt build from your machine",
-              "A pull request that passes its checks and is merged to main",
+              "Running `dbt build` from your machine",
+              "A pull request that passes its checks and is merged to `main`",
               "Asking an administrator to copy it across",
               "Waiting — the dev environment syncs to production nightly",
             ],
@@ -733,7 +733,7 @@ from {{ ref('raw_people') }}
             prompt: "What happens to production?",
             options: [
               "The deployment builds your change into production, and the nightly build maintains it from then on",
-              "Nothing until you run dbt build from your machine",
+              "Nothing until you run `dbt build` from your machine",
               "An administrator copies your tables across manually",
               "Production updates only at the end of the month",
             ],

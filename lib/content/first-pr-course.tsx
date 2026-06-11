@@ -105,7 +105,7 @@ export const FIRST_PR_COURSE: Course = {
             </>
           ),
           check: {
-            prompt: "Why does the .env file exist outside version control?",
+            prompt: "Why does the `.env` file exist outside version control?",
             options: [
               "It changes too often to be worth committing",
               "It holds your credentials, and the repo is public — secrets stay on your machine only",
@@ -139,7 +139,7 @@ export const FIRST_PR_COURSE: Course = {
           ),
           check: {
             prompt: "You want to inspect the SQL dbt actually compiled on your machine. Where do you look?",
-            options: [".env", "profiles.yml", "target/compiled/", "dbt_project.yml"],
+            options: ["`.env`", "`profiles.yml`", "`target/compiled/`", "`dbt_project.yml`"],
             answer: 2,
             explain:
               "target/ is dbt's generated output folder; compiled SQL sits under target/compiled/. You inspect it, never edit it.",
@@ -206,12 +206,12 @@ git config --global commit.gpgsign true
             </>
           ),
           check: {
-            prompt: "dbt debug fails to connect. Where do you look first?",
+            prompt: "`dbt debug` fails to connect. Where do you look first?",
             options: [
               "Reinstall dbt",
-              "The .env file — a wrong account identifier or role is the usual cause",
+              "The `.env` file — a wrong account identifier or role is the usual cause",
               "Snowflake's status page",
-              "The dbt_project.yml file",
+              "The `dbt_project.yml` file",
             ],
             answer: 1,
             explain:
@@ -524,10 +524,10 @@ git switch -c feat/opening-hours-staging`}
             prompt:
               "You're building a model that joins GP observations to derive a reusable smoking-status block. Folder?",
             options: [
-              "models/staging/olids/ — it reads staged data",
-              "models/modelling/olids/ — joins and reusable derivations are modelling-layer work",
-              "models/reporting/olids/ — analysts will use it",
-              "models/modelling/commissioning/ — derivations live under commissioning",
+              "`models/staging/olids/` — it reads staged data",
+              "`models/modelling/olids/` — joins and reusable derivations are modelling-layer work",
+              "`models/reporting/olids/` — analysts will use it",
+              "`models/modelling/commissioning/` — derivations live under commissioning",
             ],
             answer: 1,
             explain:
@@ -630,7 +630,7 @@ from {{ ref('raw_reference_opening_hours') }}
           ),
           check: {
             prompt: "Which command shows the rendered SQL without building anything?",
-            options: ["dbt build", "dbt compile", "dbt test", "dbt debug"],
+            options: ["`dbt build`", "`dbt compile`", "`dbt test`", "`dbt debug`"],
             answer: 1,
             explain:
               "compile stops after rendering: templates become plain SQL, and nothing is created in Snowflake.",
@@ -664,11 +664,11 @@ dbt compile                                # render every model to plain SQL
             </>
           ),
           check: {
-            prompt: "Why explicit columns rather than select * in staging?",
+            prompt: "Why explicit columns rather than `select *` in staging?",
             options: [
-              "select * is slower in Snowflake",
+              "`select *` is slower in Snowflake",
               "The column list is the interface downstream models depend on — * silently changes when the source does",
-              "dbt cannot compile select *",
+              "dbt cannot compile `select *`",
               "It makes the file longer, which reviewers prefer",
             ],
             answer: 1,
@@ -761,9 +761,9 @@ models:
             prompt:
               "Your grain is one row per site per weekday. Which single test catches a future join accidentally duplicating rows?",
             options: [
-              "not_null on site_code",
-              "unique on site_code",
-              "unique_combination_of_columns on [site_code, day_of_week]",
+              "`not_null` on `site_code`",
+              "`unique` on `site_code`",
+              "`unique_combination_of_columns` on `[site_code, day_of_week]`",
               "A row-count test",
             ],
             answer: 2,
@@ -844,7 +844,7 @@ Completed successfully
             </>
           ),
           check: {
-            prompt: "dbt run -s your_model finishes green. What has it proved?",
+            prompt: "`dbt run -s your_model` finishes green. What has it proved?",
             options: [
               "The model was created — but its data tests have not run",
               "The model and all its tests passed",
@@ -941,7 +941,7 @@ Completed successfully
           ),
           check: {
             prompt: "Which selector means a model and everything upstream of it?",
-            options: ["my_model+", "+my_model", "-my_model", "my_model --up"],
+            options: ["`my_model+`", "`+my_model`", "`-my_model`", "`my_model --up`"],
             answer: 1,
             explain:
               "A plus before the name walks upstream; after it, downstream. You'll use +my_model when your model needs fresh parents.",
