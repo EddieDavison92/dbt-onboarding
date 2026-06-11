@@ -89,11 +89,11 @@ where snapshot_date = {{ var('reporting_date') }}
               />
               <p>
                 Compilation resolves <code>ref()</code>, renders variables and macros,
-                and produces the plain SQL for the active target:
+                and produces plain SQL using the configured development environment:
               </p>
               <CodeBlock
                 lang="sql"
-                title="target/compiled/.../int_current_waits.sql"
+                title="compiled output (where dbt stores this comes later)"
                 code={`
 select *
 from DEV__MODELLING.DBT_STAGING.STG_WAITING_LIST
@@ -162,7 +162,7 @@ where snapshot_date = '2026-06-01'
                     out: `dbt-fusion 2.0.0
 Parsing project 'wnl_analytics'
 Found 684 models, 1,942 data tests, 38 sources, 12 snapshots
-Wrote target/manifest.json
+Wrote project manifest
 Completed successfully in 1.8s`,
                   },
                 ]}
@@ -175,7 +175,7 @@ Completed successfully in 1.8s`,
     },
     {
       slug: "project-profile-target",
-      title: "Project, profile and target",
+      title: "Project, profile and destination",
       blurb: "Code configuration versus your connection and environment",
       minutes: 22,
       steps: [
@@ -183,6 +183,27 @@ Completed successfully in 1.8s`,
           id: "two-configs",
           body: (
             <>
+              <p>
+                First, an awkward naming detail: dbt uses the word{" "}
+                <strong>target</strong> for two different things.
+              </p>
+              <ul>
+                <li>
+                  <strong>A profile target</strong> is a named connection destination,
+                  such as <code>dev</code> or <code>prod</code>. One is active for each
+                  command and determines where warehouse work goes.
+                </li>
+                <li>
+                  <strong>The <code>target/</code> directory</strong> is a local generated
+                  folder where dbt writes compiled SQL and project artifacts. It is not
+                  a database destination. We inspect it in the next lesson.
+                </li>
+              </ul>
+              <p>
+                Same word, unrelated jobs. When this course says <em>active target</em>,
+                it means the profile destination. When it shows <code>target/</code> with
+                a slash, it means the local folder.
+              </p>
               <p>
                 Two configuration ideas sit beside each other and do different jobs.
                 Mixing them up is a common first-week problem.
@@ -219,7 +240,7 @@ Completed successfully in 1.8s`,
 name: wnl_analytics
 profile: wnl_analytics
 model-paths: ["models"]
-target-path: target
+target-path: target  # local generated folder
 
 models:
   wnl_analytics:
@@ -251,7 +272,7 @@ models:
                 title="~/.dbt/profiles.yml (illustrative)"
                 code={`
 wnl_analytics:
-  target: dev
+  target: dev  # active connection destination
   outputs:
     dev:
       type: snowflake
@@ -294,8 +315,8 @@ wnl_analytics:
               <p>
                 <code>ref()</code> is environment-aware. In development, a reference
                 can resolve to a development relation; in production, the same source
-                code resolves to the production relation. The target participates in
-                that decision.
+                code resolves to the production relation. The active profile output
+                participates in that decision.
               </p>
               <CodeBlock
                 lang="text"
@@ -358,7 +379,7 @@ All checks passed!`,
     },
     {
       slug: "parse-compile-target",
-      title: "Parse, compile and target/",
+      title: "Parse, compile and artifacts",
       blurb: "Read generated artifacts instead of guessing",
       minutes: 23,
       steps: [
