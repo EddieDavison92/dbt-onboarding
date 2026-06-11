@@ -43,7 +43,6 @@ export function BranchToProd() {
   const interactionDone = useInteractionDone();
   const [active, setActive] = useState(0);
   const [viewed, setViewed] = useState<number[]>([0]);
-  const stage = STAGES[active];
 
   const view = (i: number) => {
     setActive(i);
@@ -54,43 +53,50 @@ export function BranchToProd() {
 
   return (
     <figure className="my-6 overflow-hidden rounded-2xl border-2 border-ink bg-paper shadow-[5px_5px_0_0_var(--color-layer-reporting)]">
-      <div className="grid grid-cols-2 sm:grid-cols-4">
+      <div className="flex flex-col">
         {STAGES.map((item, index) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => view(index)}
-            aria-pressed={active === index}
-            className={`relative border-b border-r border-line px-3 py-4 text-left transition sm:border-b-0 ${
-              active === index ? "bg-ink text-paper" : "bg-paper hover:bg-paper-warm"
-            }`}
-          >
-            <span
-              className="block font-display text-[11px] font-extrabold uppercase tracking-[0.14em]"
-              style={{ color: active === index ? item.color : "var(--ink-faint)" }}
+          <div key={item.id} className="border-b border-line last:border-b-0">
+            <button
+              type="button"
+              onClick={() => view(index)}
+              aria-pressed={active === index}
+              className={`flex w-full items-baseline justify-between gap-3 px-4 py-3 text-left transition ${
+                active === index ? "bg-ink text-paper" : "bg-paper hover:bg-paper-warm"
+              }`}
             >
-              {item.label}
-            </span>
-            <span className="mt-1 block text-sm font-semibold">{item.verb}</span>
-            {index < STAGES.length - 1 && (
-              <span className="absolute right-[-7px] top-1/2 z-10 hidden -translate-y-1/2 font-mono text-flame sm:block">
-                →
+              <span className="min-w-0">
+                <span
+                  className="block font-display text-[11px] font-extrabold uppercase tracking-[0.14em]"
+                  style={{ color: active === index ? item.color : "var(--ink-faint)" }}
+                >
+                  {item.label}
+                </span>
+                <span className="mt-0.5 block text-sm font-semibold">{item.verb}</span>
               </span>
+              <span
+                className={`shrink-0 font-mono text-xs ${
+                  active === index ? "text-paper/50" : viewed.includes(index) ? "text-layer-staging" : "text-ink-faint"
+                }`}
+              >
+                {active === index ? "▾" : viewed.includes(index) ? "✓" : "▸"}
+              </span>
+            </button>
+            {active === index && (
+              <div className="rise border-t border-line bg-paper-warm/60 px-4 py-3.5">
+                <p className="!my-0 text-[15px] !text-ink">{item.body}</p>
+                <div className="mt-2.5 rounded-lg border border-line bg-paper px-3 py-2 text-xs">
+                  <span className="font-display font-bold uppercase tracking-wider text-ink-faint">
+                    What it touches
+                  </span>
+                  <span className="mt-0.5 block text-ink">{item.touches}</span>
+                </div>
+              </div>
             )}
-          </button>
+          </div>
         ))}
       </div>
-      <div className="border-t-2 border-ink px-5 py-4">
-        <p className="!my-0 !text-ink">{stage.body}</p>
-        <div className="mt-3 rounded-lg border border-line bg-paper-warm px-3 py-2 text-xs">
-          <span className="font-display font-bold uppercase tracking-wider text-ink-faint">
-            What it touches
-          </span>
-          <span className="mt-0.5 block text-ink">{stage.touches}</span>
-        </div>
-      </div>
-      <figcaption className="border-t border-line px-4 py-2 text-center font-mono text-[11px] text-ink-faint">
-        click a stage · production is only reachable through a merged PR
+      <figcaption className="border-t-2 border-ink px-4 py-2 text-center font-mono text-[11px] text-ink-faint">
+        open each stage · production is only reachable through a merged PR
       </figcaption>
     </figure>
   );

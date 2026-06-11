@@ -583,17 +583,20 @@ from {{ ref('raw_people') }}
             <>
               <p>
                 This is the most useful thing to internalise before touching
-                the real project. While you develop, everything you build lands
-                in the <strong>DEV__</strong> databases —{" "}
-                <code>DEV__MODELLING</code>, <code>DEV__REPORTING</code> — a
-                working copy of the warehouse the whole team shares. Build
-                nonsense, break a model, rebuild it: dev is disposable, and no
-                report or dashboard reads from it.
+                the real project. There are exactly two environments:{" "}
+                <strong>dev</strong> and <strong>prod</strong>. While you
+                develop, everything you build lands in the DEV__ databases —{" "}
+                <code>DEV__MODELLING</code>, <code>DEV__REPORTING</code> — and
+                no report or dashboard reads from them. Build nonsense, break
+                a model, rebuild it: dev objects are cheap to recreate.
               </p>
               <p>
-                Between that dev environment and production stand the compile
-                check, the test suite, an automated reviewer and a human one.
-                The safety comes from the path, not from you being careful.
+                One honest caveat: dev is shared by the whole analytics team,
+                not a private sandbox. If a teammate rebuilds the same model,
+                they overwrite your dev copy — normal, and occasionally worth
+                a heads-up in the team channel. What nobody can do, from dev,
+                is touch production: between the two stand the compile check,
+                the test suite, an automated reviewer and a human one.
               </p>
             </>
           ),

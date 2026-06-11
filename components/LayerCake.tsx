@@ -62,19 +62,22 @@ export function LayerCake() {
           {layer.name} · {layer.job}
         </p>
         <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">{layer.detail}</p>
-        <dl className="mt-4 grid grid-cols-1 gap-2 font-mono text-xs sm:grid-cols-3">
-          <div className="rounded-lg bg-paper-warm px-3 py-2">
-            <dt className="text-ink-faint">example</dt>
-            <dd className="mt-0.5 break-all text-ink">{layer.example}</dd>
-          </div>
-          <div className="rounded-lg bg-paper-warm px-3 py-2">
-            <dt className="text-ink-faint">materialized</dt>
-            <dd className="mt-0.5 text-ink">{layer.materialized}</dd>
-          </div>
-          <div className="rounded-lg bg-paper-warm px-3 py-2">
-            <dt className="text-ink-faint">lands in</dt>
-            <dd className="mt-0.5 break-all text-ink">{layer.database}</dd>
-          </div>
+        <dl className="mt-4 flex flex-col gap-1.5 font-mono text-xs">
+          {(
+            [
+              ["example", layer.example],
+              ["materialized", layer.materialized],
+              ["lands in", layer.database],
+            ] as const
+          ).map(([label, value]) => (
+            <div
+              key={label}
+              className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 rounded-lg bg-paper-warm px-3 py-2"
+            >
+              <dt className="shrink-0 text-ink-faint">{label}</dt>
+              <dd className="!my-0 min-w-0 break-words text-right text-ink">{value}</dd>
+            </div>
+          ))}
         </dl>
       </div>
     </div>

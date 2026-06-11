@@ -76,21 +76,29 @@ export function ScriptChaos() {
             })}
           </div>
         ) : (
-          <div className="flex flex-col items-stretch gap-1.5 sm:flex-row sm:items-center">
+          <div className="flex flex-col">
             {ORDERED.map((id, i) => {
               const s = SCRIPTS.find((x) => x.id === id)!;
               return (
-                <div key={id} className="flex flex-col items-center gap-1.5 sm:min-w-0 sm:flex-1 sm:flex-row">
-                  <div className="rise w-full rounded-xl border-2 border-layer-staging bg-layer-staging/10 px-2.5 py-2.5 text-center" style={{ animationDelay: `${i * 120}ms` }}>
-                    <span className="mx-auto mb-1 grid size-5 place-items-center rounded-full bg-ink font-display text-[10px] font-bold text-paper">
+                <div key={id} className="flex flex-col">
+                  <div
+                    className="rise flex items-center gap-3 rounded-xl border-2 border-layer-staging bg-layer-staging/10 px-3.5 py-2.5"
+                    style={{ animationDelay: `${i * 120}ms` }}
+                  >
+                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-ink font-display text-[11px] font-bold text-paper">
                       {i + 1}
                     </span>
-                    <code className="block break-words !whitespace-normal !border-0 !bg-transparent !p-0 text-[10px] leading-tight text-ink">
+                    <code className="min-w-0 break-words !whitespace-normal !border-0 !bg-transparent !p-0 text-[12px] text-ink">
                       {s.file}
                     </code>
                   </div>
                   {i < ORDERED.length - 1 && (
-                    <span className="font-mono text-flame sm:shrink-0">→</span>
+                    <span
+                      className="rise ml-6 py-0.5 font-mono leading-none text-flame"
+                      style={{ animationDelay: `${i * 120 + 60}ms` }}
+                    >
+                      ↓
+                    </span>
                   )}
                 </div>
               );
