@@ -29,9 +29,10 @@ export function CourseOverview({
   accent: string;
   lessons: LessonSummary[];
 }) {
-  const { ready, name, setName, isDone } = useProgress();
+  const { ready, name, setName, isDone, resetCourse } = useProgress();
   const [draft, setDraft] = useState("");
-  const [confirming, setConfirming] = useState(false);
+  const [nameConfirming, setNameConfirming] = useState(false);
+  const [restartConfirming, setRestartConfirming] = useState(false);
 
   const doneCount = ready
     ? lessons.filter((l) => isDone(`course/${slug}/${l.slug}`)).length
@@ -66,8 +67,8 @@ export function CourseOverview({
           onSubmit={(e) => {
             e.preventDefault();
             if (!draft.trim()) return;
-            if (confirming) setName(draft.trim());
-            else setConfirming(true);
+            if (nameConfirming) setName(draft.trim());
+            else setNameConfirming(true);
           }}
         >
           <label
@@ -78,9 +79,9 @@ export function CourseOverview({
           </label>
           <p className="mt-1 text-sm text-ink-soft">
             It appears on your certificates and is{" "}
-            <strong className="text-ink">set once — it can&apos;t be changed
-            afterwards</strong>, so check the spelling. (Stored only in this
-            browser; nothing is sent anywhere.)
+            <strong className="text-ink">used for this course run</strong>, so
+            check the spelling. You can set a new name when restarting a completed
+            course. (Stored only in this browser; nothing is sent anywhere.)
           </p>
           <div className="mt-3 flex gap-2">
             <input
@@ -89,7 +90,7 @@ export function CourseOverview({
               value={draft}
               onChange={(e) => {
                 setDraft(e.target.value);
-                setConfirming(false);
+                setNameConfirming(false);
               }}
               placeholder="Your name"
               className="min-w-0 flex-1 rounded-xl border-2 border-ink bg-paper px-4 py-2.5 text-sm outline-none placeholder:text-ink-faint focus:border-flame"
@@ -98,15 +99,15 @@ export function CourseOverview({
               type="submit"
               disabled={!draft.trim()}
               className={`rounded-xl border-2 px-5 py-2.5 font-display text-sm font-extrabold uppercase tracking-widest transition disabled:opacity-40 ${
-                confirming
+                nameConfirming
                   ? "border-flame bg-flame text-white hover:bg-flame-deep"
                   : "border-ink bg-ink text-paper enabled:hover:border-flame enabled:hover:bg-flame"
               }`}
             >
-              {confirming ? "Confirm" : "Save"}
+              {nameConfirming ? "Confirm" : "Save"}
             </button>
           </div>
-          {confirming && (
+          {nameConfirming && (
             <p className="mt-2 text-sm text-ink-soft">
               Lock in <strong className="text-ink">{draft.trim()}</strong>? This is
               the name your certificates will carry.
@@ -124,12 +125,21 @@ export function CourseOverview({
             </span>
           </p>
           {allDone ? (
-            <Link
-              href={`/courses/${slug}/certificate`}
-              className="rounded-xl border-2 border-layer-staging bg-layer-staging px-5 py-2.5 font-display text-sm font-extrabold uppercase tracking-widest text-white transition hover:opacity-90"
-            >
-              View your certificate →
-            </Link>
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href={`/courses/${slug}/certificate`}
+                className="rounded-xl border-2 border-layer-staging bg-layer-staging px-5 py-2.5 font-display text-sm font-extrabold uppercase tracking-widest text-white transition hover:opacity-90"
+              >
+                View your certificate →
+              </Link>
+              <button
+                type="button"
+                onClick={() => setRestartConfirming(true)}
+                className="rounded-xl border-2 border-ink px-5 py-2.5 font-display text-sm font-extrabold uppercase tracking-widest text-ink transition hover:border-flame hover:text-flame"
+              >
+                Restart course
+              </button>
+            </div>
           ) : (
             <Link
               href={`/courses/${slug}/${firstIncomplete.slug}`}
@@ -138,6 +148,48 @@ export function CourseOverview({
               {started ? "Continue →" : "Start the course →"}
             </Link>
           )}
+        </div>
+      )}
+
+      {allDone && restartConfirming && (
+        <div
+          className="mt-5 rounded-2xl border-2 border-flame bg-flame-soft p-5"
+          role="alertdialog"
+          aria-labelledby="restart-course-title"
+          aria-describedby="restart-course-description"
+        >
+          <p
+            id="restart-course-title"
+            className="font-display text-sm font-extrabold uppercase tracking-widest text-ink"
+          >
+            Restart {title}?
+          </p>
+          <p id="restart-course-description" className="mt-1 text-sm text-ink-soft">
+            This clears this course&apos;s completion and saved lesson positions, and
+            removes the learner name <strong className="text-ink">{name}</strong> so
+            a new one can be entered. Other completed courses are left alone.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                resetCourse(slug);
+                setDraft("");
+                setNameConfirming(false);
+                setRestartConfirming(false);
+              }}
+              className="rounded-xl border-2 border-flame bg-flame px-5 py-2.5 font-display text-sm font-extrabold uppercase tracking-widest text-white transition hover:border-flame-deep hover:bg-flame-deep"
+            >
+              Clear and restart
+            </button>
+            <button
+              type="button"
+              onClick={() => setRestartConfirming(false)}
+              className="rounded-xl border-2 border-ink px-5 py-2.5 font-display text-sm font-extrabold uppercase tracking-widest text-ink transition hover:bg-paper"
+            >
+              Keep my progress
+            </button>
+          </div>
         </div>
       )}
 

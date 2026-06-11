@@ -34,6 +34,7 @@ type ProgressContextValue = ProgressState & {
   setName: (name: string) => void;
   setStep: (lessonId: string, step: number) => void;
   getStep: (lessonId: string) => number;
+  resetCourse: (courseSlug: string) => void;
   reset: () => void;
 };
 
@@ -114,6 +115,19 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     (lessonId: string) => state.steps[lessonId] ?? 0,
     [state.steps],
   );
+  const resetCourse = useCallback((courseSlug: string) => {
+    const donePrefix = `course/${courseSlug}/`;
+    const stepPrefix = `${courseSlug}/`;
+
+    setState((s) => ({
+      ...s,
+      done: s.done.filter((id) => !id.startsWith(donePrefix)),
+      name: "",
+      steps: Object.fromEntries(
+        Object.entries(s.steps).filter(([id]) => !id.startsWith(stepPrefix)),
+      ),
+    }));
+  }, []);
   const reset = useCallback(() => setState(EMPTY), []);
 
   return (
@@ -129,6 +143,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         setName,
         setStep,
         getStep,
+        resetCourse,
         reset,
       }}
     >

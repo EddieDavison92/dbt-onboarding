@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { downloadCertificatePdf } from "@/lib/certificate-pdf";
 import { useProgress } from "@/lib/progress";
 
 export function Certificate({
@@ -18,6 +20,8 @@ export function Certificate({
   lessonTitles: string[];
 }) {
   const { ready, name, isDone } = useProgress();
+  const [downloading, setDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState(false);
 
   if (!ready) return null;
 
@@ -99,10 +103,28 @@ export function Certificate({
       <div className="mt-6 flex flex-wrap justify-center gap-3 print:hidden">
         <button
           type="button"
-          onClick={() => window.print()}
+          disabled={downloading}
+          onClick={async () => {
+            setDownloading(true);
+            setDownloadError(false);
+            try {
+              await downloadCertificatePdf({
+                courseSlug,
+                courseTitle,
+                hours,
+                lessonTitles,
+                learnerName: name,
+                date,
+              });
+            } catch {
+              setDownloadError(true);
+            } finally {
+              setDownloading(false);
+            }
+          }}
           className="rounded-xl border-2 border-ink bg-ink px-6 py-3 font-display text-sm font-extrabold uppercase tracking-widest text-paper transition hover:border-flame hover:bg-flame"
         >
-          Save as PDF
+          {downloading ? "Preparing PDF..." : "Download PDF"}
         </button>
         <Link
           href="/"
@@ -111,6 +133,11 @@ export function Certificate({
           Next course →
         </Link>
       </div>
+      {downloadError && (
+        <p className="mt-3 text-center text-sm text-flame-deep" role="alert">
+          The PDF could not be created. Please try the download again.
+        </p>
+      )}
     </div>
   );
 }
