@@ -17,9 +17,7 @@ const EXAMPLES: { selector: string; title: string; selected: NodeId[]; note: str
   { selector: "int_current_waits", title: "the node only", selected: ["int"], note: "A plain name selects the matching resource." },
   { selector: "+int_current_waits", title: "ancestors", selected: ["source", "raw", "stg", "int"], note: "+ before the name walks upstream." },
   { selector: "int_current_waits+", title: "descendants", selected: ["int", "fct", "dash"], note: "+ after the name walks downstream." },
-  { selector: "+int_current_waits+", title: "both directions", selected: ["source", "raw", "stg", "int", "fct", "dash"], note: "+ on both sides selects the whole connected slice." },
-  { selector: "2+int_current_waits", title: "two generations up", selected: ["raw", "stg", "int"], note: "A number limits how many graph edges dbt walks." },
-  { selector: "@int_current_waits", title: "CI closure", selected: ["source", "raw", "stg", "int", "fct", "dash"], note: "@ includes descendants plus the ancestors those descendants need." },
+  { selector: "+int_current_waits+", title: "both directions", selected: ["source", "raw", "stg", "int", "fct", "dash"], note: "+ on both sides selects the connected slice." },
 ];
 
 export function SelectorPlayground() {

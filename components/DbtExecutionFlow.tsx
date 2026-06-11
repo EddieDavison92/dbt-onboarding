@@ -8,8 +8,8 @@ const PHASES = [
     label: "1. Parse",
     verb: "Read the project",
     body: "dbt reads SQL, YAML and configuration, resolves ref() and source(), and builds the DAG.",
-    output: "manifest.json",
-    warehouse: "No warehouse query needed",
+    output: "a map of models and links",
+    warehouse: "Nothing is created",
     color: "var(--layer-raw)",
   },
   {
@@ -17,8 +17,8 @@ const PHASES = [
     label: "2. Compile",
     verb: "Render executable SQL",
     body: "Jinja, macros and relation names become the plain SQL that the data platform can execute.",
-    output: "a compiled SQL file",
-    warehouse: "May query warehouse metadata",
+    output: "plain SQL",
+    warehouse: "Nothing is created",
     color: "var(--layer-modelling)",
   },
   {
@@ -26,8 +26,8 @@ const PHASES = [
     label: "3. Execute",
     verb: "Do the requested work",
     body: "Commands such as run, test, build and show send compiled SQL to the configured warehouse destination.",
-    output: "run_results.json",
-    warehouse: "Creates objects, tests data or returns rows",
+    output: "a model, test result or row preview",
+    warehouse: "Snowflake does the requested work",
     color: "var(--layer-reporting)",
   },
 ] as const;
@@ -68,7 +68,7 @@ export function DbtExecutionFlow() {
         <p className="!my-0 !text-ink">{phase.body}</p>
         <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
           <div className="rounded-lg border border-line bg-paper-warm px-3 py-2">
-            <span className="font-display font-bold uppercase tracking-wider text-ink-faint">Leaves behind</span>
+            <span className="font-display font-bold uppercase tracking-wider text-ink-faint">Produces</span>
             <code className="mt-0.5 block !whitespace-normal !border-0 !bg-transparent !p-0 text-ink">{phase.output}</code>
           </div>
           <div className="rounded-lg border border-line bg-paper-warm px-3 py-2">
