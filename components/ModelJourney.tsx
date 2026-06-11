@@ -12,8 +12,8 @@ const STAGES = [
 
 const CAPTIONS = [
   "Your file only describes the rows. No CREATE, no destination — just the SELECT.",
-  "dbt resolved ref('raw_people') to the real table for your environment. Nothing has touched Snowflake yet.",
-  "dbt wrapped your SELECT in the DDL and sent it. Snowflake created the view.",
+  "dbt resolved ref('raw_people') to the real table — the DEV__ copy, because you are developing. Nothing has touched Snowflake yet.",
+  "dbt wrapped your SELECT in the DDL and sent it. Snowflake created the view, in your dev environment.",
 ] as const;
 
 const CTA = ["Compile it →", "Run it →", "Start again"] as const;
@@ -114,7 +114,7 @@ export function ModelJourney() {
                 <>
                   <span className="text-[#ff9a82]">from</span>{" "}
                   <span className="rounded bg-[#7ee2c0]/15 px-1 text-[#7ee2c0]">
-                    MODELLING.DBT_RAW.RAW_PEOPLE
+                    DEV__MODELLING.DBT_RAW.RAW_PEOPLE
                   </span>
                 </>,
                 1,
@@ -131,7 +131,7 @@ export function ModelJourney() {
                 0,
                 { added: true },
               )}
-              {line(<>&nbsp;&nbsp;MODELLING.DBT_STAGING.STG_PEOPLE <span className="text-[#ff9a82]">as</span> (</>, 1, { added: true })}
+              {line(<>&nbsp;&nbsp;DEV__MODELLING.DBT_STAGING.STG_PEOPLE <span className="text-[#ff9a82]">as</span> (</>, 1, { added: true })}
               {line(
                 <>
                   &nbsp;&nbsp;<span className="text-[#ff9a82]">select</span> person_id, postcode
@@ -141,7 +141,7 @@ export function ModelJourney() {
               {line(
                 <>
                   &nbsp;&nbsp;<span className="text-[#ff9a82]">from</span>{" "}
-                  <span className="text-[#7ee2c0]">MODELLING.DBT_RAW.RAW_PEOPLE</span>
+                  <span className="text-[#7ee2c0]">DEV__MODELLING.DBT_RAW.RAW_PEOPLE</span>
                 </>,
                 3,
               )}
@@ -167,7 +167,7 @@ export function ModelJourney() {
             Snowflake view
           </span>
           <code className="block !whitespace-normal break-words !border-0 !bg-transparent !p-0 text-[12px] text-ink">
-            MODELLING.DBT_STAGING.STG_PEOPLE
+            DEV__MODELLING.DBT_STAGING.STG_PEOPLE
           </code>
         </div>
         <span
