@@ -5,6 +5,7 @@ import { TryIt } from "@/components/TryIt";
 import { DbtExecutionFlow } from "@/components/DbtExecutionFlow";
 import { ModelJourney } from "@/components/ModelJourney";
 import { CommandLab } from "@/components/CommandLab";
+import { CommandDAG } from "@/components/CommandDAG";
 import { ProjectFilesMap } from "@/components/ProjectFilesMap";
 import { SelectorPlayground } from "@/components/SelectorPlayground";
 
@@ -203,21 +204,14 @@ from DEV__MODELLING.DBT_RAW.RAW_PEOPLE`,
         },
         {
           id: "run-build-test",
-          title: "The three that sound alike",
+          title: "Watch the three that sound alike",
           body: (
             <>
-              <div className="my-6 grid gap-3 sm:grid-cols-3">
-                {[
-                  ["dbt run", "Create the selected model."],
-                  ["dbt test", "Test a relation that already exists."],
-                  ["dbt build", "Create selected resources and run their selected tests in order."],
-                ].map(([command, description]) => (
-                  <div key={command} className="rounded-xl border-2 border-line bg-paper p-4">
-                    <code className="!whitespace-normal">{command}</code>
-                    <p className="!mb-0 !mt-2 text-sm">{description}</p>
-                  </div>
-                ))}
-              </div>
+              <p>
+                These commands are easiest to understand by watching the same small
+                project react to each one. Run all three versions.
+              </p>
+              <CommandDAG />
               <p>
                 For everyday model work, <code>dbt build -s my_model</code> is usually
                 the best check: create it, then test it.
