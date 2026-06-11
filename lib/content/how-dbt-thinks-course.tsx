@@ -138,13 +138,14 @@ export const HOW_DBT_THINKS_COURSE: Course = {
               <p>
                 The unit of work in dbt is the <strong>model</strong>: one{" "}
                 <code>.sql</code> file containing one SELECT statement. That is
-                the whole definition. Press <strong>Build it</strong>.
+                the whole definition. Walk this one through what happens when
+                dbt builds it:
               </p>
               <ModelJourney />
               <p>
-                You describe the rows. dbt adds the <code>CREATE VIEW</code> or{" "}
-                <code>CREATE TABLE</code>, picks the right destination, and
-                sends the finished SQL to Snowflake.
+                You describe the rows. dbt resolves the references, adds the{" "}
+                <code>CREATE VIEW</code> or <code>CREATE TABLE</code>, picks
+                the right destination, and sends the finished SQL to Snowflake.
               </p>
             </>
           ),
