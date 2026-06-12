@@ -198,8 +198,8 @@ export const HOW_DBT_THINKS_COURSE: Course = {
                 lang="text"
                 code={`
 your SQL:    select person_id, postcode from …
-development: DEV__MODELLING.DBT_STAGING.STG_PEOPLE
-production:  MODELLING.DBT_STAGING.STG_PEOPLE
+development: DEV__STAGING.OLIDS.STG_PEOPLE
+production:  STAGING.OLIDS.STG_PEOPLE
 `}
               />
               <p>
@@ -238,7 +238,7 @@ production:  MODELLING.DBT_STAGING.STG_PEOPLE
             <>
               <p>
                 In a worksheet you would write{" "}
-                <code>from MODELLING.DBT_STAGING.STG_PEOPLE</code>. In dbt you
+                <code>from STAGING.OLIDS.STG_PEOPLE</code>. In dbt you
                 point at the model that builds it:
               </p>
               <CodeBlock
@@ -332,7 +332,7 @@ from {{ ref('raw_people') }}
             </>
           ),
           check: {
-            prompt: "Why is hardcoding `MODELLING.DBT_STAGING.STG_X` in a model a problem?",
+            prompt: "Why is hardcoding `STAGING.CSDS.STG_X` in a model a problem?",
             options: [
               "dbt refuses to compile it",
               "It breaks dev/prod separation and hides the dependency from the DAG",
@@ -399,6 +399,14 @@ from {{ ref('raw_people') }}
                 one source table — no joins, no business logic, ever.{" "}
                 <strong>Modelling</strong>{" "}is where joins and derivations live,
                 and where most analyst work happens.
+              </p>
+              <p>
+                The Snowflake database is also named <code>STAGING</code>. Raw models
+                all build in its single <code>DBT_RAW</code>{" "}schema. Staging models
+                use proper source or domain schemas in the same database, such as
+                <code>STAGING.CSDS</code>, <code>STAGING.OLIDS</code>{" "}and
+                <code>STAGING.REFERENCE</code>. Development mirrors that layout in
+                <code>DEV__STAGING</code>.
               </p>
             </>
           ),
@@ -546,8 +554,8 @@ from {{ ref('raw_people') }}
     {
       slug: "branch-to-production",
       title: "From branch to production",
-      blurb: "Why nothing you do locally can break anything",
-      minutes: 6,
+      blurb: "How reviewed code runs safely, on schedule or by deliberate request",
+      minutes: 8,
       steps: [
         {
           id: "path",
@@ -555,38 +563,39 @@ from {{ ref('raw_people') }}
             <>
               <p>
                 Put the pieces together: git from the first course, models and
-                tests from this one. A change takes exactly one path to
-                production. Click each stage:
+                tests from this one. New code takes one reviewed path before it
+                is allowed to run in production. Click each stage:
               </p>
               <BranchToProd />
             </>
           ),
           interact: true,
           check: {
-            prompt: "What is the only way a change reaches production?",
+            prompt: "How does new code become eligible to run in production?",
             options: [
-              "Running `dbt build` from your machine",
+              "Running an unmerged branch with a production target",
               "A pull request that passes its checks and is merged to `main`",
               "Asking an administrator to copy it across",
-              "Waiting — the dev environment syncs to production nightly",
+              "Waiting — the dev environment syncs its code to production nightly",
             ],
             answer: 1,
             explain:
-              "Your local commands only ever touch the shared DEV__ databases. Production is written by the deployment that follows a merged, reviewed PR — there is no other door.",
-            affirm: "production is only reachable through a merged PR.",
+              "Review and merge decide which code may run in production. A scheduled or authorised manual production run then executes code from main; it should not be used to run unreviewed branch code.",
+            affirm: "review and merge decide which code production is allowed to run.",
           },
         },
         {
           id: "freedom",
-          title: "Which means: you can't break production",
+          title: "Development stays separate from production",
           body: (
             <>
               <p>
                 This is the most useful thing to internalise before touching
                 the real project. There are exactly two environments:{" "}
                 <strong>dev</strong>{" "}and <strong>prod</strong>. While you
-                develop, everything you build lands in the DEV__ databases —{" "}
-                <code>DEV__MODELLING</code>, <code>DEV__REPORTING</code> — and
+                develop, the normal local target builds into the DEV__ databases —{" "}
+                <code>DEV__STAGING</code>, <code>DEV__MODELLING</code>,{" "}
+                <code>DEV__REPORTING</code> — and
                 no report or dashboard reads from them. Build nonsense, break
                 a model, rebuild it: dev objects are cheap to recreate.
               </p>
@@ -594,12 +603,52 @@ from {{ ref('raw_people') }}
                 One honest caveat: dev is shared by the whole analytics team,
                 not a private sandbox. If a teammate rebuilds the same model,
                 they overwrite your dev copy — normal, and occasionally worth
-                a heads-up in the team channel. What nobody can do, from dev,
-                is touch production: between the two stand the compile check,
-                the test suite, an automated reviewer and a human one.
+                a heads-up in the team channel. What normal development cannot do
+                is touch production accidentally: production uses a separate,
+                explicit target and role.
               </p>
             </>
           ),
+        },
+        {
+          id: "manual-production",
+          title: "Production can be run manually",
+          body: (
+            <>
+              <p>
+                Analysts are authorised to trigger production runs. That is useful
+                when upstream data arrives late and a model needs rerunning without
+                waiting for the schedule, or when an incremental model needs a
+                deliberate <code>--full-refresh</code>{" "}to recover or apply a change.
+              </p>
+              <p>
+                Manual production runs are discouraged as the everyday route. They
+                have a wider impact, can overlap scheduled work, and need the same
+                care as any operational change: run reviewed code from <code>main</code>,
+                select the smallest affected part of the DAG, confirm the production
+                target, and tell the team when the run is significant.
+              </p>
+              <Callout kind="info" title="Merge controls what; the run controls when">
+                <p>
+                  A manual run does not publish branch code. It reruns code that has
+                  already passed review and reached <code>main</code>.
+                </p>
+              </Callout>
+            </>
+          ),
+          check: {
+            prompt: "When is a manual production run appropriate?",
+            options: [
+              "To test unreviewed changes from your branch against production",
+              "As the default way to develop a model",
+              "To rerun reviewed code after late upstream data, or deliberately `--full-refresh` an incremental model",
+              "Whenever a dev build is slower than expected",
+            ],
+            answer: 2,
+            explain:
+              "Manual production runs are an operational tool for reviewed code. They are useful when timing or incremental state needs intervention, but the normal development loop remains dev, PR, merge and scheduled production.",
+            affirm: "manual production runs are deliberate operational work, not the development loop.",
+          },
         },
         {
           id: "handoff",
@@ -609,8 +658,8 @@ from {{ ref('raw_people') }}
               <p>
                 You now have the mental model: models are SELECTs,{" "}
                 <code>ref()</code>{" "}draws the map, layers give each model one
-                job, tests guard the data nightly, and production sits behind a
-                merged PR.
+                job, tests guard the data nightly, and only reviewed code from
+                <code>main</code>{" "}should run in production.
               </p>
               <p>
                 <strong>Your first PR</strong>{" "}makes it real: you will set up
@@ -721,8 +770,8 @@ from {{ ref('raw_people') }}
             ],
             answer: 0,
             explain:
-              "Local builds land in the DEV__ databases — the team's shared, disposable copy of the warehouse. Production, which dashboards read, sits behind a reviewed, merged PR.",
-            affirm: "local builds touch only the shared dev environment — never production.",
+              "The normal local target lands in the DEV__ databases — the team's shared, disposable copy of the warehouse. Production is a separate explicit target used for deployment, schedules and authorised manual operations.",
+            affirm: "the normal development target builds into shared dev, separate from production.",
           },
         },
         {

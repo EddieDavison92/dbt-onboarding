@@ -20,7 +20,7 @@ export default function Page() {
       <h2>Never hardcode a table</h2>
       <p>
         In a Snowflake worksheet you would write{" "}
-        <code>from MODELLING.DBT_STAGING.STG_CSDS_BRIDGING</code>. In dbt you write:
+        <code>from STAGING.CSDS.STG_CSDS_BRIDGING</code>. In dbt you write:
       </p>
       <CodeBlock
         lang="sql"
@@ -106,7 +106,7 @@ from {{ source('csds', 'ActiveSubmission') }}
       <Quiz
         questions={[
           {
-            prompt: "Why is hardcoding MODELLING.DBT_STAGING.STG_X a problem?",
+            prompt: "Why is hardcoding STAGING.CSDS.STG_X a problem?",
             options: [
               "dbt will refuse to compile a hardcoded table name",
               "It breaks dev/prod separation and hides the dependency from the DAG",

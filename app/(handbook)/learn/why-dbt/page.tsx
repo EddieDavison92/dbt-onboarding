@@ -104,11 +104,11 @@ from {{ ref('raw_csds_bridging') }}
         lang="sql"
         title="what Snowflake actually receives (dev environment)"
         code={`
-create or replace view DEV__MODELLING.DBT_STAGING.STG_CSDS_BRIDGING as (
+create or replace view DEV__STAGING.CSDS.STG_CSDS_BRIDGING as (
     select
         person_id,
         pseudo_nhs_number as sk_patient_id
-    from DEV__MODELLING.DBT_RAW.RAW_CSDS_BRIDGING
+    from DEV__STAGING.DBT_RAW.RAW_CSDS_BRIDGING
 );
 `}
       />

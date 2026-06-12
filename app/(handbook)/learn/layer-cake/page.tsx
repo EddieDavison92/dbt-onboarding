@@ -51,6 +51,16 @@ from {{ source('csds', 'ActiveSubmission') }}
         foundation everything downstream relies on.
       </p>
 
+      <Callout kind="info" title="Where raw and staging build">
+        <p>
+          Both layers use the <code>STAGING</code>{" "}database. All raw models build in
+          its single <code>DBT_RAW</code>{" "}schema. Staging models use source or domain
+          schemas such as <code>CSDS</code>, <code>OLIDS</code>{" "}and
+          <code>REFERENCE</code>. Development uses the matching layout in
+          <code>DEV__STAGING</code>.
+        </p>
+      </Callout>
+
       <h3>Modelling — reusable building blocks</h3>
       <p>
         Prefixed <code>int_</code>. This is where real work happens: joins across staging

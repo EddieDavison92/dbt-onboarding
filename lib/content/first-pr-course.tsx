@@ -503,6 +503,14 @@ git switch -c feat/opening-hours-staging`}
                 (what job is the model doing) and which <strong>domain</strong>{" "}
                 (what data is it about).
               </p>
+              <Callout kind="info" title="Raw and staging share the STAGING database">
+                <p>
+                  Raw models all build in <code>STAGING.DBT_RAW</code>. Staging models
+                  use a proper schema for the source or domain, such as
+                  <code>STAGING.OLIDS</code>{" "}or <code>STAGING.REFERENCE</code>.
+                  Development mirrors the same layout in <code>DEV__STAGING</code>.
+                </p>
+              </Callout>
             </>
           ),
         },

@@ -2,13 +2,14 @@ import type { Course } from "@/lib/course-types";
 import { CodeBlock } from "@/components/CodeBlock";
 import { BranchDiagram } from "@/components/BranchDiagram";
 import { TryIt } from "@/components/TryIt";
+import { Callout } from "@/components/Callout";
 
 export const GIT_COURSE: Course = {
   slug: "git-essentials",
   title: "Git essentials",
   tagline: "Version control from zero — the foundation everything else stands on",
   audience: "Start here if you have never used git. No installation needed yet — this course is about the ideas and the handful of commands.",
-  hours: "~45 min",
+  hours: "~1 hr",
   accent: "var(--layer-staging)",
   lessons: [
     // ------------------------------------------------------------------
@@ -178,7 +179,7 @@ analysis_v2_FINAL_jw_comments.sql
             ],
             answer: 0,
             explain:
-              "This is the whole point of branches: your work-in-progress, however broken, exists only on your branch. Production only changes when a branch is deliberately merged into main.",
+              "This is the whole point of branches: your work-in-progress, however broken, exists only on your branch. Production code only changes when a branch is deliberately merged into main.",
             affirm: "nothing on your branch can touch production — that's the point of branches.",
           },
         },
@@ -218,7 +219,7 @@ docs: describe waiting list snapshot logic
               <p>
                 You branch off main (after C), commit your work (D, E, F), and
                 eventually your branch is merged back (G) — through a process with
-                safety checks, which is the next lesson.
+                safety checks, which we cover shortly.
               </p>
             </>
           ),
@@ -234,6 +235,131 @@ docs: describe waiting list snapshot logic
             explain:
               "Branch = the parallel line; commits = the snapshots along it. One branch per piece of work, several commits per branch.",
             affirm: "branch = the parallel line, commits = the snapshots along it.",
+          },
+        },
+      ],
+    },
+    // ------------------------------------------------------------------
+    {
+      slug: "public-repository-safety",
+      title: "Keep sensitive data out of git",
+      blurb: "How this public repository is kept safe, and where those controls stop",
+      minutes: 9,
+      steps: [
+        {
+          id: "public",
+          body: (
+            <>
+              <p>
+                The <code>dbt-analytics</code>{" "}repository is public. Anyone on the
+                internet can read its files and full git history. That is deliberate:
+                the repository contains transformation code, tests and documentation,
+                but it must never contain patient-level data, credentials or private
+                working outputs.
+              </p>
+              <p>
+                Git remembers history. Deleting a value in the next commit does not
+                unpublish the earlier one, so the safe habit is to inspect what you
+                are sharing before it leaves your machine.
+              </p>
+            </>
+          ),
+        },
+        {
+          id: "never-commit",
+          title: "Three things never belong in the repo",
+          body: (
+            <>
+              <ul>
+                <li>
+                  <strong>Data extracts:</strong>{" "}<code>.csv</code>{" "}files, query
+                  results, screenshots of rows, or notebook output containing patient
+                  or person-level information.
+                </li>
+                <li>
+                  <strong>Credentials:</strong>{" "}passwords, Snowflake personal access
+                  tokens, API keys or connection strings. These stay in ignored local
+                  environment files or an approved secret store.
+                </li>
+                <li>
+                  <strong>Notebooks with outputs:</strong>{" "}a <code>.ipynb</code>{" "}is
+                  JSON and its preview can expose every rendered row. Clear outputs and
+                  check the file before sharing it, or keep the notebook outside the repo.
+                </li>
+              </ul>
+              <Callout kind="warn" title="A filename is not a safety control">
+                <p>
+                  Git will happily track a CSV, notebook or token if you add it. Never
+                  assume a file is safe because it came from an analytical workflow.
+                </p>
+              </Callout>
+            </>
+          ),
+          check: {
+            prompt: "Which file is safe to push to this public repository?",
+            options: [
+              "A `.csv` extract with pseudonymised patient identifiers",
+              "A `.ipynb` whose preview contains record-level query results",
+              "A `.sql` model containing transformations and no real data or credentials",
+              "A connection example containing a Snowflake personal access token",
+            ],
+            answer: 2,
+            explain:
+              "Code and documentation belong here. Pseudonymised patient data is still data; notebook outputs can expose rows in GitHub's preview; and a token is a credential.",
+            affirm: "share code, tests and documentation — never data, outputs or credentials.",
+          },
+        },
+        {
+          id: "guardrails",
+          title: "The guardrails help, but you are still the final check",
+          body: (
+            <>
+              <p>
+                This project makes safe working easier: local environment files are
+                ignored, <code>main</code>{" "}is protected, changes go through a visible
+                diff, automated checks run, and another person reviews the pull request.
+                These layers catch many mistakes and make normal dbt work low risk.
+              </p>
+              <p>
+                They are not a promise that sensitive content cannot be committed.
+                Before every push, read <code>git status</code>{" "}and the staged diff.
+                If a file is unfamiliar, generated, data-shaped or unexpectedly large,
+                stop and inspect it rather than staging it.
+              </p>
+            </>
+          ),
+        },
+        {
+          id: "boundaries",
+          title: "Do not copy these assumptions to another repo",
+          body: (
+            <>
+              <p>
+                The safety described here belongs to this project and its team setup.
+                A new analytical repository may not have the same <code>.gitignore</code>,
+                branch protection, checks, templates or reviewers. Before using git
+                elsewhere, establish those controls and decide whether the repository
+                may contain data at all.
+              </p>
+              <p>
+                If sensitive data or a credential is ever committed, do not quietly
+                delete it and carry on. Stop, tell the team immediately, and follow the
+                incident process so access can be revoked or the secret rotated.
+              </p>
+            </>
+          ),
+          check: {
+            prompt: "You create a new analysis repo from scratch. What can you assume?",
+            options: [
+              "The dbt project's safety controls apply automatically",
+              "GitHub blocks patient data and credentials from every repository",
+              "Nothing — check visibility, ignores, protections and review controls before adding files",
+              "Pseudonymised extracts are always safe in a private repository",
+            ],
+            answer: 2,
+            explain:
+              "Repository controls are configuration, not a property of git. New or personal repos need their own deliberate safety setup before analytical files are added.",
+            affirm: "every repository needs its own explicit safety controls.",
           },
         },
       ],

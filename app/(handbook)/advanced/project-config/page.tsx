@@ -35,10 +35,14 @@ models:
       columns: true               # YAML descriptions -> Snowflake comments
     +post-hook: ["{{ grant_ownership_with_copy() }}"]
 
+    raw:
+      +materialized: view
+      +database: "STAGING"
+      +schema: "DBT_RAW"
+
     staging:
       +materialized: view         # staging overrides the default
-      +database: "MODELLING"
-      +schema: "DBT_STAGING"
+      +database: "STAGING"
       +tags: ["staging", "daily"]
 
     reporting:
@@ -59,6 +63,14 @@ models:
         Read it top-down: settings cascade from project → folder → subfolder, with
         deeper levels winning. The <code>+</code>{" "}prefix marks a config property (as
         opposed to a folder name).
+      </p>
+      <p>
+        Raw is the exception with one fixed schema: <code>STAGING.DBT_RAW</code>.
+        Staging models use source or domain schemas within the <code>STAGING</code>{" "}
+        database, including <code>CSDS</code>, <code>OLIDS</code>{" "}and
+        <code>REFERENCE</code>. The project&apos;s schema configuration derives or assigns
+        the appropriate schema rather than putting every staging model into one
+        shared schema.
       </p>
 
       <h2>The hierarchy</h2>

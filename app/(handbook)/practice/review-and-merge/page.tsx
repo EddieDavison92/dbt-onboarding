@@ -67,6 +67,17 @@ git branch -d feat/short-description
         the PR environment, or is production different?”
       </p>
 
+      <Callout kind="info" title="Production can also be run manually">
+        <p>
+          Analysts can deliberately trigger a production run of reviewed code from
+          <code>main</code>. This is useful after late upstream data arrives, or when an
+          incremental model needs a controlled <code>--full-refresh</code>. It is
+          discouraged as the normal route: confirm the production target, select the
+          smallest affected part of the DAG, avoid clashing with scheduled work, and
+          tell the team when the run has a significant impact.
+        </p>
+      </Callout>
+
       <Checklist
         id="merge"
         items={[

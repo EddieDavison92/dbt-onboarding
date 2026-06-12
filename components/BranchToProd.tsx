@@ -31,14 +31,14 @@ const STAGES = [
   {
     id: "prod",
     label: "4. Production",
-    verb: "Merge, then every night",
-    body: "Merging to main deploys the model. From then on the nightly build reruns it — and its tests — without you.",
-    touches: "Production, at last",
+    verb: "Deploy, schedule or trigger",
+    body: "Merging to main deploys the reviewed code. Scheduled runs normally keep it fresh; authorised analysts can also trigger a production run when there is an operational reason.",
+    touches: "Production, using code from main",
     color: "var(--layer-reporting)",
   },
 ] as const;
 
-/** the only path a change can take to production */
+/** the path reviewed code takes before it can run in production */
 export function BranchToProd() {
   const interactionDone = useInteractionDone();
   const [active, setActive] = useState(0);
@@ -96,7 +96,7 @@ export function BranchToProd() {
         ))}
       </div>
       <figcaption className="border-t-2 border-ink px-4 py-2 text-center font-mono text-[11px] text-ink-faint">
-        open each stage · production is only reachable through a merged PR
+        open each stage · only reviewed code from main should run in production
       </figcaption>
     </figure>
   );

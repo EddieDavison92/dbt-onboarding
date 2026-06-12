@@ -21,7 +21,7 @@ const SCENARIOS = [
     prompt: "A ref() or macro looks wrong. You want to inspect the SQL dbt produced.",
     answer: "dbt compile",
     command: "dbt compile -s stg_people",
-    output: "Compiled stg_people\nselect person_id, postcode\nfrom DEV__MODELLING.DBT_RAW.RAW_PEOPLE",
+    output: "Compiled stg_people\nselect person_id, postcode\nfrom DEV__STAGING.DBT_RAW.RAW_PEOPLE",
   },
   {
     prompt: "You want to know what +stg_people selects before running anything.",
