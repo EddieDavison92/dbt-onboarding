@@ -9,6 +9,7 @@ import { ScriptChaos } from "@/components/ScriptChaos";
 import { TestProbe } from "@/components/TestProbe";
 import { GrainFanout } from "@/components/GrainFanout";
 import { BranchToProd } from "@/components/BranchToProd";
+import { YamlWorkshop } from "@/components/YamlWorkshop";
 
 export const HOW_DBT_THINKS_COURSE: Course = {
   slug: "how-dbt-thinks",
@@ -16,7 +17,7 @@ export const HOW_DBT_THINKS_COURSE: Course = {
   tagline: "What dbt is and why it exists — in pictures, before you ever run it",
   audience:
     "For SQL analysts who have never used dbt. Nothing to install, nothing to run — short visual chunks with a question at each step. Take it after Git essentials, before Your first PR.",
-  hours: "~50 min",
+  hours: "~1 hr",
   accent: "var(--layer-modelling)",
   lessons: [
     // ------------------------------------------------------------------
@@ -448,6 +449,163 @@ from {{ ref('raw_people') }}
     },
     // ------------------------------------------------------------------
     {
+      slug: "yaml-describes-the-project",
+      title: "YAML describes the project",
+      blurb: "Keys, lists and indentation, written by you",
+      minutes: 9,
+      steps: [
+        {
+          id: "two-files",
+          body: (
+            <>
+              <p>
+                A dbt model usually has two sides. The <code>.sql</code>{" "}file
+                describes the rows to build. A nearby <code>.yml</code>{" "}file
+                describes what dbt should know about those rows: the model&apos;s name,
+                its columns, its meaning, and the rules its data must obey.
+              </p>
+              <div className="my-6 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border-2 border-ink bg-graphite-deep p-4 text-paper shadow-[4px_4px_0_0_var(--color-layer-staging)]">
+                  <span className="font-display text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#7ee2c0]">
+                    stg_people.sql
+                  </span>
+                  <p className="!mb-0 !mt-2 font-mono text-[12px] leading-6 !text-white/80">
+                    select person_id, postcode
+                    <br />
+                    from {"{{ ref('raw_people') }}"}
+                  </p>
+                  <p className="!mb-0 !mt-3 text-sm !text-white/65">What rows should exist?</p>
+                </div>
+                <div className="rounded-2xl border-2 border-ink bg-paper p-4 shadow-[4px_4px_0_0_var(--color-layer-modelling)]">
+                  <span className="font-display text-[10px] font-extrabold uppercase tracking-[0.16em] text-layer-modelling">
+                    stg_people.yml
+                  </span>
+                  <p className="!mb-0 !mt-2 font-mono text-[12px] leading-6 !text-ink-soft">
+                    models:<br />
+                    {"  - name: stg_people"}<br />
+                    {"    columns: …"}
+                  </p>
+                  <p className="!mb-0 !mt-3 text-sm">What does dbt know about them?</p>
+                </div>
+              </div>
+              <p>
+                YAML is not another programming language. It is a compact way to write
+                nested information. dbt calls these <strong>properties files</strong>.
+                They can have any useful filename, as long as they are <code>.yml</code>{" "}
+                files inside the project paths dbt reads.
+              </p>
+            </>
+          ),
+          check: {
+            prompt: "Which file tells dbt that `person_id` should be unique?",
+            options: [
+              "The model's SQL file",
+              "A YAML properties file beside the model",
+              "The compiled SQL in `target/`",
+              "The Snowflake worksheet that first explored the data",
+            ],
+            answer: 1,
+            explain:
+              "SQL describes the rows. YAML attaches knowledge to the model, including descriptions, columns and data tests.",
+            affirm: "SQL builds the rows; YAML describes and tests the resource.",
+          },
+        },
+        {
+          id: "grammar",
+          title: "Three marks carry the structure",
+          body: (
+            <>
+              <CodeBlock
+                lang="yaml"
+                code={`version: 2
+models:
+  - name: stg_people
+    description: One row per person
+    columns:
+      - name: person_id
+        data_tests:
+          - not_null
+          - unique`}
+              />
+              <p>
+                Read it from the left edge. A <code>key: value</code>{" "}pair names a
+                property. A dash starts one item in a list. Extra indentation means
+                “this belongs inside the thing above.” So <code>person_id</code>{" "}is
+                a column inside <code>stg_people</code>, and its two tests belong to that column.
+              </p>
+              <Callout kind="warn" title="Spaces carry meaning">
+                <p>
+                  YAML has no brackets to show nesting. The spaces are the brackets.
+                  Use spaces, never tabs, and follow the file&apos;s existing indentation.
+                  This project uses two spaces for each level.
+                </p>
+              </Callout>
+            </>
+          ),
+          check: {
+            prompt: "In YAML, what makes `data_tests` belong to the `person_id` column?",
+            options: [
+              "The filename",
+              "Its indentation beneath the column item",
+              "The order dbt reads the lines",
+              "The word `columns` earlier in the file",
+            ],
+            answer: 1,
+            explain:
+              "Indentation is structure in YAML. Moving data_tests left or right changes which object owns it, even when every word remains the same.",
+            affirm: "indentation says what belongs inside what.",
+          },
+        },
+        {
+          id: "workshop",
+          title: "Your turn: write the structure",
+          body: (
+            <>
+              <p>
+                Repair the first file, then add a second column. Pressing Tab in the
+                editor inserts two spaces, so you can work one nesting level at a time.
+              </p>
+              <YamlWorkshop />
+            </>
+          ),
+          interact: true,
+        },
+        {
+          id: "meaning",
+          title: "The shape mirrors the thing described",
+          body: (
+            <>
+              <p>
+                The useful trick is to stop seeing YAML as punctuation. Read it as a
+                tree: this file has a list of models; this model has a list of columns;
+                this column has a list of tests. Siblings line up. Children move right.
+              </p>
+              <p>
+                You do not need to memorise every property. In the real repo, copy the
+                nearest good example and change the values. What matters now is being
+                able to see the structure, keep the indentation intact, and know that a
+                misplaced line changes what dbt thinks you described.
+              </p>
+            </>
+          ),
+          check: {
+            prompt: "You add `postcode` directly beneath `person_id` with four extra spaces. What have you described?",
+            options: [
+              "A second column beside person_id",
+              "A property nested inside person_id, not a sibling column",
+              "A second model",
+              "Valid YAML that dbt automatically moves into columns",
+            ],
+            answer: 1,
+            explain:
+              "Sibling list items must start at the same indentation. Moving postcode farther right nests it inside the person_id item instead of adding another column.",
+            affirm: "siblings line up; children move right.",
+          },
+        },
+      ],
+    },
+    // ------------------------------------------------------------------
+    {
       slug: "tests-are-promises",
       title: "Tests are promises",
       blurb: "Assertions that run every night, forever",
@@ -458,10 +616,10 @@ from {{ ref('raw_people') }}
           body: (
             <>
               <p>
-                Next to a model&apos;s SQL sits a small YAML file declaring{" "}
-                <strong>tests</strong>: rules the data must obey. Each one
-                compiles to a query that hunts for rows breaking the rule. Run
-                all three against this table:
+                You can now read the YAML structure. One of the most useful things
+                nested inside it is a list of <strong>data tests</strong>: rules the
+                model&apos;s rows must obey. Each test compiles to a query that hunts for
+                rows breaking the rule. Run all three against this table:
               </p>
               <TestProbe />
             </>
@@ -657,9 +815,9 @@ from {{ ref('raw_people') }}
             <>
               <p>
                 You now have the mental model: models are SELECTs,{" "}
-                <code>ref()</code>{" "}draws the map, layers give each model one
-                job, tests guard the data nightly, and only reviewed code from
-                <code>main</code>{" "}should run in production.
+                <code>ref()</code>{" "}draws the map, YAML records what dbt should
+                know, layers give each model one job, tests guard the data nightly,
+                and only reviewed code from <code>main</code>{" "}should run in production.
               </p>
               <p>
                 <strong>Your first PR</strong>{" "}makes it real: you will set up
@@ -676,14 +834,14 @@ from {{ ref('raw_people') }}
     {
       slug: "fundamentals-check",
       title: "Can you predict dbt?",
-      blurb: "Six situations to confirm the mental model",
-      minutes: 6,
+      blurb: "Seven situations to confirm the mental model",
+      minutes: 7,
       steps: [
         {
           id: "intro",
           body: (
             <p>
-              No syntax, no commands — just the ideas. For each situation,
+              No commands to remember. For each situation,
               predict what dbt does.
             </p>
           ),
@@ -723,8 +881,35 @@ from {{ ref('raw_people') }}
           },
         },
         {
+          id: "q-yaml",
+          title: "3. The YAML",
+          body: (
+            <CodeBlock
+              lang="yaml"
+              code={`models:
+  - name: stg_people
+    columns:
+      - name: person_id
+      - name: postcode`}
+            />
+          ),
+          check: {
+            prompt: "Why do `person_id` and `postcode` start at exactly the same indentation?",
+            options: [
+              "They are sibling items in the model's columns list",
+              "YAML requires every name to start in the same place",
+              "They belong to different models",
+              "The indentation is cosmetic; only the dashes matter",
+            ],
+            answer: 0,
+            explain:
+              "Both dashes begin items in the same columns list. If one moved farther right, it would become nested inside the other item instead of sitting beside it.",
+            affirm: "siblings line up at the same indentation.",
+          },
+        },
+        {
           id: "q-layer",
-          title: "3. The layer",
+          title: "4. The layer",
           body: <p>A model joins GP observations to derive a reusable smoking-status block.</p>,
           check: {
             prompt: "Which layer does it belong in?",
@@ -741,7 +926,7 @@ from {{ ref('raw_people') }}
         },
         {
           id: "q-test",
-          title: "4. The test",
+          title: "5. The test",
           body: <p>A <code>unique</code>{" "}test on <code>person_id</code>{" "}compiles and runs its query.</p>,
           check: {
             prompt: "The query returns 3 rows. What happened?",
@@ -758,7 +943,7 @@ from {{ ref('raw_people') }}
         },
         {
           id: "q-dev",
-          title: "5. The dev environment",
+          title: "6. The dev environment",
           body: <p>While developing, you build a model with a bad join and ruin its output.</p>,
           check: {
             prompt: "Which reports or dashboards show wrong numbers?",
@@ -776,7 +961,7 @@ from {{ ref('raw_people') }}
         },
         {
           id: "q-change",
-          title: "6. The change",
+          title: "7. The change",
           body: <p>Your PR is approved, checks are green, and you merge it to main.</p>,
           check: {
             prompt: "What happens to production?",

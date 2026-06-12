@@ -1,4 +1,5 @@
-import { PDFDocument, StandardFonts, rgb, type PDFFont } from "pdf-lib";
+import fontkit from "@pdf-lib/fontkit";
+import { PDFDocument, rgb, type PDFFont } from "pdf-lib";
 
 type CertificatePdfOptions = {
   courseSlug: string;
@@ -16,15 +17,23 @@ const FLAME = rgb(255 / 255, 105 / 255, 74 / 255);
 const PAPER = rgb(251 / 255, 250 / 255, 248 / 255);
 const LINE = rgb(230 / 255, 226 / 255, 218 / 255);
 
-function printable(value: string) {
+const FONT_URLS = {
+  regular: "/fonts/InstrumentSans-Regular.ttf",
+  bold: "/fonts/Archivo-Bold.ttf",
+  mono: "/fonts/JetBrainsMono-Regular.ttf",
+} as const;
+
+async function loadFont(url: string) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Could not load certificate font: ${url}`);
+  return response.arrayBuffer();
+}
+
+function pdfText(value: string) {
   return value
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[‘’]/g, "'")
-    .replace(/[“”]/g, '"')
-    .replace(/[–—]/g, "-")
-    .replace(/·/g, "|")
-    .replace(/[^\x20-\x7E]/g, "");
+    .replace(/[\u0000-\u001F\u007F]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function fittedSize(font: PDFFont, text: string, preferred: number, maxWidth: number) {
@@ -34,7 +43,9 @@ function fittedSize(font: PDFFont, text: string, preferred: number, maxWidth: nu
 }
 
 function filenamePart(value: string) {
-  return printable(value)
+  return value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
@@ -50,14 +61,22 @@ export async function downloadCertificatePdf({
   date,
 }: CertificatePdfOptions) {
   const pdf = await PDFDocument.create();
+  pdf.registerFontkit(fontkit);
   pdf.setTitle(`${courseTitle} certificate - ${learnerName}`);
   pdf.setAuthor("WNL Analytics");
   pdf.setSubject("Course completion certificate");
 
   const page = pdf.addPage([841.89, 595.28]);
-  const regular = await pdf.embedFont(StandardFonts.Helvetica);
-  const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
-  const mono = await pdf.embedFont(StandardFonts.Courier);
+  const [regularBytes, boldBytes, monoBytes] = await Promise.all([
+    loadFont(FONT_URLS.regular),
+    loadFont(FONT_URLS.bold),
+    loadFont(FONT_URLS.mono),
+  ]);
+  const [regular, bold, mono] = await Promise.all([
+    pdf.embedFont(regularBytes, { subset: true }),
+    pdf.embedFont(boldBytes, { subset: true }),
+    pdf.embedFont(monoBytes, { subset: true }),
+  ]);
 
   page.drawRectangle({ x: 0, y: 0, width: 841.89, height: 595.28, color: PAPER });
   page.drawRectangle({
@@ -98,7 +117,7 @@ export async function downloadCertificatePdf({
     color: INK_SOFT,
   });
 
-  const safeName = printable(learnerName) || "Course learner";
+  const safeName = pdfText(learnerName) || "Course learner";
   page.drawText(safeName, {
     x: left,
     y: 389,
@@ -113,14 +132,14 @@ export async function downloadCertificatePdf({
     font: regular,
     color: INK_SOFT,
   });
-  page.drawText(printable(courseTitle), {
+  page.drawText(pdfText(courseTitle), {
     x: left,
     y: 311,
     size: 24,
     font: bold,
     color: INK,
   });
-  page.drawText(`${lessonTitles.length} lessons  |  ${printable(hours)}`, {
+  page.drawText(`${lessonTitles.length} lessons  ·  ${pdfText(hours)}`, {
     x: left,
     y: 289,
     size: 10,
@@ -135,7 +154,7 @@ export async function downloadCertificatePdf({
     const x = columns[column];
     const y = 249 - row * 24;
     page.drawCircle({ x: x + 4, y: y + 4, size: 4, color: FLAME });
-    page.drawText(printable(title), {
+    page.drawText(pdfText(title), {
       x: x + 15,
       y,
       size: 10,
@@ -165,7 +184,7 @@ export async function downloadCertificatePdf({
     color: INK_FAINT,
   });
 
-  const safeDate = printable(date);
+  const safeDate = pdfText(date);
   page.drawText(safeDate, {
     x: 728 - mono.widthOfTextAtSize(safeDate, 10),
     y: 79,
