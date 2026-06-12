@@ -9,6 +9,8 @@ import { CommandLab } from "@/components/CommandLab";
 import { SelectorPlayground } from "@/components/SelectorPlayground";
 import { ProjectFilesMap } from "@/components/ProjectFilesMap";
 import { SourceSetupFlow } from "@/components/SourceSetupFlow";
+import { SetupDeviceGuide } from "@/components/SetupDeviceGuide";
+import { CommitSigningGuide } from "@/components/CommitSigningGuide";
 import { SourceRouteLab } from "@/components/SourceRouteLab";
 
 export const FIRST_PR_COURSE: Course = {
@@ -23,8 +25,8 @@ export const FIRST_PR_COURSE: Course = {
     // ------------------------------------------------------------------
     {
       slug: "set-up-your-machine",
-      title: "Set up your machine",
-      blurb: "Tools, credentials and a green dbt debug",
+      title: "Set up your development environment",
+      blurb: "Windows, macOS or Codespaces, ending with a green dbt debug",
       minutes: 30,
       steps: [
         {
@@ -36,7 +38,7 @@ export const FIRST_PR_COURSE: Course = {
                 see this → here&apos;s why</em>. Before starting you need three
                 things from your team lead: a GitHub account added to the org,
                 Snowflake access with the analyst role or higher, and the connection
-                details (account identifier, role, warehouse).
+                details (account identifier, username, role and warehouse).
               </p>
               <p>
                 Setup is the slowest part of the whole course — and you only ever do
@@ -47,77 +49,59 @@ export const FIRST_PR_COURSE: Course = {
         },
         {
           id: "install",
-          title: "Do: install the tools",
+          title: "Choose your setup path",
           body: (
             <>
-              <ol>
-                <li>
-                  Install <strong>Git for Windows</strong>{" "}from git-scm.com
-                  (defaults are fine).
-                </li>
-                <li>
-                  Install <strong>VS Code</strong>{" "}if you don&apos;t have it.
-                </li>
-                <li>
-                  Clone the repo — in a terminal:
-                  <CodeBlock
-                    lang="bash"
-                    code={`git clone https://github.com/wnl-icb-analytics/dbt-analytics.git`}
-                  />
-                </li>
-                <li>Open the cloned folder in VS Code.</li>
-              </ol>
               <p>
-                <strong>You should see:</strong>{" "}VS Code offers to install the
-                workspace&apos;s recommended extensions — say yes; that includes the
-                dbt extension, which gives you error-checking, autocomplete and
-                lineage as you write.
+                Setup differs slightly between managed Windows laptops, Macs and a
+                browser-based Codespace. Pick the environment you will actually use;
+                the guide will show only the relevant commands.
               </p>
+              <SetupDeviceGuide />
             </>
           ),
+          interact: true,
         },
         {
           id: "script",
-          title: "Do: open a terminal",
+          title: "What the project just set up",
           body: (
             <>
               <p>
-                Open a terminal in VS Code (<code>Ctrl+`</code>). The project&apos;s
-                setup script, <code>start_dbt.ps1</code>, runs automatically — it
-                configures git hooks, installs the dbt engine (called Fusion),
-                prepares the Python tooling for helper scripts, and loads your
-                connection settings.
+                All three routes prepare the same project: the pinned dbt Fusion engine,
+                Git hooks, dbt packages, the recommended editor extensions and the
+                optional Python environment used by helper scripts. dbt itself is the
+                Fusion executable; it is not installed into the Python environment.
               </p>
               <p>
-                <strong>You should see:</strong>{" "}since this is your first run with
-                no <code>.env</code>{" "}file, it walks you through creating one —
-                prompting for the account identifier, your username, role and
-                warehouse (the details from your team lead), then asking how to
-                authenticate. Pick option 1 (browser SSO) unless you have been given
-                a token.
+                On Windows and macOS, opening a terminal from the workspace launches
+                <code>start_dbt.ps1</code>{" "}or <code>start_dbt.sh</code>{" "}and guides
+                you through creating a local <code>.env</code>. Codespaces runs its
+                devcontainer setup once when the cloud environment is created and reads
+                your Snowflake values from Codespaces secrets instead.
               </p>
-              <Callout kind="warn" title="Why a .env file?">
+              <Callout kind="warn" title="Credentials stay outside Git">
                 <p>
-                  Credentials never go in the repo — the repo is public. The{" "}
-                  <code>.env</code>{" "}file lives only on your machine and git is
-                  configured to ignore it. The script writes it for you; you never
-                  paste secrets into project files.
+                  Local credentials live in the ignored <code>.env</code>{" "}file;
+                  Codespaces credentials live in GitHub&apos;s encrypted secret store.
+                  Neither belongs in SQL, YAML, comments, screenshots, commit messages
+                  or pull requests.
                 </p>
               </Callout>
             </>
           ),
           check: {
-            prompt: "Why does the `.env` file exist outside version control?",
+            prompt: "Where should Snowflake credentials live?",
             options: [
-              "It changes too often to be worth committing",
-              "It holds your credentials, and the repo is public — secrets stay on your machine only",
-              "git cannot store configuration files",
-              "It is regenerated by the setup script every day",
+              "In profiles.yml so every developer receives them",
+              "In an ignored local .env, or in Codespaces secrets for a cloud workspace",
+              "In the pull request description while setup is reviewed",
+              "In dbt_project.yml because dbt needs them",
             ],
             answer: 1,
             explain:
-              "Anything committed to this repo is on the public internet. Connection details and tokens live in .env, which .gitignore keeps out of every commit automatically.",
-            affirm: "secrets live in .env on your machine — never in the repo.",
+              "Local setup keeps credentials in the ignored .env file. Codespaces injects encrypted user secrets as environment variables. Neither route commits them to Git.",
+            affirm: "credentials come from the environment — never from tracked project files.",
           },
         },
         {
@@ -155,32 +139,10 @@ export const FIRST_PR_COURSE: Course = {
             <>
               <p>
                 This repo requires commits to be <em>signed</em> — cryptographic
-                proof that a commit really came from you. One-time setup, in the
-                terminal:
+                proof that a commit really came from you. Choose your environment for
+                the correct one-time setup:
               </p>
-              <CodeBlock
-                lang="bash"
-                code={`
-ssh-keygen -t ed25519 -C "you@nhs.net"
-git config --global gpg.format ssh
-git config --global user.signingkey ~/.ssh/id_ed25519.pub
-git config --global commit.gpgsign true
-`}
-              />
-              <p>
-                Then add the key at{" "}
-                <a
-                  href="https://github.com/settings/keys"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  GitHub Settings → SSH and GPG keys
-                </a>{" "}
-                → <em>New SSH key</em>.{" "}
-                <strong>The key-type dropdown defaults to Authentication Key —
-                change it to Signing Key</strong>, or your commits will still count
-                as unsigned.
-              </p>
+              <CommitSigningGuide />
             </>
           ),
         },
@@ -192,17 +154,18 @@ git config --global commit.gpgsign true
               <CodeBlock lang="bash" code={`dbt debug`} />
               <p>
                 <strong>You should see:</strong>{" "}a series of checks ending in{" "}
-                <strong>“All checks passed!”</strong> — possibly after a browser
-                window opens for Snowflake sign-in.
+                <strong>“All checks passed!”</strong>. Local setup may open a browser
+                window for Snowflake sign-in; Codespaces uses the PAT stored in your
+                Codespaces secrets.
               </p>
               <p>
-                <strong>If it fails:</strong>{" "}the cause is almost always the{" "}
-                <code>.env</code> — a typo in the account identifier or a role you
-                don&apos;t have yet. Fix the value in <code>.env</code>, open a new
-                terminal (so it reloads), and run <code>dbt debug</code>{" "}again.
+                <strong>If it fails:</strong>{" "}check the connection values for your
+                route: <code>.env</code>{" "}on Windows or macOS, or GitHub Codespaces
+                secrets in the cloud route. A mistyped account identifier, unavailable
+                role or missing PAT causes most first-day connection failures.
               </p>
               <p>
-                Green? Your machine is done — permanently. Everything from here is
+                Green? Your development environment is ready. Everything from here is
                 the actual work.
               </p>
             </>
@@ -211,14 +174,14 @@ git config --global commit.gpgsign true
             prompt: "`dbt debug` fails to connect. Where do you look first?",
             options: [
               "Reinstall dbt",
-              "The `.env` file — a wrong account identifier or role is the usual cause",
+              "The connection values: local `.env` or Codespaces secrets, depending on your route",
               "Snowflake's status page",
               "The `dbt_project.yml` file",
             ],
             answer: 1,
             explain:
-              "dbt debug tests connection + config, and the connection details come from .env. Check those values, open a fresh terminal so they reload, retry — that resolves nearly every first-day failure.",
-            affirm: "when dbt can't connect, .env is the first suspect.",
+              "dbt debug tests connection and configuration. Local routes read .env; Codespaces reads injected secrets. Check the account, user, role, warehouse and authentication value for the route you chose, then retry.",
+            affirm: "when dbt cannot connect, check the environment values for your setup route.",
           },
         },
       ],
