@@ -4,8 +4,10 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { Callout } from "@/components/Callout";
 import { Checklist } from "@/components/Checklist";
 import { GuidedCourseLink } from "@/components/GuidedCourseLink";
+import { SetupDeviceGuide } from "@/components/SetupDeviceGuide";
+import { CommitSigningGuide } from "@/components/CommitSigningGuide";
 
-export const metadata: Metadata = { title: "Set up your machine" };
+export const metadata: Metadata = { title: "Set up your development environment" };
 
 export default function Page() {
   return (
@@ -13,9 +15,9 @@ export default function Page() {
       section="practice"
       slug="setup"
       kicker="Field guide · 1"
-      title="Set up your machine"
-      lede="The prerequisites, commands and checks for getting a working local dbt environment."
-      minutes={5}
+      title="Set up your development environment"
+      lede="Choose Windows, macOS or Codespaces and follow the setup path for that environment."
+      minutes={10}
     >
       <GuidedCourseLink href="/courses/first-pr/set-up-your-machine" />
 
@@ -24,48 +26,31 @@ export default function Page() {
         id="setup-tools"
         items={[
           { key: "github", label: <>GitHub account added to the organisation</> },
-          { key: "snowflake", label: <>Snowflake access and your account, role and warehouse</> },
-          { key: "git", label: <>Git for Windows v2.34 or later</> },
-          { key: "vscode", label: <>VS Code with the workspace&apos;s recommended dbt extension</> },
+          { key: "snowflake", label: <>Snowflake access and your account, username, role and warehouse</> },
         ]}
       />
 
-      <h2>Clone and bootstrap</h2>
-      <CodeBlock
-        lang="bash"
-        code={`
-git clone https://github.com/wnl-icb-analytics/dbt-analytics.git
-cd dbt-analytics
-`}
-      />
+      <h2>Choose your setup path</h2>
       <p>
-        Open the folder in VS Code. The integrated terminal runs{" "}
-        <code>start_dbt.ps1</code>{" "}automatically. On the first run it creates your
-        ignored <code>.env</code>{" "}file, installs the pinned tooling and tells you about
-        any setup still outstanding.
+        The project supports managed Windows laptops, macOS and GitHub Codespaces.
+        Choose the environment you will use to see its folder, clone, workspace and
+        credential instructions.
       </p>
-      <Callout kind="warn" title="Keep credentials local">
+      <SetupDeviceGuide />
+      <Callout kind="warn" title="Keep credentials out of Git">
         <p>
-          The repository is public. Account details, tokens and passwords belong only
-          in <code>.env</code>; never put them in SQL, YAML, screenshots or a pull
-          request.
+          The repository is public. Local setup keeps credentials in <code>.env</code>;
+          Codespaces keeps them in its encrypted secret store. Never put account details,
+          tokens or passwords in SQL, YAML, screenshots or a pull request.
         </p>
       </Callout>
 
       <h2>Configure commit signing</h2>
-      <CodeBlock
-        lang="bash"
-        code={`
-ssh-keygen -t ed25519 -C "you@example.nhs.uk"
-git config --global gpg.format ssh
-git config --global user.signingkey ~/.ssh/id_ed25519.pub
-git config --global commit.gpgsign true
-`}
-      />
       <p>
-        Add the public key in GitHub under <em>Settings → SSH and GPG keys</em>. Choose{" "}
-        <strong>Signing Key</strong>, not the default Authentication Key.
+        Every commit must be signed. The setup differs between local devices and
+        Codespaces, so choose the environment you are using.
       </p>
+      <CommitSigningGuide />
 
       <h2>Prove it works</h2>
       <CodeBlock
@@ -84,12 +69,22 @@ dbt show -s stg_csds_bridging
       <h2>If setup fails</h2>
       <ul>
         <li>
-          <strong>Connection or role error:</strong>{" "}check <code>.env</code>, then open a
-          fresh terminal so the values reload.
+          <strong>Connection or role error:</strong>{" "}check <code>.env</code>{" "}for a
+          local setup, or your repository-scoped Codespaces secrets for the cloud route.
         </li>
         <li>
-          <strong>Browser sign-in does not open:</strong>{" "}rerun <code>dbt debug</code>{" "}
-          and choose browser SSO unless your team supplied a token.
+          <strong>Authentication does not start:</strong>{" "}local setup normally uses
+          browser SSO. Codespaces cannot use that redirect and requires a Snowflake PAT.
+        </li>
+        <li>
+          <strong>Tooling is missing:</strong>{" "}locally, reopen the named workspace and
+          create a fresh terminal. In Codespaces, rebuild the container from the command
+          palette so the post-create setup runs again.
+        </li>
+        <li>
+          <strong>PowerShell blocks the setup script:</strong>{" "}run the CurrentUser
+          execution-policy command shown in the Windows route. If corporate policy still
+          blocks it, ask your team or IT support.
         </li>
         <li>
           <strong>Access denied:</strong>{" "}this is usually an access request, not a local
@@ -100,7 +95,8 @@ dbt show -s stg_csds_bridging
       <Checklist
         id="setup-verify"
         items={[
-          { key: "ready", label: <>The setup script finishes with <strong>Ready!</strong></> },
+          { key: "ready", label: <>The local setup script or Codespaces container setup finishes</> },
+          { key: "signing", label: <>Commit signing is configured for the chosen environment</> },
           { key: "debug", label: <><code>dbt debug</code>{" "}passes</> },
           { key: "show", label: <><code>dbt show</code>{" "}returns rows</> },
         ]}

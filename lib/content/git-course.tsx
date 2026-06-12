@@ -242,124 +242,190 @@ docs: describe waiting list snapshot logic
     // ------------------------------------------------------------------
     {
       slug: "public-repository-safety",
-      title: "Keep sensitive data out of git",
-      blurb: "How this public repository is kept safe, and where those controls stop",
+      title: "What belongs in the project",
+      blurb: "How .gitignore keeps local clutter out, and why seeds are different",
       minutes: 9,
       steps: [
         {
-          id: "public",
+          id: "project-boundary",
           body: (
             <>
               <p>
-                The <code>dbt-analytics</code>{" "}repository is public. Anyone on the
-                internet can read its files and full git history. That is deliberate:
-                the repository contains transformation code, tests and documentation,
-                but it must never contain patient-level data, credentials or private
-                working outputs.
+                A dbt project contains the <strong>instructions</strong>{" "}for turning
+                warehouse data into useful datasets. You commit SQL models, YAML
+                properties, tests, macros and documentation. The data itself stays in
+                Snowflake; dbt sends queries to it rather than copying rows into your
+                project folder.
               </p>
               <p>
-                Git remembers history. Deleting a value in the next commit does not
-                unpublish the earlier one, so the safe habit is to inspect what you
-                are sharing before it leaves your machine.
+                The code is public deliberately. Analytical definitions are more useful
+                when other organisations can adopt or adapt them in their own projects,
+                users can trace how a measure was produced, and people outside the
+                immediate team can question and improve the logic. Open code also makes
+                it possible to build tools that explain a result through its documented
+                upstream lineage, rather than presenting a number without its reasoning.
               </p>
-            </>
-          ),
-        },
-        {
-          id: "never-commit",
-          title: "Three things never belong in the repo",
-          body: (
-            <>
-              <ul>
-                <li>
-                  <strong>Data extracts:</strong>{" "}<code>.csv</code>{" "}files, query
-                  results, screenshots of rows, or notebook output containing patient
-                  or person-level information.
-                </li>
-                <li>
-                  <strong>Credentials:</strong>{" "}passwords, Snowflake personal access
-                  tokens, API keys or connection strings. These stay in ignored local
-                  environment files or an approved secret store.
-                </li>
-                <li>
-                  <strong>Notebooks with outputs:</strong>{" "}a <code>.ipynb</code>{" "}is
-                  JSON and its preview can expose every rendered row. Clear outputs and
-                  check the file before sharing it, or keep the notebook outside the repo.
-                </li>
-              </ul>
-              <Callout kind="warn" title="A filename is not a safety control">
+              <Callout kind="info" title="Open definitions, not open data">
                 <p>
-                  Git will happily track a CSV, notebook or token if you add it. Never
-                  assume a file is safe because it came from an analytical workflow.
+                  Anyone can inspect the transformation logic; access to the underlying
+                  warehouse data remains controlled separately. <code>dbt-analytics</code>{" "}
+                  is therefore a public codebase, not a workspace for extracts or
+                  analysis outputs.
                 </p>
               </Callout>
             </>
           ),
           check: {
-            prompt: "Which file is safe to push to this public repository?",
+            prompt: "When a dbt model runs, where do its result rows belong?",
             options: [
-              "A `.csv` extract with pseudonymised patient identifiers",
-              "A `.ipynb` whose preview contains record-level query results",
-              "A `.sql` model containing transformations and no real data or credentials",
-              "A connection example containing a Snowflake personal access token",
+              "In a CSV beside the model",
+              "In the data warehouse; the repository keeps the SQL that creates them",
+              "In git history so reviewers can inspect them",
+              "In the project's target folder",
             ],
-            answer: 2,
+            answer: 1,
             explain:
-              "Code and documentation belong here. Pseudonymised patient data is still data; notebook outputs can expose rows in GitHub's preview; and a token is a credential.",
-            affirm: "share code, tests and documentation — never data, outputs or credentials.",
+              "The project stores transformation instructions. dbt runs those instructions in Snowflake, where the resulting tables and views remain.",
+            affirm: "git stores the instructions; the warehouse stores the data.",
           },
         },
         {
-          id: "guardrails",
-          title: "The guardrails help, but you are still the final check",
+          id: "gitignore",
+          title: ".gitignore handles the predictable clutter",
           body: (
             <>
               <p>
-                This project makes safe working easier: local environment files are
-                ignored, <code>main</code>{" "}is protected, changes go through a visible
-                diff, automated checks run, and another person reviews the pull request.
-                These layers catch many mistakes and make normal dbt work low risk.
+                The repository includes a file called <code>.gitignore</code>. It lists
+                paths that Git should leave out of its normal file list. Here is a
+                shortened version of the project&apos;s real rules:
               </p>
+              <CodeBlock
+                lang="text"
+                code={`
+# dbt-generated files
+target/
+logs/
+dbt_packages/
+
+# Local credentials and environments
+.env
+.env.*
+.venv/
+
+# Data-shaped files
+*.csv
+*.xlsx
+*.parquet
+
+# Deliberate exception
+!seeds/*.csv
+`}
+              />
               <p>
-                They are not a promise that sensitive content cannot be committed.
-                Before every push, read <code>git status</code>{" "}and the staged diff.
-                If a file is unfamiliar, generated, data-shaped or unexpectedly large,
-                stop and inspect it rather than staging it.
+                A trailing <code>/</code>{" "}matches a directory. <code>*</code>{" "}is a
+                wildcard. A rule beginning with <code>!</code>{" "}makes an exception to
+                an earlier rule. Because the file is committed, everyone who clones the
+                project gets the same defaults.
               </p>
+              <Callout kind="info" title="Ignored is not the same as forbidden">
+                <p>
+                  <code>.gitignore</code>{" "}only filters untracked files. It does not
+                  inspect contents, and it does not remove a file that Git already tracks.
+                  Treat it as a tidy set of guardrails, not as a security scanner.
+                </p>
+              </Callout>
             </>
           ),
+          check: {
+            prompt: "Why does `target/` not normally appear in `git status`?",
+            options: [
+              "dbt deletes it when each command finishes",
+              "GitHub removes generated files after a push",
+              "The project's `.gitignore` tells Git to ignore that generated directory",
+              "Files inside directories cannot be committed",
+            ],
+            answer: 2,
+            explain:
+              "dbt writes compiled SQL and other generated artefacts to target/. The project ignores that directory because it can be recreated and does not belong in version control.",
+            affirm: ".gitignore keeps reproducible local artefacts out of the file list.",
+          },
         },
         {
-          id: "boundaries",
-          title: "Do not copy these assumptions to another repo",
+          id: "seeds",
+          title: "Seeds are the deliberate data exception",
           body: (
             <>
               <p>
-                The safety described here belongs to this project and its team setup.
-                A new analytical repository may not have the same <code>.gitignore</code>,
-                branch protection, checks, templates or reviewers. Before using git
-                elsewhere, establish those controls and decide whether the repository
-                may contain data at all.
+                A dbt <strong>seed</strong>{" "}is a CSV that intentionally lives under
+                <code>seeds/</code>. Running <code>dbt seed</code>{" "}loads it into
+                Snowflake, and models can use <code>ref()</code>{" "}to depend on it.
+                That is why the ignore file first ignores CSVs, then makes a narrow
+                exception for seed files.
               </p>
               <p>
-                If sensitive data or a credential is ever committed, do not quietly
-                delete it and carry on. Stop, tell the team immediately, and follow the
-                incident process so access can be revoked or the secret rotated.
+                Seeds should be small, static reference datasets that belong to the
+                project&apos;s logic: mappings, categories, code lists or thresholds that
+                change infrequently. They are reviewed and versioned like code. A query
+                export, a sample of patient records or a large source dataset is not a
+                seed, even if you place it in that folder.
               </p>
             </>
           ),
           check: {
-            prompt: "You create a new analysis repo from scratch. What can you assume?",
+            prompt: "Which CSV is a sensible dbt seed?",
             options: [
-              "The dbt project's safety controls apply automatically",
-              "GitHub blocks patient data and credentials from every repository",
-              "Nothing — check visibility, ignores, protections and review controls before adding files",
-              "Pseudonymised extracts are always safe in a private repository",
+              "A daily export of appointments",
+              "A sample of pseudonymised patient records",
+              "A small team-owned mapping from status codes to reporting categories",
+              "The output of a query used to debug a model",
             ],
             answer: 2,
             explain:
-              "Repository controls are configuration, not a property of git. New or personal repos need their own deliberate safety setup before analytical files are added.",
-            affirm: "every repository needs its own explicit safety controls.",
+              "Seeds are for small, stable reference data that forms part of the project's logic. Extracts and record-level examples still belong outside the repository.",
+            affirm: "a seed is reviewed reference data, not a convenient place for an extract.",
+          },
+        },
+        {
+          id: "final-check",
+          title: "Treat the repository as a public record",
+          body: (
+            <>
+              <p>
+                Normal work in this project should leave you with a short, unsurprising
+                list: SQL, YAML, macros, documentation and, occasionally, an intentional
+                seed. Credentials stay in ignored environment files. Build artefacts stay
+                in ignored dbt directories. Data extracts stay outside the project
+                workspace altogether.
+              </p>
+              <p>
+                Once pushed, the code, YAML, comments, filenames, commit authors and
+                commit messages are visible to anyone, including earlier committed
+                versions. Pull request descriptions and review conversations are public
+                on GitHub too. Write them as a professional record that helps a future
+                reader understand the work; never use them for data, credentials or
+                private notes.
+              </p>
+              <p>
+                Before committing, read <code>git status</code>{" "}and review the diff.
+                If an unexpected file appears, stop and understand it before staging.
+                If sensitive material is ever committed, tell the team immediately;
+                deleting it later does not remove it from Git history, and a credential
+                may need to be rotated.
+              </p>
+            </>
+          ),
+          check: {
+            prompt: "Which statement about a pushed commit is true?",
+            options: [
+              "Only the latest version of each file is public",
+              "The code is public, but its comments and commit message are private",
+              "Its tracked files, authorship and message become part of the public history",
+              "Its contents remain private until the pull request is merged",
+            ],
+            answer: 2,
+            explain:
+              "Pushing publishes the branch's committed history. That includes tracked file contents, comments inside those files, authorship and commit messages; GitHub also shows the public pull request discussion.",
+            affirm: "open code creates shared understanding, so write every public part with care.",
           },
         },
       ],

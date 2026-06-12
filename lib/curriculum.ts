@@ -41,9 +41,9 @@ export const LEARN: NavItem[] = [
 export const PRACTICE: NavItem[] = [
   {
     slug: "setup",
-    title: "Set up your machine",
+    title: "Set up your development environment",
     blurb: "Prerequisites, setup commands and connection checks",
-    minutes: 5,
+    minutes: 10,
   },
   {
     slug: "find-a-source",

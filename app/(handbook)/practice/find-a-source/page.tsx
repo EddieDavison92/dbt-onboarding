@@ -4,6 +4,7 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { Callout } from "@/components/Callout";
 import { Checklist } from "@/components/Checklist";
 import { GuidedCourseLink } from "@/components/GuidedCourseLink";
+import { SourceSetupFlow } from "@/components/SourceSetupFlow";
 
 export const metadata: Metadata = { title: "Find your source" };
 
@@ -14,47 +15,110 @@ export default function Page() {
       slug="find-a-source"
       kicker="Field guide · 2"
       title="Find your source"
-      lede="Search before creating anything, then follow the source route the project already uses."
-      minutes={5}
+      lede="A step-by-step route from a Snowflake table to the raw model you can safely use."
+      minutes={10}
     >
       <GuidedCourseLink href="/courses/first-pr/find-or-add-the-source" />
 
-      <h2>Search in this order</h2>
+      <SourceSetupFlow />
+
+      <h2>1 · Write down the table address</h2>
+      <p>
+        Start with the exact <code>DATABASE.SCHEMA.TABLE</code>{" "}from Snowflake. You
+        need the database and schema to choose the route; a table name alone is not enough.
+      </p>
+      <CodeBlock
+        lang="text"
+        code={`DATA_LAKE__NCL.ANALYST_MANAGED.OPENING_HOURS`}
+      />
+
+      <h2>2 · Search before creating anything</h2>
       <ol>
         <li>
-          Search <code>models/staging/</code>. If the table already has a staging model,
-          use it rather than creating a second one.
+          Press <code>Ctrl+P</code>{" "}and search for the likely staging name, such as
+          <code>stg_reference_opening_hours</code>. Reuse it if it exists.
         </li>
         <li>
-          Search <code>models/raw/</code>{" "}for a likely{" "}
-          <code>raw_&#123;domain&#125;_&#123;table&#125;.sql</code>{" "}name.
+          Search for the likely raw name, such as
+          <code>raw_reference_opening_hours</code>.
         </li>
         <li>
-          Open the raw model and use its cleaned column names. Preview it before writing
-          downstream SQL.
+          Search the exact Snowflake table name across the repo in case the project uses
+          a source prefix you did not guess.
         </li>
       </ol>
       <CodeBlock lang="bash" code={`dbt show -s raw_reference_opening_hours`} />
 
-      <h2>If the raw model is missing</h2>
-      <ul>
-        <li>
-          <strong>Auto-mapped schema:</strong>{" "}run the source-generation pipeline. It
-          discovers the table and writes the source YAML and raw model.
-        </li>
-        <li>
-          <strong>Manual schema:</strong>{" "}add the table to the relevant{" "}
-          <code>manual_*.yml</code>, then run the pipeline.
-        </li>
-        <li>
-          <strong>New source or uncertain mapping:</strong>{" "}pair with someone. Changes to{" "}
-          <code>source_mappings.yml</code>{" "}affect more than one model.
-        </li>
-      </ul>
+      <h2>3 · If raw is missing, inspect the registry</h2>
+      <p>
+        Open <code>scripts/sources/source_mappings.yml</code>. Search for the schema and
+        confirm the database in the same block.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>What the registry says</th>
+            <th>Your next move</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Database/schema found; no <code>manual: true</code></td>
+            <td>Do not edit YAML. Run the pipeline.</td>
+          </tr>
+          <tr>
+            <td>Database/schema found with <code>manual: true</code></td>
+            <td>Add the table to that source&apos;s <code>manual_*.yml</code>, then run.</td>
+          </tr>
+          <tr>
+            <td>No matching database/schema</td>
+            <td>Pair with the team before adding a new mapping.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>4 · For a manual schema, add one table block</h2>
+      <p>
+        Open the matching file under <code>models/sources/manual_*.yml</code>. Find the
+        existing source and add the table inside its <code>tables:</code>{" "}list. Copy a
+        neighbouring block to preserve indentation.
+      </p>
+      <CodeBlock
+        lang="yaml"
+        title="models/sources/manual_analyst_managed.yml"
+        code={`- name: OPENING_HOURS
+  identifier: '"OPENING_HOURS"'
+  columns:
+  - name: SITE_CODE
+    data_type: TEXT
+  - name: DAY_OF_WEEK
+    data_type: NUMBER(2,0)`}
+      />
+
+      <h2>5 · Run generation from the repo root</h2>
       <CodeBlock
         lang="bash"
         code={`python scripts/sources/run_all_source_generation.py`}
       />
+      <p>
+        Complete the Snowflake browser sign-in. Wait for all four stages to finish:
+        metadata query, metadata extract, source YAML, then raw models.
+      </p>
+
+      <h2>6 · Inspect and verify the result</h2>
+      <CodeBlock
+        lang="bash"
+        code={`git status --short
+git diff -- models/sources models/raw
+dbt parse
+dbt show -s raw_reference_opening_hours`}
+      />
+      <p>
+        Confirm the expected source YAML changed, the raw model appeared in the mapped
+        domain, dbt parses, and the preview shows cleaned snake_case columns. Review any
+        unrelated drift with the team before including it in your PR.
+      </p>
+
       <Callout kind="warn" title="Generated means replaceable">
         <p>
           Never hand-edit files under <code>models/raw/</code>{" "}or an{" "}
