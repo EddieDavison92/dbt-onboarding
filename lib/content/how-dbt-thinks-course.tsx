@@ -562,8 +562,10 @@ models:
           body: (
             <>
               <p>
-                Repair the first file, then add a second column. Pressing Tab in the
-                editor inserts two spaces, so you can work one nesting level at a time.
+                Repair the first file, then add a second column. Work from the top
+                down: place each line inside its parent before moving to the next one.
+                Pressing Tab inserts two spaces. If you get stuck, ask for the next
+                move and the workshop will explain one line at a time.
               </p>
               <YamlWorkshop />
             </>

@@ -32,23 +32,44 @@ const SIBLING_ANSWER = `${INDENT_ANSWER}
       - name: postcode
         description: Latest known postcode`;
 
+const INDENT_HELP = [
+  "version is top-level file metadata, so it stays against the left edge.",
+  "models is a top-level property, so it also stays against the left edge.",
+  "models opens a list. Its first item sits one level inside it: two spaces, then a dash.",
+  "description belongs to the model. Align it with the model's other properties, four spaces from the left.",
+  "columns is another property of the model. Align it with description, four spaces from the left.",
+  "columns opens a list. Its first column sits one level inside it: six spaces, then a dash.",
+  "This description belongs to person_id, so it sits one level inside that column item: eight spaces.",
+  "data_tests also belongs to person_id. Align it with the column description, eight spaces from the left.",
+  "data_tests opens a list. Its first test sits one level inside it: ten spaces, then a dash.",
+  "unique is a second test in the same list. Align it with not_null at ten spaces.",
+] as const;
+
+const SIBLING_HELP = [
+  ...INDENT_HELP,
+  "postcode is a second item in the columns list. Align it with person_id: six spaces, then a dash.",
+  "This description belongs to postcode, so move it one level inside the postcode item: eight spaces.",
+] as const;
+
 const ROUNDS = [
   {
     id: "indent",
     label: "1 · Repair the structure",
     prompt:
-      "The words are right, but every nested line has fallen left. Add spaces so each property belongs to the object above it.",
+      "Every nested line has fallen left. Add spaces so each property belongs to the object above it. You can rewrite the descriptions in your own words.",
     start: INDENT_START,
     answer: INDENT_ANSWER,
+    help: INDENT_HELP,
     done: "The indentation now says: one model, containing one column, containing two tests.",
   },
   {
     id: "sibling",
     label: "2 · Add a sibling column",
     prompt:
-      "Replace the comment with a postcode column. It belongs beside person_id, with the description nested beneath it.",
+      "Replace the comment with a postcode column. It belongs beside person_id, with a description nested beneath it. The description wording is yours.",
     start: SIBLING_START,
     answer: SIBLING_ANSWER,
+    help: SIBLING_HELP,
     done: "postcode is a second item in the columns list, not a child of person_id.",
   },
 ] as const;
@@ -61,11 +82,18 @@ function leadingSpaces(line: string) {
   return line.length - line.trimStart().length;
 }
 
-function feedbackFor(value: string, answer: string) {
-  if (value.includes("\t")) {
-    return "A tab has slipped in. YAML indentation must use spaces; replace the tab before checking again.";
-  }
+function lineMatches(got: string | undefined, wanted: string | undefined) {
+  if (got === undefined || wanted === undefined) return got === wanted;
+  if (!wanted.trimStart().startsWith("description:")) return got === wanted;
 
+  const expectedIndent = leadingSpaces(wanted);
+  return (
+    leadingSpaces(got) === expectedIndent &&
+    /^description:\s+\S.*$/.test(got.trimStart())
+  );
+}
+
+function firstDifference(value: string, answer: string) {
   const actual = clean(value).split("\n");
   const expected = clean(answer).split("\n");
   const max = Math.max(actual.length, expected.length);
@@ -73,23 +101,16 @@ function feedbackFor(value: string, answer: string) {
   for (let index = 0; index < max; index += 1) {
     const got = actual[index];
     const wanted = expected[index];
-    if (got === wanted) continue;
-
-    if (got === undefined) {
-      return `Line ${index + 1} is missing. Add: ${wanted.trim()}`;
-    }
-    if (wanted === undefined) {
-      return `Line ${index + 1} is extra. Remove it, then check again.`;
-    }
-    if (got.trim() === wanted.trim()) {
-      const spaces = leadingSpaces(wanted);
-      return `Line ${index + 1} has the right words. It needs ${spaces} leading ${spaces === 1 ? "space" : "spaces"}.`;
-    }
-
-    return `Line ${index + 1} should read: ${wanted.trim()}`;
+    if (!lineMatches(got, wanted)) return { index, got, wanted };
   }
 
-  return "Something still differs from the target structure. Check the spacing and punctuation.";
+  return null;
+}
+
+function correctLineCount(value: string, answer: string) {
+  const actual = clean(value).split("\n");
+  const expected = clean(answer).split("\n");
+  return expected.filter((line, index) => lineMatches(actual[index], line)).length;
 }
 
 export function YamlWorkshop() {
@@ -98,9 +119,13 @@ export function YamlWorkshop() {
   const [values, setValues] = useState<string[]>([ROUNDS[0].start, ROUNDS[1].start]);
   const [checked, setChecked] = useState(false);
   const [solved, setSolved] = useState<boolean[]>([false, false]);
+  const [helpOpen, setHelpOpen] = useState<boolean[]>([false, false]);
   const current = ROUNDS[round];
   const value = values[round];
-  const correct = clean(value) === clean(current.answer);
+  const difference = firstDifference(value, current.answer);
+  const correct = difference === null;
+  const expectedLines = clean(current.answer).split("\n");
+  const linesCorrect = correctLineCount(value, current.answer);
 
   const update = (next: string) => {
     setValues((all) => all.map((item, index) => (index === round ? next : item)));
@@ -109,7 +134,10 @@ export function YamlWorkshop() {
 
   const check = () => {
     setChecked(true);
-    if (!correct) return;
+    if (!correct) {
+      setHelpOpen((all) => all.map((item, index) => (index === round ? true : item)));
+      return;
+    }
 
     const next = solved.map((item, index) => (index === round ? true : item));
     setSolved(next);
@@ -119,6 +147,28 @@ export function YamlWorkshop() {
   const openRound = (index: number) => {
     setRound(index);
     setChecked(solved[index]);
+  };
+
+  const applyNextMove = () => {
+    if (!difference) return;
+
+    const lines = clean(value).split("\n");
+    if (difference.wanted === undefined) {
+      lines.splice(difference.index, 1);
+    } else {
+      lines[difference.index] = difference.wanted;
+    }
+    update(lines.join("\n"));
+  };
+
+  const reset = () => {
+    update(current.start);
+    setHelpOpen((all) => all.map((item, index) => (index === round ? false : item)));
+  };
+
+  const fillAnswer = () => {
+    update(current.answer);
+    setHelpOpen((all) => all.map((item, index) => (index === round ? false : item)));
   };
 
   return (
@@ -214,6 +264,18 @@ export function YamlWorkshop() {
         </aside>
       </div>
 
+      <div className="flex items-center gap-3 border-t-2 border-ink bg-paper-warm px-4 py-2.5">
+        <div className="h-2 flex-1 overflow-hidden rounded-full border border-ink/15 bg-paper">
+          <div
+            className="h-full bg-layer-staging transition-[width] duration-300"
+            style={{ width: `${(linesCorrect / expectedLines.length) * 100}%` }}
+          />
+        </div>
+        <p className="!my-0 whitespace-nowrap font-mono text-[10px] text-ink-soft">
+          {linesCorrect} of {expectedLines.length} lines in place
+        </p>
+      </div>
+
       {checked && (
         <div
           className={`rise border-t-2 border-ink px-4 py-3 text-sm ${
@@ -222,26 +284,88 @@ export function YamlWorkshop() {
         >
           <strong className="text-ink">{correct ? "Valid structure. " : "Not yet. "}</strong>
           <span className="text-ink-soft">
-            {correct ? current.done : feedbackFor(value, current.answer)}
+            {correct
+              ? current.done
+              : `Start with line ${(difference?.index ?? 0) + 1}. YAML is easiest to repair from the top down.`}
           </span>
+        </div>
+      )}
+
+      {helpOpen[round] && !correct && difference && (
+        <section className="rise border-t-2 border-ink bg-[#fff7d8] px-4 py-4" aria-live="polite">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="max-w-xl">
+              <p className="!my-0 font-display text-[10px] font-extrabold uppercase tracking-[0.18em] !text-flame-deep">
+                Next move · line {difference.index + 1}
+              </p>
+              <p className="!mb-0 !mt-1.5 text-sm text-ink-soft">
+                {current.help[difference.index] ??
+                  "This line does not belong in the target structure. Remove it before continuing."}
+              </p>
+            </div>
+            {difference.wanted !== undefined && (
+              <span className="rounded-full border border-ink/15 bg-paper px-2.5 py-1 font-mono text-[10px] text-ink-soft">
+                {leadingSpaces(difference.wanted)} leading spaces
+              </span>
+            )}
+          </div>
+
+          {difference.wanted !== undefined && (
+            <div className="mt-3 overflow-x-auto rounded-lg border-2 border-ink bg-graphite-deep px-3 py-2 font-mono text-xs text-[#e8eaf2]">
+              <span className="mr-3 select-none text-white/35">{difference.index + 1}</span>
+              <span className="whitespace-pre">{difference.wanted}</span>
+            </div>
+          )}
+
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+            <p className="!my-0 text-xs text-ink-soft">
+              Try making this edit yourself, or apply just this line and study the next one.
+            </p>
+            <button
+              type="button"
+              onClick={applyNextMove}
+              className="rounded-lg border-2 border-ink bg-paper px-3 py-1.5 font-display text-xs font-extrabold uppercase tracking-wider text-ink transition hover:border-flame hover:text-flame-deep"
+            >
+              Apply this move
+            </button>
+          </div>
+        </section>
+      )}
+
+      {helpOpen[round] && correct && !checked && (
+        <div className="rise border-t-2 border-ink bg-layer-staging/10 px-4 py-3 text-sm text-ink-soft">
+          The structure now matches the target. Check the YAML to complete this round.
         </div>
       )}
 
       <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-line bg-paper-warm p-3">
         <button
           type="button"
-          onClick={() => update(current.start)}
+          onClick={reset}
           className="rounded-lg border-2 border-line px-3 py-1.5 font-display text-xs font-extrabold uppercase tracking-wider text-ink-soft transition hover:border-ink"
         >
           Reset
         </button>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap justify-end gap-2">
+          {!correct && !helpOpen[round] && (
+            <button
+              type="button"
+              onClick={() =>
+                setHelpOpen((all) =>
+                  all.map((item, index) => (index === round ? true : item)),
+                )
+              }
+              className="rounded-lg border-2 border-line px-3 py-1.5 font-display text-xs font-extrabold uppercase tracking-wider text-ink-soft transition hover:border-ink hover:text-ink"
+            >
+              Show next move
+            </button>
+          )}
           <button
             type="button"
-            onClick={() => update(current.answer)}
+            onClick={fillAnswer}
             className="rounded-lg border-2 border-line px-3 py-1.5 font-display text-xs font-extrabold uppercase tracking-wider text-ink-soft transition hover:border-flame hover:text-flame-deep"
           >
-            Fill answer
+            Show completed YAML
           </button>
           {solved[round] && round === 0 ? (
             <button
