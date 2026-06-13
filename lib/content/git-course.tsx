@@ -838,7 +838,7 @@ git push                        # share the branch
     {
       slug: "pull-requests",
       title: "Pull requests",
-      blurb: "How review and automated checks get a branch into production",
+      blurb: "How automated checks and review get a branch into production",
       minutes: 9,
       steps: [
         {
@@ -859,23 +859,69 @@ git push                        # share the branch
           ),
         },
         {
-          id: "review",
-          title: "Safety net one: a human review",
+          id: "ci",
+          title: "Safety net one: automation",
           body: (
             <>
               <p>
-                A teammate reads your changes and applies context that automated
-                checks do not have. Is the model in the right layer, and is the logic
-                reusable? Are the clinical definitions sound, with code lists broad
-                enough for the intended population? Is the code straightforward to
-                maintain, and is it clear what would need to change when the definition
-                changes?
+                When a PR opens, <strong>CI</strong>{" "}(continuous integration) runs
+                fast checks on the branch. dbt compiles the project against the dev
+                catalogue, catching broken references, Jinja, YAML and SQL. Other
+                checks make sure changed models have descriptions and tests, use
+                <code>ref()</code>{" "}and <code>source()</code>{" "}properly, and do not
+                skip the staging layer. Missing ownership is suggested in a comment.
               </p>
               <p>
-                CodeRabbit and CI do a thorough implementation pass. They can flag
-                missing tests, suspicious joins and likely fan-out. Those are useful
-                signals, but they cannot prove that the intended grain or clinical
-                definition is correct. That judgement belongs to the team.
+                CodeRabbit reviews the diff once the PR is no longer a draft. It looks
+                for risks such as suspicious joins, likely fan-out, missing tests and
+                models in the wrong layer.
+              </p>
+              <p>
+                When you request a human review, a slower validation builds and tests
+                the changed models against real data in Snowflake DEV. Changes to a
+                model&apos;s YAML include that model; changes to a macro include models
+                that use it. This is the closest rehearsal of what will run in
+                production.
+              </p>
+              <p>
+                Failing checks show a red cross on the PR. Fix the issue, commit and
+                push to the same branch; the relevant checks run again. All required
+                checks must pass before the PR can merge.
+              </p>
+            </>
+          ),
+          check: {
+            prompt: "A CI check on your PR goes red. The right response is…",
+            options: [
+              "Fix the issue locally, commit, and `git push` to the same branch — checks re-run",
+              "Open a new PR so the checks start fresh",
+              "Ask someone to merge it anyway — checks are advisory",
+              "Delete the branch and start again",
+            ],
+            answer: 0,
+            explain:
+              "A red check is information: open its details, read the error, fix it, commit and push. The relevant checks run again on the same PR. Failing a check is a normal part of the loop, not a verdict.",
+            affirm: "fix locally and push to the same branch — the checks run again.",
+          },
+        },
+        {
+          id: "review",
+          title: "Safety net two: a human review",
+          body: (
+            <>
+              <p>
+                With the automated findings available, a teammate reads your changes
+                and applies context that automation does not have. Is the model in the
+                right layer, and is the logic reusable? Are the clinical definitions
+                sound, with code lists broad enough for the intended population? Is
+                the code straightforward to maintain, and is it clear what would need
+                to change when the definition changes?
+              </p>
+              <p>
+                CodeRabbit and CI can flag missing tests, suspicious joins and likely
+                fan-out. Those are useful signals, but they cannot prove that the
+                intended grain or clinical definition is correct. That judgement
+                belongs to the team.
               </p>
               <p>
                 Reviewers leave questions, suggestions and approvals. You respond by
@@ -890,39 +936,6 @@ git push                        # share the branch
               </p>
             </>
           ),
-        },
-        {
-          id: "ci",
-          title: "Safety net two: automated checks",
-          body: (
-            <>
-              <p>
-                The moment a PR opens, robots get to work — this is{" "}
-                <strong>CI</strong>{" "}(continuous integration). In our project the
-                checks compile every model, lint the code, verify ownership and
-                descriptions, build your changed models against real data in a dev
-                environment, and an automated reviewer (CodeRabbit) comments on the
-                diff.
-              </p>
-              <p>
-                Each check reports a green tick or a red cross on the PR. Merging
-                requires green.
-              </p>
-            </>
-          ),
-          check: {
-            prompt: "A CI check on your PR goes red. The right response is…",
-            options: [
-              "Fix the issue locally, commit, and `git push` to the same branch — checks re-run",
-              "Open a new PR so the checks start fresh",
-              "Ask someone to merge it anyway — checks are advisory",
-              "Delete the branch and start again",
-            ],
-            answer: 0,
-            explain:
-              "A red check is information: click Details, read the last 30 lines of the log, fix, commit, push. The same PR re-runs everything. Failing a check is a normal part of the loop, not a verdict.",
-            affirm: "fix locally, push to the same branch — the checks re-run themselves.",
-          },
         },
         {
           id: "merge",
