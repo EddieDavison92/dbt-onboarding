@@ -891,7 +891,7 @@ git push                        # share the branch
                 <div className="grid gap-px bg-white/10 sm:grid-cols-2">
                   {[
                     ["Why", "The problem or user need this change addresses."],
-                    ["What", "The models changed, their purpose and intended grain."],
+                    ["What", "The models changed, each model's job and how they fit together."],
                     ["Checked", "What you ran, what passed and any limits to testing."],
                     ["Review", "The decisions where you want a colleague's attention."],
                   ].map(([label, copy]) => (
@@ -987,22 +987,37 @@ git push                        # share the branch
           body: (
             <>
               <p>
-                The checks provide evidence. A teammate applies the context that
-                automation does not have.
+                Start with the PR description, then read the changed models and their
+                lineage. A good review asks questions in three places.
               </p>
               <div className="my-6 grid gap-3 sm:grid-cols-3">
                 {[
-                  ["Architecture", "Right layer", "Reusable logic", "Clear dependencies"],
-                  ["Clinical", "Sound definition", "Broad code lists", "Right population"],
-                  ["Maintenance", "Readable approach", "Visible assumptions", "Clear future changes"],
+                  [
+                    "Architecture",
+                    "Does this belong in this layer?",
+                    "Could it reuse an existing model?",
+                    "Are its dependencies clear?",
+                  ],
+                  [
+                    "Clinical",
+                    "Does this identify the intended population?",
+                    "Are code lists and exclusions sound?",
+                    "Do dates and edge cases make sense?",
+                  ],
+                  [
+                    "Maintenance",
+                    "Can the next person follow the logic?",
+                    "Are assumptions visible?",
+                    "Where would a future definition change?",
+                  ],
                 ].map(([title, ...questions], index) => (
                   <div key={title} className="rounded-2xl border-2 border-ink bg-paper p-4 shadow-[4px_4px_0_0_var(--color-layer-staging)]">
                     <div className="mb-3 flex h-8 w-8 items-center justify-center rounded-full bg-ink font-mono text-xs font-black text-paper">{index + 1}</div>
                     <p className="!my-0 font-display text-base font-extrabold !text-ink">{title}</p>
                     <ul className="!mb-0 !mt-3 space-y-2 !pl-0">
                       {questions.map((question) => (
-                        <li key={question} className="flex items-center gap-2 text-sm !text-ink-soft">
-                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-layer-staging" aria-hidden />
+                        <li key={question} className="flex items-start gap-2 text-sm leading-5 !text-ink-soft">
+                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-layer-staging" aria-hidden />
                           {question}
                         </li>
                       ))}
@@ -1010,22 +1025,43 @@ git push                        # share the branch
                   </div>
                 ))}
               </div>
-              <div className="my-6 grid overflow-hidden rounded-2xl border-2 border-ink sm:grid-cols-2">
-                <div className="bg-mist p-4">
-                  <p className="!my-0 font-display text-xs font-extrabold uppercase tracking-[0.12em] !text-ink">Automation finds clues</p>
-                  <p className="!mb-0 !mt-2 text-sm !text-ink-soft">Missing tests, suspicious joins, likely fan-out.</p>
+              <div className="my-6 overflow-hidden rounded-2xl border-2 border-ink bg-graphite-deep shadow-[5px_5px_0_0_var(--color-layer-modelling)]">
+                <div className="border-b border-white/10 px-5 py-3">
+                  <p className="!my-0 font-display text-xs font-extrabold uppercase tracking-[0.14em] !text-white">A useful review comment</p>
                 </div>
-                <div className="border-t-2 border-ink bg-layer-staging/10 p-4 sm:border-l-2 sm:border-t-0">
-                  <p className="!my-0 font-display text-xs font-extrabold uppercase tracking-[0.12em] !text-ink">People make judgements</p>
-                  <p className="!mb-0 !mt-2 text-sm !text-ink-soft">Whether the grain, clinical meaning and design are right.</p>
+                <div className="grid gap-px bg-white/10 sm:grid-cols-[0.8fr_1.2fr_1fr]">
+                  {[
+                    ["Point", "This join can return several observations per person."],
+                    ["Reason", "That may change the model from one row per person and inflate downstream counts."],
+                    ["Question", "Should we select the latest observation before joining?"],
+                  ].map(([label, copy]) => (
+                    <div key={label} className="bg-graphite-deep p-4">
+                      <p className="!my-0 font-display text-[10px] font-extrabold uppercase tracking-[0.16em] !text-[#7ee2c0]">{label}</p>
+                      <p className="!mb-0 !mt-2 text-sm leading-6 !text-white/75">{copy}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
               <p>
-                Reply to comments and push fixes to the same branch; the PR updates
-                automatically. Comments are about the code, not about you.
+                A review can approve the approach, ask a question or suggest a change.
+                It is not a hunt for mistakes. Reply to comments and push fixes to the
+                same branch; the PR updates automatically.
               </p>
             </>
           ),
+          check: {
+            prompt: "Which comment is most useful in a code review?",
+            options: [
+              "This looks complicated",
+              "CodeRabbit did not flag anything, so this is fine",
+              "This join may return several rows per person and change the grain. Should we select one observation before joining?",
+              "Please rewrite this in the way I would have written it",
+            ],
+            answer: 2,
+            explain:
+              "Useful review feedback points to specific code, explains why it matters and asks a clear question. It helps the author assess the design rather than merely announcing a preference.",
+            affirm: "specific code, a reason and a clear question make feedback actionable.",
+          },
         },
         {
           id: "merge",
