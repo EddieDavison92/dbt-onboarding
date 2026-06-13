@@ -902,8 +902,12 @@ Completed successfully
               <p>
                 <code>run</code>{" "}creates without testing; <code>test</code>{" "}
                 tests without creating; <code>build</code>{" "}does both, in DAG
-                order, and stops downstream work when a test fails. For
-                everyday model work, build is the answer.
+                order. The order matters: dbt builds a model, then tests the rows
+                it just wrote. If an error-level test fails, dbt leaves that model
+                in place and skips selected downstream nodes. Existing downstream
+                tables stay on their previous version, so they become stale rather
+                than being rebuilt from data that failed its checks. For everyday
+                model work, build is the answer.
               </p>
             </>
           ),
@@ -932,6 +936,17 @@ Completed successfully
                 data</strong>{" "}that nobody had written down. The usual first-model
                 discoveries:
               </p>
+              <Callout kind="warn" title="The model has already been built">
+                <p>
+                  <code>dbt build</code>{" "}writes the model before it runs that
+                  model&apos;s tests. A failing error-level test does not roll the
+                  relation back. Instead, dbt marks the build as failed and skips
+                  selected downstream nodes. Any existing downstream tables remain
+                  on their last successful version: stale, rather than updated from
+                  the failed model. Someone querying the failed model directly can
+                  still see its new rows.
+                </p>
+              </Callout>
               <ul>
                 <li>
                   <strong>Grain test fails</strong> — the source has duplicates you
@@ -1251,7 +1266,8 @@ git pull
                 <li>the nightly build rebuilds your model and runs your tests;</li>
                 <li>
                   if the feed changes in six months, your grain test raises the
-                  alarm — to the team, before any dashboard is wrong;
+                  alarm; dbt skips selected descendants, leaving existing downstream
+                  tables on their last successful version;
                 </li>
                 <li>
                   your column descriptions are live in dbt docs and as Snowflake
@@ -1270,14 +1286,14 @@ git pull
             prompt: "Six months on, the feed starts sending duplicate rows. Who finds out, and how?",
             options: [
               "A dashboard user notices odd numbers and emails around",
-              "The nightly build — your grain test fails and the team sees it before any output is consumed",
+              "The nightly build — your model is updated, its grain test fails, and selected downstream nodes are skipped",
               "Nobody, unless someone re-checks the model",
               "Snowflake blocks the duplicate rows automatically",
             ],
             answer: 1,
             explain:
-              "This is the payoff of the YAML you wrote in twenty minutes: your understanding of the data became an assertion that runs every night, forever, guarding everyone downstream of you.",
-            affirm: "your tests now guard the pipeline every night, without you.",
+              "The failed model has already been built, but dbt isolates the problem in the DAG. Existing downstream relations are not rebuilt from it, so consumers of those relations see older data rather than newly propagated bad data.",
+            affirm: "tests isolate failed data; downstream relations stay on their previous version.",
           },
         },
       ],

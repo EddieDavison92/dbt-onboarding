@@ -54,9 +54,22 @@ models:
         for <strong>rows that break the rule</strong>. Zero rows back = pass.{" "}
         <code>unique</code>{" "}on <code>person_id</code>{" "}literally runs “group by person_id
         having count(*) &gt; 1”. Tests run when you <code>dbt build</code>, in CI on your
-        pull request, and in the nightly production build — so a problem in a feed is
-        caught by the pipeline rather than discovered by a dashboard user.
+        pull request, and in the nightly production build. A problem in a feed is
+        recorded against the model that failed, with the downstream nodes that were
+        prevented from refreshing visible in the run results.
       </p>
+      <Callout kind="warn" title="A failed test does not roll back the model">
+        <p>
+          During <code>dbt build</code>, dbt builds a model and then tests the rows it
+          wrote. If an error-level test fails, the updated relation remains in the
+          warehouse. dbt marks the build as failed and skips selected downstream
+          nodes. Where those downstream tables already exist, they remain on their
+          last successful version: stale, rather than rebuilt from data that failed
+          its checks. Anything querying the failed model directly can still see its
+          new rows. Tests configured with <code>severity: warn</code>{" "}raise a warning
+          instead and do not block downstream nodes.
+        </p>
+      </Callout>
       <p>The tests you will use constantly:</p>
       <table>
         <thead>

@@ -15,7 +15,7 @@ const NODES: { id: NodeId; label: string; layer: string }[] = [
 const EXPLANATIONS: Record<Command, string> = {
   run: "All three models are created. Their data tests are not run.",
   test: "The existing relations are left alone. Their tests run, and one fails.",
-  build: "Each model is created, then tested. The failed staging test stops its downstream model.",
+  build: "stg_people is built first, then its test fails. dbt leaves that updated model in place but skips dim_people, so the existing downstream table becomes stale rather than being rebuilt from failed data.",
 };
 
 const EMPTY_MODELS: Record<NodeId, Status> = { raw: "waiting", stg: "waiting", dim: "waiting" };
@@ -28,6 +28,11 @@ function statusLabel(status: Status) {
   if (status === "skipped") return "skipped";
   if (status === "unchanged") return "not run";
   return "waiting";
+}
+
+function modelStatusLabel(status: Status) {
+  if (status === "passed") return "built";
+  return statusLabel(status);
 }
 
 function statusClass(status: Status) {
@@ -171,7 +176,7 @@ export function CommandDAG() {
                     {node.label}
                   </code>
                   <span className="mt-1 block font-display text-[9px] font-bold uppercase tracking-wider">
-                    model · {statusLabel(models[node.id])}
+                    model · {modelStatusLabel(models[node.id])}
                   </span>
                 </div>
                 <div className="mx-auto h-3 w-px bg-line" />

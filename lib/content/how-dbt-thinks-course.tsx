@@ -684,9 +684,18 @@ models:
                 Tests run when a model is built, again on every pull request,
                 and again in the nightly production build. So when a feed
                 starts sending duplicates six months from now, the test fails
-                that night — and the team hears about it before any dashboard
-                shows a wrong number.
+                that night and the team hears about it immediately.
               </p>
+              <Callout kind="warn" title="Build first, then test">
+                <p>
+                  dbt has already updated the model by the time its test runs. If
+                  the test fails, dbt leaves that model in place but skips selected
+                  models downstream of it. Existing downstream tables keep their
+                  previous successful data. They become stale rather than being
+                  rebuilt from rows that failed the test. A tool that reads the
+                  failed model directly can still see those new rows.
+                </p>
+              </Callout>
               <p>
                 That is the trade dbt offers: write down what you know about
                 the data once, and the pipeline checks it every night, forever,
@@ -698,14 +707,14 @@ models:
             prompt: "Six months on, a feed starts sending duplicate rows. Who finds out first, and how?",
             options: [
               "A dashboard user notices odd numbers",
-              "The nightly build — the grain test fails before any output is consumed",
+              "The nightly build — the model is updated, its grain test fails, and selected downstream models are skipped",
               "Nobody, unless someone re-checks the model",
               "Snowflake blocks duplicates automatically",
             ],
             answer: 1,
             explain:
-              "A test is your understanding of the data turned into an assertion that runs nightly. It guards everyone downstream of the model — including future you.",
-            affirm: "tests raise the alarm before dashboards go wrong.",
+              "A test is your understanding of the data turned into an assertion that runs nightly. The failed model remains updated, but dbt does not propagate it through the selected DAG; existing downstream relations stay on their previous version.",
+            affirm: "the failed model is isolated; downstream data stays on its previous version.",
           },
         },
       ],
