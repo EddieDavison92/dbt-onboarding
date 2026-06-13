@@ -915,46 +915,69 @@ git push                        # share the branch
           body: (
             <>
               <p>
-                Automation arrives in stages. Each stage answers a different question.
+                These checks do not all run as soon as the PR opens. Each one has its
+                own trigger and runs only when that condition is met.
+              </p>
+              <div className="my-5 grid overflow-hidden rounded-2xl border-2 border-ink sm:grid-cols-3">
+                {[
+                  ["Fast gates", "Running", "bg-layer-staging"],
+                  ["CodeRabbit", "Waiting for PR ready", "bg-layer-modelling"],
+                  ["Snowflake DEV", "Waiting for review", "bg-layer-published"],
+                ].map(([label, state, dotClass], index) => (
+                  <div key={label} className={`flex items-center gap-2 bg-paper px-4 py-3 ${index > 0 ? "border-t-2 border-ink sm:border-l-2 sm:border-t-0" : ""}`}>
+                    <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${dotClass}`} aria-hidden />
+                    <div>
+                      <p className="!my-0 font-display text-xs font-extrabold !text-ink">{label}</p>
+                      <p className="!my-0 font-mono text-[9px] uppercase tracking-wide !text-ink-soft">{state}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-sm !text-ink-soft">
+                That is the state of a new draft PR: the fast gates run, while the
+                other automation waits.
               </p>
               <div className="my-6 grid gap-3 lg:grid-cols-3">
                 {[
                   {
-                    number: "01",
                     trigger: "PR opens or updates",
                     title: "Fast gates",
+                    result: "Fast gates run",
                     dotClass: "bg-layer-staging",
                     checks: ["Fusion compile", "Descriptions + tests", "Refs + layer rules", "Ownership suggestion"],
                   },
                   {
-                    number: "02",
                     trigger: "PR leaves draft",
                     title: "CodeRabbit",
+                    result: "CodeRabbit runs",
                     dotClass: "bg-layer-modelling",
                     checks: ["Joins + fan-out", "Test gaps", "Layer placement", "dbt conventions"],
                   },
                   {
-                    number: "03",
-                    trigger: "Review requested",
+                    trigger: "Review requested or CI label added",
                     title: "Snowflake DEV",
+                    result: "Snowflake DEV runs",
                     dotClass: "bg-layer-published",
                     checks: ["Changed models build", "Data tests run", "YAML changes included", "Macro users included"],
                   },
                 ].map((stage) => (
-                  <div key={stage.number} className="relative overflow-hidden rounded-2xl border-2 border-ink bg-paper p-4 shadow-[4px_4px_0_0_var(--color-ink)]">
-                    <div className="mb-4 flex items-start justify-between gap-3">
-                      <span className="font-mono text-2xl font-black text-ink-faint">{stage.number}</span>
-                      <span className="rounded-full bg-mist px-2.5 py-1 text-right font-mono text-[9px] font-bold uppercase tracking-wide text-ink-soft">{stage.trigger}</span>
+                  <div key={stage.title} className="relative overflow-hidden rounded-2xl border-2 border-ink bg-paper shadow-[4px_4px_0_0_var(--color-ink)]">
+                    <div className="border-b-2 border-ink bg-mist p-4">
+                      <p className="!my-0 font-display text-[9px] font-extrabold uppercase tracking-[0.16em] !text-ink-soft">When</p>
+                      <p className="!mb-0 !mt-1 text-sm font-bold !text-ink">{stage.trigger}</p>
                     </div>
-                    <p className="!my-0 font-display text-lg font-extrabold !text-ink">{stage.title}</p>
-                    <ul className="!mb-0 !mt-3 space-y-2 !pl-0">
-                      {stage.checks.map((check) => (
-                        <li key={check} className="flex items-start gap-2 text-sm !text-ink-soft">
-                          <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${stage.dotClass}`} aria-hidden />
-                          <span>{check}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="p-4">
+                      <p className="!my-0 font-display text-[9px] font-extrabold uppercase tracking-[0.16em] !text-ink-soft">Then</p>
+                      <p className="!mb-0 !mt-1 font-display text-lg font-extrabold !text-ink">{stage.result}</p>
+                      <ul className="!mb-0 !mt-3 space-y-2 !pl-0">
+                        {stage.checks.map((check) => (
+                          <li key={check} className="flex items-start gap-2 text-sm !text-ink-soft">
+                            <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${stage.dotClass}`} aria-hidden />
+                            <span>{check}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 ))}
               </div>
