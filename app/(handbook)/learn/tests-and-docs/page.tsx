@@ -14,7 +14,7 @@ export default function Page() {
       kicker="Learn 04"
       title="Tests & documentation"
       lede="Every model travels with a YAML file: who owns it, what each column means, and the assertions that must hold every single night."
-      minutes={7}
+      minutes={9}
     >
       <h2>The YAML next to your SQL</h2>
       <p>
@@ -47,6 +47,44 @@ models:
         description: Pseudonymised NHS number (surrogate key for patient)
 `}
       />
+
+      <h2>How YAML expresses structure</h2>
+      <p>
+        YAML is structured text. A colon names a property, a dash starts an item in a
+        list, and indentation says what belongs inside what. In the example above,
+        <code>models:</code>{" "}contains a list of models; <code>- name:</code>{" "}starts
+        one model; and its description, config, tests and columns are indented beneath
+        it.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Mark</th>
+            <th>Meaning</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>name:</code></td>
+            <td>A property called <code>name</code></td>
+          </tr>
+          <tr>
+            <td><code>- name:</code></td>
+            <td>A new item in a list</td>
+          </tr>
+          <tr>
+            <td>Two more spaces</td>
+            <td>This line belongs inside the object above it</td>
+          </tr>
+        </tbody>
+      </table>
+      <Callout kind="info" title="Use spaces, not tabs">
+        <p>
+          This project uses two spaces for each level of indentation. If dbt reports a
+          YAML parsing error, first check the line it names and the indentation just
+          above it. The wording can be yours; it is the shape that YAML requires.
+        </p>
+      </Callout>
 
       <h2>How tests work</h2>
       <p>
@@ -143,10 +181,12 @@ where decision_date < referral_request_received_date
         Column <code>description:</code>{" "}fields end up in three places: the dbt docs
         site, Snowflake column comments (we persist docs to the warehouse), and in front
         of the next analyst deciding whether they can trust your column. The{" "}
-        <code>owner</code>{" "}block is enforced by CI — every model must name a human.
+        <code>owner</code>{" "}block names the human responsible for the model. If it is
+        missing from a changed model, the ownership workflow suggests the block inline
+        on the PR rather than failing the build.
       </p>
 
-      <h2>Don&apos;t write YAML by hand</h2>
+      <h2>Generate the skeleton, then supply the meaning</h2>
       <p>The project ships a generator that scaffolds it from the built model:</p>
       <CodeBlock
         lang="bash"
@@ -156,7 +196,9 @@ dbt run-operation generate_model_yaml --args '{"model_names": ["stg_your_model"]
       />
       <p>
         It emits the model and column skeleton with descriptions inherited from upstream
-        where they exist. You fill in the gaps and add tests.
+        where they exist. This removes repetitive typing; you still need to understand
+        the structure, fill in the gaps and add the tests that express the model&apos;s
+        contract.
       </p>
 
       <Quiz

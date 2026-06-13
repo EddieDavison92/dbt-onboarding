@@ -51,20 +51,28 @@ gh pr create --fill
       </Callout>
 
       <h2>Use a useful description</h2>
+      <p>
+        Treat the PR as a proposal, not a receipt. A reviewer should be able to see why
+        the change exists, what job each model does, what you have already checked and
+        where their judgement would help most.
+      </p>
       <CodeBlock
         lang="text"
         title="PR description"
         code={`
-## What
-Adds stg_reference_opening_hours: one row per site per weekday.
-
 ## Why
 Needed for the access dashboard; no staging model exists today.
 
-## Checks
+## What
+- stg_reference_opening_hours standardises the source's site, weekday and opening-time fields.
+- Its YAML documents the output and tests the expected key.
+
+## Checked
 - dbt build -s stg_reference_opening_hours green locally
-- Grain verified on (site_code, day_of_week)
 - Null closes_at retained where is_open_24h is true
+
+## Review focus
+- Does the representation of 24-hour opening make the downstream use clear?
 `}
       />
 
@@ -82,7 +90,7 @@ Needed for the access dashboard; no staging model exists today.
           { key: "branch", label: <>Work is on a named branch, not <code>main</code></> },
           { key: "diff", label: <>Staged diff contains only intended, non-sensitive changes</> },
           { key: "build", label: <>Relevant local build is green</> },
-          { key: "pr", label: <>PR explains what changed, why, and how it was checked</> },
+          { key: "pr", label: <>PR explains why, each model&apos;s job, checks run and review focus</> },
         ]}
       />
     </LessonShell>

@@ -24,7 +24,7 @@ const STEPS = [
   },
   {
     name: "pull request",
-    desc: "Ask for review; CI starts checking automatically",
+    desc: "Propose the change; checks run as their conditions are met",
     cmd: "gh pr create",
   },
   {
@@ -42,7 +42,7 @@ export default function Page() {
       kicker="Learn 05"
       title="Git & pull requests"
       lede="Git is version control for the whole project; a pull request is how your change gets a human review and automated checks before it reaches production."
-      minutes={9}
+      minutes={12}
     >
       <h2>The mental model</h2>
       <p>
@@ -50,8 +50,9 @@ export default function Page() {
         edit it directly (it is locked). Instead you take a <strong>branch</strong>: a
         parallel copy where you can work freely. When your work is ready, a{" "}
         <strong>pull request (PR)</strong>{" "}proposes merging your changes into{" "}
-        <code>main</code>. Between proposal and merge sit the two safety nets: a human
-        review and automated CI checks.
+        <code>main</code>. Between proposal and merge, automated checks supply evidence
+        about the implementation and a human reviewer decides whether the design and
+        definitions make sense.
       </p>
 
       <div className="my-6 flex max-w-[72ch] flex-col gap-0">
@@ -142,49 +143,85 @@ git commit -m "docs: describe waiting list snapshot logic"
         forget about it).
       </p>
 
-      <h2>What CI runs on your PR</h2>
+      <h2>Keep commits and branches small</h2>
       <p>
-        The moment you open a PR, GitHub Actions starts a series of checks. Green ticks
-        are required to merge:
+        A useful rule is <strong>commit small, commit often; branch small, branch
+        often</strong>. A commit should capture one understandable step. A branch should
+        deliver one reviewable outcome. That makes the history easier to follow, gives
+        reviewers less to hold in their heads, and gets changes merged before they drift
+        too far from <code>main</code>.
       </p>
       <table>
         <thead>
           <tr>
-            <th>Check</th>
+            <th>Keep this small</th>
+            <th>Why it helps</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Commit</td>
+            <td>Each saved step has one purpose and is easier to understand or undo</td>
+          </tr>
+          <tr>
+            <td>Branch / PR</td>
+            <td>The change is quicker to review and less likely to conflict with other work</td>
+          </tr>
+        </tbody>
+      </table>
+      <Callout kind="info" title="What a merge conflict means">
+        <p>
+          A conflict happens when your branch and <code>main</code>{" "}have both changed
+          the same lines in the same file and Git cannot safely choose between them.
+          Short-lived branches reduce the time available for those overlapping changes
+          to accumulate.
+        </p>
+      </Callout>
+
+      <h2>What CI runs on your PR</h2>
+      <p>
+        The checks are independent: each starts only when its own condition is met. A
+        new draft PR therefore has fast checks running while deeper review and warehouse
+        validation are still waiting.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>When</th>
+            <th>What runs</th>
             <th>What it verifies</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>Compile</td>
-            <td>Every model still compiles — catches broken refs and Jinja typos</td>
-          </tr>
-          <tr>
-            <td>Code quality</td>
+            <td>PR opens or changes</td>
+            <td>Fusion compile and fast quality gates</td>
             <td>
-              No hardcoded table references, source() only in the raw/staging path,
-              every changed model has a description and at least one test — plus lint
+              Refs, Jinja and project structure still compile; changed models have
+              descriptions and tests; source and hardcoded-reference rules are followed
             </td>
           </tr>
           <tr>
-            <td>PR validation</td>
-            <td>
-              Builds your changed models in the Snowflake DEV environment — starts once
-              a reviewer is assigned (or the snowflake-ci label is added)
-            </td>
-          </tr>
-          <tr>
-            <td>Model ownership</td>
-            <td>
-              Checks changed models have an owner in their YAML, suggesting additions
-              inline
-            </td>
-          </tr>
-          <tr>
+            <td>PR leaves draft</td>
             <td>CodeRabbit review</td>
             <td>
-              An automated reviewer comments on every PR — conventions, likely bugs,
-              missed project patterns
+              Likely bugs, fan-out risk, layer placement, missing tests and project
+              conventions
+            </td>
+          </tr>
+          <tr>
+            <td>Review requested or <code>snowflake-ci</code>{" "}label added</td>
+            <td>Snowflake DEV validation</td>
+            <td>
+              Builds and tests the changed models against real development data
+            </td>
+          </tr>
+          <tr>
+            <td>A changed model has no owner</td>
+            <td>Ownership suggestion</td>
+            <td>
+              Posts the suggested YAML inline for the author; this is guidance rather
+              than a failing gate
             </td>
           </tr>
         </tbody>
@@ -207,7 +244,16 @@ git commit -m "docs: describe waiting list snapshot logic"
         </p>
       </Callout>
 
-      <h2>The repo is public — keep data out of it</h2>
+      <h2>Why the code is open</h2>
+      <p>
+        The dbt project is public deliberately. Open definitions let other organisations
+        adopt and adapt useful work, let users inspect how a result was produced, and let
+        people outside the immediate team question or improve the logic. It also enables
+        tools to explain a result through the SQL and upstream lineage that produced it.
+        The definitions are open; the data is not.
+      </p>
+
+      <h2>Keep data out of the public repo</h2>
       <p>
         The dbt-analytics code is open on GitHub. Code, YAML and docs are meant to be
         public; <strong>data never is</strong>. Git history is forever — once pushed,
@@ -242,21 +288,48 @@ git commit -m "docs: describe waiting list snapshot logic"
         </p>
       </Callout>
 
-      <h2>Review etiquette</h2>
+      <h2>Write the proposal clearly</h2>
+      <p>A useful PR description gives the reviewer four things:</p>
       <ul>
         <li>
-          <strong>Keep PRs small.</strong>{" "}One model (plus its YAML) reviews in minutes;
-          ten models sit for a week.
+          <strong>Why:</strong>{" "}the problem or need behind the change.
         </li>
         <li>
-          <strong>Write the description for a stranger.</strong>{" "}What changed, why, and
-          how you checked the numbers.
+          <strong>What:</strong>{" "}each model&apos;s job and how the models fit together.
         </li>
         <li>
-          <strong>Review comments are about the code.</strong>{" "}“Could this join fan
-          out?” is the reviewer doing their job — and soon it will be you asking.
+          <strong>Checked:</strong>{" "}the commands and sensible data checks already run.
+        </li>
+        <li>
+          <strong>Review:</strong>{" "}the decision or area where human attention is most useful.
         </li>
       </ul>
+
+      <h2>What human review is for</h2>
+      <p>
+        By the time a colleague reviews the PR, automation should have supplied much of
+        the mechanical evidence. The reviewer&apos;s highest-value work is judging the
+        choices that require context:
+      </p>
+      <ul>
+        <li>
+          <strong>Architecture:</strong>{" "}does each model have a clear job, and should
+          reusable logic be separated so other models in the repo can reference it?
+        </li>
+        <li>
+          <strong>Clinical correctness:</strong>{" "}do the definitions reflect the
+          intended population, and are code lists and exclusions sufficiently broad?
+        </li>
+        <li>
+          <strong>Maintenance:</strong>{" "}is the code straightforward to change, and is
+          it clear what would need updating when the source or definition changes?
+        </li>
+      </ul>
+      <p>
+        A useful comment identifies the design concern, explains why it matters and asks
+        a question that helps improve the change. The aim is not to rewrite the code in
+        the reviewer&apos;s personal style.
+      </p>
 
       <Quiz
         questions={[

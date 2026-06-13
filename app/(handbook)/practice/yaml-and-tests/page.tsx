@@ -33,6 +33,14 @@ dbt run-operation generate_model_yaml --args '{"model_names": ["stg_reference_op
         true about the data.
       </p>
 
+      <Callout kind="info" title="Read the YAML shape">
+        <p>
+          A colon names a property, a dash starts an item in a list, and indentation says
+          what belongs inside what. Use two spaces for each level and never tabs. Your
+          descriptions do not need prescribed wording; dbt needs valid structure.
+        </p>
+      </Callout>
+
       <h2>Add the decisions</h2>
       <CodeBlock
         lang="yaml"

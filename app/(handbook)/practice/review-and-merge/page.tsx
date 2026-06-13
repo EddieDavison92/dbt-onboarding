@@ -19,6 +19,34 @@ export default function Page() {
     >
       <GuidedCourseLink href="/courses/first-pr/merge-and-after" />
 
+      <h2>What a good review is deciding</h2>
+      <p>
+        Automated checks run first and catch many implementation problems. Human review
+        is where the team decides whether the design is the right one.
+      </p>
+      <ul>
+        <li>
+          <strong>Architecture:</strong>{" "}does each model have one clear job, and is
+          useful logic placed where other models in the repo can reuse it?
+        </li>
+        <li>
+          <strong>Clinical correctness:</strong>{" "}are definitions, populations,
+          exclusions and code lists sound?
+        </li>
+        <li>
+          <strong>Maintenance:</strong>{" "}can someone understand the code and see what
+          a future source or definition change would require?
+        </li>
+      </ul>
+      <Callout kind="info" title="Make the reasoning useful">
+        <p>
+          A strong review comment names the concern and why it matters, then asks a
+          question or suggests a direction. For example: this model both defines
+          eligibility and shapes the final output; would separating the reusable
+          eligibility logic make future changes easier to isolate?
+        </p>
+      </Callout>
+
       <h2>Respond to review</h2>
       <CodeBlock
         lang="bash"
