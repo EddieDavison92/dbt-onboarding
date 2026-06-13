@@ -11,7 +11,6 @@ import { ProjectFilesMap } from "@/components/ProjectFilesMap";
 import { SourceSetupFlow } from "@/components/SourceSetupFlow";
 import { SetupDeviceGuide } from "@/components/SetupDeviceGuide";
 import { CommitSigningGuide } from "@/components/CommitSigningGuide";
-import { SourceRouteLab } from "@/components/SourceRouteLab";
 
 export const FIRST_PR_COURSE: Course = {
   slug: "first-pr",
@@ -279,47 +278,39 @@ git switch -c feat/opening-hours-staging`}
     // ------------------------------------------------------------------
     {
       slug: "find-or-add-the-source",
-      title: "Find — or add — the source",
-      blurb: "A mechanical route from a Snowflake table to a generated raw model",
-      minutes: 30,
+      title: "Find your source",
+      blurb: "1,500+ models already exist — your input is almost certainly one of them",
+      minutes: 10,
       steps: [
         {
-          id: "map",
-          title: "First, see the whole route",
+          id: "start",
+          title: "Start from what already exists",
           body: (
             <>
               <p>
-                A table landing in Snowflake is not ready to use in hand-written dbt
-                SQL. This project first declares it as a <strong>source</strong>, then
-                generates a 1:1 <strong>raw model</strong> that quotes and renames its
-                columns. Your staging model uses that raw model with <code>ref()</code>.
+                The project already holds more than 1,500 tested models. Before you
+                write anything, the first job is not to build — it is to{" "}
+                <strong>find</strong>{" "}what is already there. Your staging model will
+                read from a <strong>raw model</strong>: a generated, 1:1 cleaned view
+                of a source table. You never write raw models by hand — the source
+                pipeline generates them — so your job is to find the raw model for
+                your table and build staging on top of it with <code>ref()</code>.
               </p>
               <SourceSetupFlow />
               <p>
-                An <strong>automatic</strong>{" "}schema admits every table the pipeline
-                discovers. A <strong>manual</strong>{" "}schema admits only tables listed
-                in its curated YAML. In both routes, the raw SQL is generated — never
-                written by hand.
+                The diagram shows where a raw model comes from. The detail that
+                matters for your first PR is the last box: the <strong>raw layer is
+                always generated</strong>, never edited by hand. How a table earns a
+                raw model in the first place — the source registry, manual versus
+                automatic schemas, the generation pipeline — is a larger,
+                project-specific topic the handbook covers in full.
               </p>
             </>
           ),
-          check: {
-            prompt: "Which file do you edit to add one table to a `manual: true` schema?",
-            options: [
-              "The generated raw SQL file",
-              "The schema's `manual_*.yml` source file",
-              "The schema's `auto_*.yml` file",
-              "`dbt_project.yml`",
-            ],
-            answer: 1,
-            explain:
-              "The manual YAML is the curated admission list. The pipeline reads it and generates the raw model; generated raw SQL and auto YAML are replaceable outputs.",
-            affirm: "manual YAML is the editable admission list for a curated schema.",
-          },
         },
         {
           id: "search",
-          title: "1 · Search before creating anything",
+          title: "Search before you build",
           body: (
             <>
               <p>
@@ -335,202 +326,65 @@ git switch -c feat/opening-hours-staging`}
               </p>
               <ol>
                 <li>
-                  <code>stg_reference_opening_hours</code>{" "}— if it exists, reuse it.
+                  <code>stg_reference_opening_hours</code>{" "}— the staging model. If it
+                  already exists, your work may be done: reuse it, don&apos;t duplicate it.
                 </li>
                 <li>
-                  <code>raw_reference_opening_hours</code>{" "}— if it exists, open it
-                  and use its cleaned columns to create staging later.
+                  <code>raw_reference_opening_hours</code>{" "}— the raw model. This is the
+                  input your staging model will <code>ref()</code>.
                 </li>
                 <li>
                   Search <code>OPENING_HOURS</code>{" "}across the repo to catch an
                   unexpected existing name.
                 </li>
               </ol>
-              <Callout kind="info" title="Found one? Keep the result">
-                <p>
-                  If staging exists, that is your input. If only raw exists, preview
-                  it with <code>dbt show -s raw_reference_opening_hours</code>. The rest
-                  of this lesson rehearses the recovery path for a genuinely missing raw model.
-                </p>
-              </Callout>
-            </>
-          ),
-        },
-        {
-          id: "decide",
-          title: "2 · Find the schema in the source registry",
-          body: (
-            <>
               <p>
-                Open <code>scripts/sources/source_mappings.yml</code>. Search for the
-                table&apos;s <strong>schema</strong>, here <code>ANALYST_MANAGED</code>, and
-                confirm the database on the same block. Do not search only for your
-                guessed source name; the mapping tells you the project&apos;s name.
+                For the worked example the raw model exists but no staging model does
+                yet — so staging is exactly the gap your first PR fills. Preview the
+                raw input and note its cleaned, snake_case columns; those are what you
+                will select from:
               </p>
-              <CodeBlock
-                lang="yaml"
-                title="scripts/sources/source_mappings.yml"
-                code={`- source_name: reference_analyst_managed
-  database: DATA_LAKE__NCL
-  schema: ANALYST_MANAGED
-  raw_prefix: raw_reference
-  domain: shared
-  manual: true`}
-              />
-              <p>
-                Read the block as a recipe: the source is called
-                <code>reference_analyst_managed</code>, generated models start
-                <code>raw_reference_</code>, they live under the shared domain, and
-                <code>manual: true</code>{" "}means you must approve the table in manual YAML first.
-              </p>
-            </>
-          ),
-        },
-        {
-          id: "route-lab",
-          title: "3 · Choose the route from the mapping",
-          body: (
-            <>
-              <p>
-                Use only two facts: did you find the database/schema, and does its
-                block say <code>manual: true</code>? Route each case before moving on.
-              </p>
-              <SourceRouteLab />
-            </>
-          ),
-          interact: true,
-        },
-        {
-          id: "manual-route",
-          title: "4 · Manual route: add the table block",
-          body: (
-            <>
-              <p>
-                The worked example is manual. Open
-                <code>models/sources/manual_analyst_managed.yml</code>, find the
-                existing <code>reference_analyst_managed</code>{" "}source, then add one
-                table block inside its <code>tables:</code>{" "}list. Copy a neighbouring
-                block so the indentation stays exact.
-              </p>
-              <CodeBlock
-                lang="yaml"
-                title="models/sources/manual_analyst_managed.yml"
-                code={`
-- name: reference_analyst_managed
-  database: '"DATA_LAKE__NCL"'
-  schema: '"ANALYST_MANAGED"'
-  tables:
-  # ...existing table blocks stay here...
-  - name: OPENING_HOURS
-    identifier: '"OPENING_HOURS"'
-    columns:
-    - name: SITE_CODE
-      data_type: TEXT
-    - name: DAY_OF_WEEK
-      data_type: NUMBER(2,0)
-`}
-              />
-              <p>
-                Use the exact Snowflake table and column identifiers. Do not create a
-                second <code>sources:</code>{" "}section or a second source with the same
-                name. The pipeline syncs declared data types against live metadata and
-                warns about missing or extra columns.
-              </p>
-            </>
-          ),
-        },
-        {
-          id: "automatic-route",
-          title: "5 · Automatic route: do not edit YAML",
-          body: (
-            <>
-              <p>
-                If the database/schema mapping exists and has no
-                <code>manual: true</code>, make no source-file edit. The pipeline reads
-                Snowflake metadata and updates the matching <code>auto_*.yml</code>{" "}
-                itself.
-              </p>
-              <p>
-                If there is <strong>no matching database/schema block</strong>, stop and
-                pair with the team. Adding a mapping chooses a source name, raw prefix,
-                domain and ownership convention for every table in that schema; that is
-                a project design decision, not a mechanical one-table edit.
-              </p>
+              <CodeBlock lang="bash" code={`dbt show -s raw_reference_opening_hours`} />
             </>
           ),
           check: {
-            prompt: "The schema is mapped and there is no `manual: true`. What do you edit before running the pipeline?",
+            prompt:
+              "You find a `raw_` model for your table but no `stg_` model. What is the first-PR move?",
             options: [
-              "The matching `auto_*.yml`",
-              "A new raw SQL model",
-              "Nothing — the pipeline discovers the table from Snowflake metadata",
-              "`dbt_project.yml`",
+              "Build your staging model on top of the existing raw model with `ref()`",
+              "Regenerate the raw model first, to be safe",
+              "Edit the raw model to add the columns you need",
+              "Add the table as a new source before doing anything",
             ],
-            answer: 2,
+            answer: 0,
             explain:
-              "An automatic mapping already contains the naming and placement rules. Running the pipeline refreshes its generated source YAML and raw models from live metadata.",
-            affirm: "automatic mappings need a pipeline run, not a hand edit.",
+              "The raw model is your input, and staging is the missing piece — writing it is exactly what your first PR is for. Raw models are generated, so you never edit or regenerate them by hand.",
+            affirm: "find the raw model, then build staging on top of it with ref().",
           },
         },
         {
-          id: "run",
-          title: "6 · Run the four-stage pipeline",
+          id: "no-raw",
+          title: "No raw model yet?",
           body: (
             <>
-              <p>From the repo root, in the terminal opened by the workspace, run:</p>
-              <CodeBlock
-                lang="bash"
-                code={`python scripts/sources/run_all_source_generation.py`}
-              />
               <p>
-                A browser window opens for Snowflake SSO. Complete the sign-in and
-                return to the terminal. The script then builds the metadata query,
-                extracts live metadata, updates source YAML, and generates raw models.
+                Occasionally a table has no raw model because its source has never been
+                added to the project. Adding one is a bigger, more project-specific job:
+                finding the schema in{" "}
+                <code>scripts/sources/source_mappings.yml</code>, deciding between a
+                manual and an automatic schema, and running the generation pipeline. It
+                is worth learning — just not the best thing to spend your very first PR on.
               </p>
-              <p>
-                <strong>You should see:</strong>{" "}all four scripts complete
-                successfully. For this manual example,
-                <code>manual_analyst_managed.yml</code>{" "}remains the source declaration
-                and a new
-                <code>models/raw/shared/raw_reference_opening_hours.sql</code>{" "}appears.
-              </p>
-              <Callout kind="warn" title="Generated means replaceable">
+              <Callout kind="info" title="Pick a table that already has a raw model">
                 <p>
-                  Never hand-edit <code>models/raw/**/*.sql</code>{" "}or
-                  <code>models/sources/auto_*.yml</code>. A future pipeline run will
-                  overwrite the edit. Fix manual YAML or generator configuration instead.
+                  With 1,500+ models, most tables you would reach for already have one.
+                  For your first PR, choose one of those and let the win be the staging
+                  model you write. When you do need to add a source, the handbook&apos;s{" "}
+                  <strong>Find your source</strong>{" "}field guide walks the whole route —
+                  the registry, manual versus automatic schemas and the pipeline — and
+                  assumes the dbt basics this course gives you.
                 </p>
               </Callout>
-            </>
-          ),
-        },
-        {
-          id: "verify",
-          title: "7 · Verify the files and preview the raw model",
-          body: (
-            <>
-              <p>First inspect exactly what generation changed:</p>
-              <CodeBlock
-                lang="bash"
-                code={`git status --short
-git diff -- models/sources models/raw`}
-              />
-              <p>
-                For the worked example, expect the manual YAML to be modified and the
-                raw SQL file to be new. If the full refresh shows unrelated source
-                drift, review it with the team rather than bundling it into your PR blindly.
-              </p>
-              <p>Then make dbt parse the declaration and preview real rows:</p>
-              <CodeBlock
-                lang="bash"
-                code={`dbt parse
-dbt show -s raw_reference_opening_hours`}
-              />
-              <p>
-                <strong>You are done when:</strong>{" "}<code>dbt parse</code>{" "}passes,
-                <code>dbt show</code>{" "}returns rows, and you can see the cleaned
-                snake_case columns you will use in staging.
-              </p>
             </>
           ),
         },

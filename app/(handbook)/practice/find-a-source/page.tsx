@@ -15,10 +15,22 @@ export default function Page() {
       slug="find-a-source"
       kicker="Field guide · 2"
       title="Find your source"
-      lede="A step-by-step route from a Snowflake table to the raw model you can safely use."
+      lede="Find the raw model your staging model will build on — and, when one does not exist yet, add the source that generates it."
       minutes={10}
     >
       <GuidedCourseLink href="/courses/first-pr/find-or-add-the-source" />
+
+      <Callout kind="info" title="Two jobs, very different sizes">
+        <p>
+          Most models — especially a first one — start from a raw model that{" "}
+          <strong>already exists</strong>: that is steps 1–2, and usually all you need.
+          Steps 3 onward cover <strong>adding a new source</strong>, a larger,
+          project-specific task — editing the source registry, choosing a manual or
+          automatic schema, and running the generation pipeline. Reach for it once
+          you are comfortable with the dbt basics, and lean on it whenever you genuinely
+          need a table the project has never staged.
+        </p>
+      </Callout>
 
       <SourceSetupFlow />
 
