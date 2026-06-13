@@ -864,15 +864,24 @@ git push                        # share the branch
           body: (
             <>
               <p>
-                A teammate reads your changes and comments — questions (“is this
-                grain right?”), suggestions, approvals. You respond by replying and,
-                where needed, pushing more commits to the same branch: the PR updates
-                automatically.
+                A teammate reads your changes and applies context that automated
+                checks do not have. Is the model in the right layer, and is the logic
+                reusable? Are the clinical definitions sound, with code lists broad
+                enough for the intended population? Is the code straightforward to
+                maintain, and is it clear what would need to change when the definition
+                changes?
               </p>
               <p>
-                Review comments are about the code, not about you. They are how
-                knowledge moves around the team — and within weeks, you will be the
-                one asking the questions on someone else&apos;s PR.
+                CodeRabbit and CI do a thorough implementation pass. They can flag
+                missing tests, suspicious joins and likely fan-out. Those are useful
+                signals, but they cannot prove that the intended grain or clinical
+                definition is correct. That judgement belongs to the team.
+              </p>
+              <p>
+                Reviewers leave questions, suggestions and approvals. You respond by
+                replying and, where needed, pushing more commits to the same branch;
+                the PR updates automatically. Review comments are about the code, not
+                about you. They are how knowledge moves around the team.
               </p>
               <p>
                 You can open a <strong>draft PR</strong> before the branch is ready to
