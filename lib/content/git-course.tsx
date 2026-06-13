@@ -983,7 +983,7 @@ git push                        # share the branch
         },
         {
           id: "review",
-          title: "Safety net two: a human review",
+          title: "Human review: does the design make sense?",
           body: (
             <>
               <p>
@@ -1031,9 +1031,9 @@ git push                        # share the branch
                 </div>
                 <div className="grid gap-px bg-white/10 sm:grid-cols-[0.8fr_1.2fr_1fr]">
                   {[
-                    ["Point", "This join can return several observations per person."],
-                    ["Reason", "That may change the model from one row per person and inflate downstream counts."],
-                    ["Question", "Should we select the latest observation before joining?"],
+                    ["Point", "This model cleans the source, defines eligibility and prepares the final output."],
+                    ["Reason", "Those rules may be useful elsewhere, and keeping them together makes future changes harder to isolate."],
+                    ["Question", "Could we move the reusable eligibility logic into its own intermediate model?"],
                   ].map(([label, copy]) => (
                     <div key={label} className="bg-graphite-deep p-4">
                       <p className="!my-0 font-display text-[10px] font-extrabold uppercase tracking-[0.16em] !text-[#7ee2c0]">{label}</p>
@@ -1054,7 +1054,7 @@ git push                        # share the branch
             options: [
               "This looks complicated",
               "CodeRabbit did not flag anything, so this is fine",
-              "This join may return several rows per person and change the grain. Should we select one observation before joining?",
+              "This model defines eligibility as well as preparing the final output. Could the reusable eligibility logic live in an intermediate model?",
               "Please rewrite this in the way I would have written it",
             ],
             answer: 2,
