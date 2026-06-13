@@ -1052,14 +1052,14 @@ git push                        # share the branch
           check: {
             prompt: "Which comment is most useful in a code review?",
             options: [
-              "This looks complicated",
-              "CodeRabbit did not flag anything, so this is fine",
+              "Could this model be split up? It feels like it is doing a lot",
+              "The eligibility logic should be moved into an intermediate model so it can be reused",
               "This model defines eligibility as well as shaping the final output. Could eligibility become an intermediate model that this and other outputs reference?",
-              "Please rewrite this in the way I would have written it",
+              "Could you add comments to separate the cleaning, eligibility and output sections?",
             ],
             answer: 2,
             explain:
-              "Useful review feedback points to specific code, explains why it matters and asks a clear question. It helps the author assess the design rather than merely announcing a preference.",
+              "Each comment could improve the code. The strongest one identifies the specific architectural concern, shows where reuse may be valuable and asks rather than assuming the answer. It gives the author enough context to assess the model boundary.",
             affirm: "specific code, a reason and a clear question make feedback actionable.",
           },
         },
