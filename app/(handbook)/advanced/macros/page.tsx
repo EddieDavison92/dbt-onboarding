@@ -11,7 +11,7 @@ export default function Page() {
     <LessonShell
       section="advanced"
       slug="macros"
-      kicker="Going further 01"
+      kicker="Going further 02"
       title="Macros"
       lede="Organisation codes, age bands, deduplication — the same cleaning logic is needed in model after model. Macros define it once so every model agrees."
       minutes={5}

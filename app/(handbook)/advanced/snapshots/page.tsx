@@ -11,7 +11,7 @@ export default function Page() {
     <LessonShell
       section="advanced"
       slug="snapshots"
-      kicker="Going further 05"
+      kicker="Going further 06"
       title="Snapshots"
       lede="Some sources only keep the present: a patient's practice today, an address today. Snapshots record every change so you can ask what was true at any point in time."
       minutes={6}

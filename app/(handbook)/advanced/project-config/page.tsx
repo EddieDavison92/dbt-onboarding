@@ -11,7 +11,7 @@ export default function Page() {
     <LessonShell
       section="advanced"
       slug="project-config"
-      kicker="Going further 04"
+      kicker="Going further 05"
       title="Project configuration"
       lede="Why does a staging model become a view in the right schema with the right grants, when your file contains nothing but a SELECT? Because dbt_project.yml decided it already."
       minutes={7}

@@ -11,7 +11,7 @@ export default function Page() {
     <LessonShell
       section="advanced"
       slug="python-models"
-      kicker="Going further 07"
+      kicker="Going further 08"
       title="Python models"
       lede="A dbt model doesn't have to be SQL. A .py file in models/ joins the same DAG, gets the same tests and lineage — and runs Python where SQL runs out of road."
       minutes={8}

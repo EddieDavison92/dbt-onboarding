@@ -85,6 +85,12 @@ export const PRACTICE: NavItem[] = [
 
 export const ADVANCED: NavItem[] = [
   {
+    slug: "dbt-extension",
+    title: "The dbt extension",
+    blurb: "Live error detection, rename-a-column-everywhere, lineage in the editor",
+    minutes: 8,
+  },
+  {
     slug: "macros",
     title: "Macros",
     blurb: "Reusable SQL — define cleaning logic once, use it everywhere",

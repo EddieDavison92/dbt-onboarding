@@ -11,7 +11,7 @@ export default function Page() {
     <LessonShell
       section="advanced"
       slug="materialisations"
-      kicker="Going further 02"
+      kicker="Going further 03"
       title="Materialisations"
       lede="The same SELECT can become a view, a table, or an incremental table that only processes new rows. Choosing well is the difference between a 2-second build and a 2-hour one."
       minutes={7}

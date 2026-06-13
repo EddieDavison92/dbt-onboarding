@@ -219,8 +219,8 @@ export default function Home() {
               Going further
             </span>
             <span className="block text-sm text-ink-soft">
-              Macros, materialisations, clustering, snapshots, semantic views, Python —{" "}
-              {ADVANCED.length} pages
+              The dbt extension, macros, materialisations, clustering, snapshots,
+              semantic views, Python — {ADVANCED.length} pages
             </span>
           </Link>
           <Link

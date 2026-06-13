@@ -11,7 +11,7 @@ export default function Page() {
     <LessonShell
       section="advanced"
       slug="clustering"
-      kicker="Going further 03"
+      kicker="Going further 04"
       title="Clustering"
       lede="Snowflake stores tables in micro-partitions and skips those a query cannot match. cluster_by orders the data so that pruning is effective."
       minutes={5}
