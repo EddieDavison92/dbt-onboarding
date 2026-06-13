@@ -1031,9 +1031,9 @@ git push                        # share the branch
                 </div>
                 <div className="grid gap-px bg-white/10 sm:grid-cols-[0.8fr_1.2fr_1fr]">
                   {[
-                    ["Point", "This model cleans the source, defines eligibility and prepares the final output."],
-                    ["Reason", "Those rules may be useful elsewhere, and keeping them together makes future changes harder to isolate."],
-                    ["Question", "Could we move the reusable eligibility logic into its own intermediate model?"],
+                    ["Observation", "This model is doing three jobs: cleaning source data, deciding who is eligible and shaping the final output."],
+                    ["Why it matters", "Eligibility is reusable business logic. If it stays here, other outputs may repeat it and future changes become harder to make safely."],
+                    ["Suggestion", "Could eligibility become an intermediate model that this output, and any future outputs, can reference?"],
                   ].map(([label, copy]) => (
                     <div key={label} className="bg-graphite-deep p-4">
                       <p className="!my-0 font-display text-[10px] font-extrabold uppercase tracking-[0.16em] !text-[#7ee2c0]">{label}</p>
@@ -1054,7 +1054,7 @@ git push                        # share the branch
             options: [
               "This looks complicated",
               "CodeRabbit did not flag anything, so this is fine",
-              "This model defines eligibility as well as preparing the final output. Could the reusable eligibility logic live in an intermediate model?",
+              "This model defines eligibility as well as shaping the final output. Could eligibility become an intermediate model that this and other outputs reference?",
               "Please rewrite this in the way I would have written it",
             ],
             answer: 2,
