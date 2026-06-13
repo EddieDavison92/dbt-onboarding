@@ -131,8 +131,8 @@ analysis_v2_FINAL_jw_comments.sql
     {
       slug: "branches-and-commits",
       title: "Branches and commits",
-      blurb: "Working safely beside production, one snapshot at a time",
-      minutes: 9,
+      blurb: "Working safely beside production, one small change at a time",
+      minutes: 12,
       steps: [
         {
           id: "main",
@@ -202,12 +202,88 @@ docs: describe waiting list snapshot logic
 `}
               />
               <p>
-                Commit small and often — each commit should be one coherent step. A
-                branch is usually a handful of commits; the history reads like a
-                story of how the work happened.
+                Each message should finish the sentence “this commit will…” so that
+                someone reading the history can understand what changed.
               </p>
             </>
           ),
+        },
+        {
+          id: "hygiene",
+          title: "Branch and commit hygiene",
+          body: (
+            <>
+              <p>
+                Two habits keep Git work easy to understand: <strong>commit small,
+                commit often; branch small, branch often.</strong>
+              </p>
+              <div className="my-6 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border-2 border-layer-staging bg-layer-staging/5 p-4 shadow-[4px_4px_0_0_var(--color-layer-staging)]">
+                  <p className="!my-0 font-display text-[10px] font-extrabold uppercase tracking-[0.16em] !text-layer-staging">
+                    Commit hygiene
+                  </p>
+                  <p className="!mb-2 !mt-2 font-display text-lg font-extrabold !text-ink">
+                    Commit small, commit often
+                  </p>
+                  <div className="flex items-center gap-1.5" aria-hidden>
+                    <span className="h-2 flex-1 rounded-full bg-layer-staging" />
+                    <span className="h-2 flex-1 rounded-full bg-layer-staging" />
+                    <span className="h-2 flex-1 rounded-full bg-layer-staging/30" />
+                  </div>
+                  <p className="!mb-0 !mt-3 text-sm !text-ink-soft">
+                    Commit small and often. Each snapshot should do one thing and have
+                    a message that says what it does.
+                  </p>
+                </div>
+                <div className="rounded-2xl border-2 border-layer-modelling bg-layer-modelling/5 p-4 shadow-[4px_4px_0_0_var(--color-layer-modelling)]">
+                  <p className="!my-0 font-display text-[10px] font-extrabold uppercase tracking-[0.16em] !text-layer-modelling">
+                    Branch hygiene
+                  </p>
+                  <p className="!mb-2 !mt-2 font-display text-lg font-extrabold !text-ink">
+                    Branch small, branch often
+                  </p>
+                  <div className="flex items-center gap-1" aria-hidden>
+                    {[1, 2, 3, 4, 5].map((item) => (
+                      <span
+                        key={item}
+                        className="h-2 flex-1 rounded-full bg-layer-modelling"
+                      />
+                    ))}
+                  </div>
+                  <p className="!mb-0 !mt-3 text-sm !text-ink-soft">
+                    Keep one outcome on each branch. Finish and share it, then start
+                    the next branch from fresh main.
+                  </p>
+                </div>
+              </div>
+              <p>
+                They solve different problems. Small commits make the history easy to
+                follow. Small, short-lived branches are easier to review and less
+                likely to conflict with changes on <code>main</code>.
+              </p>
+              <Callout kind="info" title="What a merge conflict means">
+                <p>
+                  A merge conflict happens when your branch and <code>main</code> have
+                  changed the same lines in the same file. Git cannot know which
+                  version you intend to keep, so it stops and asks a person instead
+                  of silently choosing one.
+                </p>
+              </Callout>
+            </>
+          ),
+          check: {
+            prompt: "When does Git need a person to resolve a merge conflict?",
+            options: [
+              "Whenever two branches change the same file",
+              "When your branch and main change the same lines in the same file",
+              "Whenever a branch contains more than one commit",
+              "When two people create branches on the same day",
+            ],
+            answer: 1,
+            explain:
+              "Two branches can safely change different parts of the same file. Git stops when edits overlap on the same lines and it cannot infer which version should win.",
+            affirm: "same file and same lines: Git stops rather than guessing.",
+          },
         },
         {
           id: "history",
@@ -762,8 +838,8 @@ git push                        # share the branch
     {
       slug: "pull-requests",
       title: "Pull requests",
-      blurb: "How a small, reviewable branch becomes production",
-      minutes: 13,
+      blurb: "How review and automated checks get a branch into production",
+      minutes: 9,
       steps: [
         {
           id: "what",
@@ -798,93 +874,13 @@ git push                        # share the branch
                 knowledge moves around the team — and within weeks, you will be the
                 one asking the questions on someone else&apos;s PR.
               </p>
+              <p>
+                You can open a <strong>draft PR</strong> before the branch is ready to
+                merge. It makes the direction visible and lets teammates give early
+                feedback while you keep working.
+              </p>
             </>
           ),
-        },
-        {
-          id: "small-prs",
-          title: "Open early; keep it small",
-          body: (
-            <>
-              <p>
-                The normal failure mode is to keep working privately until a large
-                change feels “finished”, then reveal it as one enormous PR. By then
-                the reviewer has hundreds of lines and several decisions to understand
-                at once. Feedback arrives late, when changing direction is expensive.
-              </p>
-              <div className="my-6 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border-2 border-layer-staging bg-layer-staging/5 p-4 shadow-[4px_4px_0_0_var(--color-layer-staging)]">
-                  <p className="!my-0 font-display text-[10px] font-extrabold uppercase tracking-[0.16em] !text-layer-staging">
-                    Small and visible
-                  </p>
-                  <p className="!mb-2 !mt-2 font-display text-lg font-extrabold !text-ink">
-                    One coherent outcome
-                  </p>
-                  <div className="flex items-center gap-1.5" aria-hidden>
-                    <span className="h-2 flex-1 rounded-full bg-layer-staging" />
-                    <span className="h-2 flex-1 rounded-full bg-layer-staging" />
-                    <span className="h-2 flex-1 rounded-full bg-layer-staging/30" />
-                  </div>
-                  <p className="!mb-0 !mt-3 text-sm !text-ink-soft">
-                    Open a draft early, add a few understandable commits, get feedback,
-                    merge when that outcome is green.
-                  </p>
-                </div>
-                <div className="rounded-2xl border-2 border-flame bg-flame-soft p-4 shadow-[4px_4px_0_0_var(--color-flame)]">
-                  <p className="!my-0 font-display text-[10px] font-extrabold uppercase tracking-[0.16em] !text-flame-deep">
-                    Saved up
-                  </p>
-                  <p className="!mb-2 !mt-2 font-display text-lg font-extrabold !text-ink">
-                    Several outcomes tangled together
-                  </p>
-                  <div className="flex items-center gap-1" aria-hidden>
-                    {[1, 2, 3, 4, 5, 6, 7].map((item) => (
-                      <span key={item} className="h-2 flex-1 rounded-full bg-flame" />
-                    ))}
-                  </div>
-                  <p className="!mb-0 !mt-3 text-sm !text-ink-soft">
-                    Main keeps changing while the branch grows. Review is harder,
-                    feedback is later, and overlapping edits are more likely.
-                  </p>
-                </div>
-              </div>
-              <p>
-                <strong>Small commits and small PRs solve different problems.</strong>{" "}
-                Small commits make the history understandable. A PR can still contain
-                ten tidy commits and be far too large. A small PR limits the whole
-                change to one reviewable outcome.
-              </p>
-              <p>
-                You do not need to wait until the work is finished to open one. A
-                {" "}<strong>draft PR</strong>{" "}makes the direction visible while you keep
-                working. Teammates can spot overlap or question an assumption before
-                you build more work on top of it.
-              </p>
-              <Callout kind="info" title="What a merge conflict means">
-                <p>
-                  A merge conflict happens when your branch and <code>main</code>{" "}
-                  have changed the same lines in the same file, and Git cannot know
-                  which version you intend to keep. It stops and asks a person instead
-                  of silently choosing one. Small, short-lived PRs change fewer lines
-                  and spend less time drifting away from <code>main</code>, so there are
-                  fewer chances for that overlap.
-                </p>
-              </Callout>
-            </>
-          ),
-          check: {
-            prompt: "When does Git need a person to resolve a merge conflict?",
-            options: [
-              "Whenever two branches change the same file",
-              "When your branch and main change the same lines in the same file",
-              "Whenever a PR contains more than one commit",
-              "When two people create branches on the same day",
-            ],
-            answer: 1,
-            explain:
-              "Two branches can safely change different parts of the same file. Git stops only when the edits overlap on the same lines and it cannot infer which version should win.",
-            affirm: "same file and same lines: Git stops rather than guessing.",
-          },
         },
         {
           id: "ci",
