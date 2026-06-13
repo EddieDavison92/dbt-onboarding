@@ -839,7 +839,7 @@ git push                        # share the branch
       slug: "pull-requests",
       title: "Pull requests",
       blurb: "How automated checks and review get a branch into production",
-      minutes: 9,
+      minutes: 12,
       steps: [
         {
           id: "what",
@@ -855,6 +855,57 @@ git push                        # share the branch
                 Nothing reaches main any other way. Between proposal and merge sit
                 two safety nets.
               </p>
+              <div className="my-6 flex flex-wrap items-center justify-center gap-2" aria-label="The pull request path to main">
+                {[
+                  ["1", "Describe"],
+                  ["2", "Automate"],
+                  ["3", "Review"],
+                  ["4", "Merge"],
+                ].map(([number, label], index) => (
+                  <div key={label} className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 rounded-full border-2 border-ink bg-paper px-3 py-2 shadow-[2px_2px_0_0_var(--color-ink)]">
+                      <span className="font-mono text-xs font-bold text-layer-staging">{number}</span>
+                      <span className="font-display text-xs font-extrabold uppercase tracking-[0.1em] text-ink">{label}</span>
+                    </div>
+                    {index < 3 && <span className="font-mono text-ink-faint" aria-hidden>→</span>}
+                  </div>
+                ))}
+              </div>
+            </>
+          ),
+        },
+        {
+          id: "description",
+          title: "Write the proposal",
+          body: (
+            <>
+              <p>
+                A good PR description gives the reviewer a map. Keep it short, but
+                make these four things easy to find.
+              </p>
+              <div className="my-6 overflow-hidden rounded-2xl border-2 border-ink bg-graphite-deep shadow-[6px_6px_0_0_var(--color-layer-modelling)]">
+                <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
+                  <span className="font-display text-xs font-extrabold uppercase tracking-[0.14em] text-white">PR description</span>
+                  <span className="rounded-full bg-layer-modelling/20 px-2.5 py-1 font-mono text-[10px] font-bold text-[#d5b8ff]">DRAFT</span>
+                </div>
+                <div className="grid gap-px bg-white/10 sm:grid-cols-2">
+                  {[
+                    ["Why", "The problem or user need this change addresses."],
+                    ["What", "The models changed, their purpose and intended grain."],
+                    ["Checked", "What you ran, what passed and any limits to testing."],
+                    ["Review", "The decisions where you want a colleague's attention."],
+                  ].map(([label, copy]) => (
+                    <div key={label} className="bg-graphite-deep p-4">
+                      <p className="!my-0 font-display text-[10px] font-extrabold uppercase tracking-[0.16em] !text-[#7ee2c0]">{label}</p>
+                      <p className="!mb-0 !mt-2 text-sm leading-6 !text-white/75">{copy}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <p>
+                Link the issue when there is one. A reviewer should understand the
+                change before opening the first file.
+              </p>
             </>
           ),
         },
@@ -864,30 +915,56 @@ git push                        # share the branch
           body: (
             <>
               <p>
-                When a PR opens, <strong>CI</strong>{" "}(continuous integration) runs
-                fast checks on the branch. dbt compiles the project against the dev
-                catalogue, catching broken references, Jinja, YAML and SQL. Other
-                checks make sure changed models have descriptions and tests, use
-                <code>ref()</code>{" "}and <code>source()</code>{" "}properly, and do not
-                skip the staging layer. Missing ownership is suggested in a comment.
+                Automation arrives in stages. Each stage answers a different question.
               </p>
-              <p>
-                CodeRabbit reviews the diff once the PR is no longer a draft. It looks
-                for risks such as suspicious joins, likely fan-out, missing tests and
-                models in the wrong layer.
-              </p>
-              <p>
-                When you request a human review, a slower validation builds and tests
-                the changed models against real data in Snowflake DEV. Changes to a
-                model&apos;s YAML include that model; changes to a macro include models
-                that use it. This is the closest rehearsal of what will run in
-                production.
-              </p>
-              <p>
-                Failing checks show a red cross on the PR. Fix the issue, commit and
-                push to the same branch; the relevant checks run again. All required
-                checks must pass before the PR can merge.
-              </p>
+              <div className="my-6 grid gap-3 lg:grid-cols-3">
+                {[
+                  {
+                    number: "01",
+                    trigger: "PR opens or updates",
+                    title: "Fast gates",
+                    dotClass: "bg-layer-staging",
+                    checks: ["Fusion compile", "Descriptions + tests", "Refs + layer rules", "Ownership suggestion"],
+                  },
+                  {
+                    number: "02",
+                    trigger: "PR leaves draft",
+                    title: "CodeRabbit",
+                    dotClass: "bg-layer-modelling",
+                    checks: ["Joins + fan-out", "Test gaps", "Layer placement", "dbt conventions"],
+                  },
+                  {
+                    number: "03",
+                    trigger: "Review requested",
+                    title: "Snowflake DEV",
+                    dotClass: "bg-layer-published",
+                    checks: ["Changed models build", "Data tests run", "YAML changes included", "Macro users included"],
+                  },
+                ].map((stage) => (
+                  <div key={stage.number} className="relative overflow-hidden rounded-2xl border-2 border-ink bg-paper p-4 shadow-[4px_4px_0_0_var(--color-ink)]">
+                    <div className="mb-4 flex items-start justify-between gap-3">
+                      <span className="font-mono text-2xl font-black text-ink-faint">{stage.number}</span>
+                      <span className="rounded-full bg-mist px-2.5 py-1 text-right font-mono text-[9px] font-bold uppercase tracking-wide text-ink-soft">{stage.trigger}</span>
+                    </div>
+                    <p className="!my-0 font-display text-lg font-extrabold !text-ink">{stage.title}</p>
+                    <ul className="!mb-0 !mt-3 space-y-2 !pl-0">
+                      {stage.checks.map((check) => (
+                        <li key={check} className="flex items-start gap-2 text-sm !text-ink-soft">
+                          <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${stage.dotClass}`} aria-hidden />
+                          <span>{check}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+              <Callout kind="info" title="Red means: look, fix, push">
+                <p>
+                  Open the failed check, read the error, fix it and push to the same
+                  branch. The relevant checks run again. Required checks must pass
+                  before merge.
+                </p>
+              </Callout>
             </>
           ),
           check: {
@@ -910,29 +987,42 @@ git push                        # share the branch
           body: (
             <>
               <p>
-                With the automated findings available, a teammate reads your changes
-                and applies context that automation does not have. Is the model in the
-                right layer, and is the logic reusable? Are the clinical definitions
-                sound, with code lists broad enough for the intended population? Is
-                the code straightforward to maintain, and is it clear what would need
-                to change when the definition changes?
+                The checks provide evidence. A teammate applies the context that
+                automation does not have.
               </p>
+              <div className="my-6 grid gap-3 sm:grid-cols-3">
+                {[
+                  ["Architecture", "Right layer", "Reusable logic", "Clear dependencies"],
+                  ["Clinical", "Sound definition", "Broad code lists", "Right population"],
+                  ["Maintenance", "Readable approach", "Visible assumptions", "Clear future changes"],
+                ].map(([title, ...questions], index) => (
+                  <div key={title} className="rounded-2xl border-2 border-ink bg-paper p-4 shadow-[4px_4px_0_0_var(--color-layer-staging)]">
+                    <div className="mb-3 flex h-8 w-8 items-center justify-center rounded-full bg-ink font-mono text-xs font-black text-paper">{index + 1}</div>
+                    <p className="!my-0 font-display text-base font-extrabold !text-ink">{title}</p>
+                    <ul className="!mb-0 !mt-3 space-y-2 !pl-0">
+                      {questions.map((question) => (
+                        <li key={question} className="flex items-center gap-2 text-sm !text-ink-soft">
+                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-layer-staging" aria-hidden />
+                          {question}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+              <div className="my-6 grid overflow-hidden rounded-2xl border-2 border-ink sm:grid-cols-2">
+                <div className="bg-mist p-4">
+                  <p className="!my-0 font-display text-xs font-extrabold uppercase tracking-[0.12em] !text-ink">Automation finds clues</p>
+                  <p className="!mb-0 !mt-2 text-sm !text-ink-soft">Missing tests, suspicious joins, likely fan-out.</p>
+                </div>
+                <div className="border-t-2 border-ink bg-layer-staging/10 p-4 sm:border-l-2 sm:border-t-0">
+                  <p className="!my-0 font-display text-xs font-extrabold uppercase tracking-[0.12em] !text-ink">People make judgements</p>
+                  <p className="!mb-0 !mt-2 text-sm !text-ink-soft">Whether the grain, clinical meaning and design are right.</p>
+                </div>
+              </div>
               <p>
-                CodeRabbit and CI can flag missing tests, suspicious joins and likely
-                fan-out. Those are useful signals, but they cannot prove that the
-                intended grain or clinical definition is correct. That judgement
-                belongs to the team.
-              </p>
-              <p>
-                Reviewers leave questions, suggestions and approvals. You respond by
-                replying and, where needed, pushing more commits to the same branch;
-                the PR updates automatically. Review comments are about the code, not
-                about you. They are how knowledge moves around the team.
-              </p>
-              <p>
-                You can open a <strong>draft PR</strong> before the branch is ready to
-                merge. It makes the direction visible and lets teammates give early
-                feedback while you keep working.
+                Reply to comments and push fixes to the same branch; the PR updates
+                automatically. Comments are about the code, not about you.
               </p>
             </>
           ),
