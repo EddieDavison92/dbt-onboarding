@@ -838,8 +838,8 @@ git push                        # share the branch
     {
       slug: "pull-requests",
       title: "Pull requests",
-      blurb: "How automated checks and review get a branch into production",
-      minutes: 12,
+      blurb: "How automated checks, AI review and a human get a branch into production",
+      minutes: 15,
       steps: [
         {
           id: "what",
@@ -853,21 +853,22 @@ git push                        # share the branch
               </p>
               <p>
                 Nothing reaches main any other way. Between proposal and merge sit
-                two safety nets.
+                three safety nets: automation, an AI reviewer, and a person.
               </p>
               <div className="my-6 flex flex-wrap items-center justify-center gap-2" aria-label="The pull request path to main">
                 {[
                   ["1", "Describe"],
                   ["2", "Automate"],
-                  ["3", "Review"],
-                  ["4", "Merge"],
+                  ["3", "AI review"],
+                  ["4", "Review"],
+                  ["5", "Merge"],
                 ].map(([number, label], index) => (
                   <div key={label} className="flex items-center gap-2">
                     <div className="flex items-center gap-2 rounded-full border-2 border-ink bg-paper px-3 py-2 shadow-[2px_2px_0_0_var(--color-ink)]">
                       <span className="font-mono text-xs font-bold text-layer-staging">{number}</span>
                       <span className="font-display text-xs font-extrabold uppercase tracking-[0.1em] text-ink">{label}</span>
                     </div>
-                    {index < 3 && <span className="font-mono text-ink-faint" aria-hidden>→</span>}
+                    {index < 4 && <span className="font-mono text-ink-faint" aria-hidden>→</span>}
                   </div>
                 ))}
               </div>
@@ -937,7 +938,7 @@ git push                        # share the branch
                 That is the state of a new draft PR: the fast gates run, while the
                 other automation waits.
               </p>
-              <div className="my-6 grid gap-3 lg:grid-cols-3">
+              <div className="my-6 grid gap-3 sm:grid-cols-2">
                 {[
                   {
                     trigger: "PR opens or updates",
@@ -945,13 +946,6 @@ git push                        # share the branch
                     result: "Fast gates run",
                     dotClass: "bg-layer-staging",
                     checks: ["Fusion compile", "Descriptions + tests", "Refs + layer rules", "Ownership suggestion"],
-                  },
-                  {
-                    trigger: "PR leaves draft",
-                    title: "CodeRabbit",
-                    result: "CodeRabbit runs",
-                    dotClass: "bg-layer-modelling",
-                    checks: ["Joins + fan-out", "Test gaps", "Layer placement", "dbt conventions"],
                   },
                   {
                     trigger: "Review requested or CI label added",
@@ -988,6 +982,11 @@ git push                        # share the branch
                   before merge.
                 </p>
               </Callout>
+              <p>
+                Both gates are objective: they pass or they fail. The third tile on
+                the board — CodeRabbit — is different. It does not pass or fail; it
+                reviews. That is the next step.
+              </p>
             </>
           ),
           check: {
@@ -1005,10 +1004,107 @@ git push                        # share the branch
           },
         },
         {
-          id: "review",
-          title: "Human review: does the design make sense?",
+          id: "ai-review",
+          title: "Safety net two: AI review (CodeRabbit)",
           body: (
             <>
+              <p>
+                When the PR leaves draft, <strong>CodeRabbit</strong> reviews it. It
+                is an <strong>AI code reviewer</strong>: it reads the diff and leaves
+                comments the way a colleague would — but on every changed line, every
+                time, without getting tired. It is not a pass/fail gate like CI; its
+                comments are suggestions you weigh, reply to, or fix.
+              </p>
+              <p>
+                And it is not generic advice. CodeRabbit reads{" "}
+                <code>.coderabbit.yaml</code>{" "}in the repo, where each layer&apos;s
+                contract and our naming rules are written down — so it reviews against{" "}
+                <em>our</em> conventions, and its comments cite them. On a recent PR it
+                caught a staging model selecting straight from{" "}
+                <code>source(&apos;sdl_wnl&apos;, &apos;REF&apos;)</code>{" "}and pointed
+                out that this skips the raw layer — the fix being to reference the raw
+                model, <code>ref(&apos;raw_sdl_wnl_ref&apos;)</code>, so everything
+                downstream reads one stable name. Because that rule lives in the config,
+                it is applied on every PR, not only when a reviewer happens to notice.
+              </p>
+              <p>
+                That is the shape of what it is good at, and where it stops. It is
+                tireless on anything checkable from the code and the rules — and silent
+                on anything that needs to know what the model is <em>for</em>.
+              </p>
+              <div className="my-6 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border-2 border-ink bg-paper p-4 shadow-[4px_4px_0_0_var(--color-layer-modelling)]">
+                  <p className="!my-0 font-display text-base font-extrabold !text-ink">Good at: rules and patterns</p>
+                  <p className="!mb-3 !mt-1 text-sm leading-5 !text-ink-soft">Things checkable from the code, applied the same way every time.</p>
+                  <ul className="!mb-0 !mt-0 space-y-2 !pl-0">
+                    {[
+                      "Layer rules — a staging model reading straight from source() instead of the raw model",
+                      "Fan-out joins that silently multiply rows",
+                      "Missing tests, or YAML that documents fewer columns than the SQL emits",
+                      "Edge cases — try_to_number() on a value that was never validated",
+                      "Naming — is_/has_ booleans, _date / _at / _id suffixes",
+                    ].map((item) => (
+                      <li key={item} className="flex items-start gap-2 text-sm leading-5 !text-ink-soft">
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-layer-modelling" aria-hidden />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="rounded-2xl border-2 border-ink bg-paper p-4 shadow-[4px_4px_0_0_var(--color-layer-staging)]">
+                  <p className="!my-0 font-display text-base font-extrabold !text-ink">Can&apos;t judge: meaning and fit</p>
+                  <p className="!mb-3 !mt-1 text-sm leading-5 !text-ink-soft">Things that need context only a person who knows the intent has.</p>
+                  <ul className="!mb-0 !mt-0 space-y-2 !pl-0">
+                    {[
+                      "Whether this is the intended clinical population",
+                      "Whether the model belongs in this layer, or should reuse one that exists",
+                      "Whether the next person will follow the logic",
+                      "Whether a flagged “issue” is actually fine here",
+                    ].map((item) => (
+                      <li key={item} className="flex items-start gap-2 text-sm leading-5 !text-ink-soft">
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-layer-staging" aria-hidden />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <Callout kind="info" title="Comments, not commands">
+                <p>
+                  CodeRabbit can be over-eager — some comments are nitpicks, and it is
+                  sometimes wrong. Resolve the ones that do not apply, fix the ones that
+                  do and push to the same branch. It is evidence for the human reviewer,
+                  not the final word.
+                </p>
+              </Callout>
+            </>
+          ),
+          check: {
+            prompt:
+              "CodeRabbit flags that a staging model reads from source() instead of the raw model. Why is this the kind of thing it catches well?",
+            options: [
+              "It is a convention written in .coderabbit.yaml — a rule that can be checked on every line, the same way every time",
+              "It understands whether the staging model identifies the intended clinical population",
+              "It decides whether the model belongs in the project's architecture",
+              "It removes the need for a human to review the PR at all",
+            ],
+            answer: 0,
+            explain:
+              "CodeRabbit is strongest on rules and patterns knowable from the code and our config — layer contracts, naming, missing tests, fan-out joins. Judgement about clinical meaning, architectural fit and maintainability stays with a human.",
+            affirm: "CodeRabbit is strongest on rule- and pattern-based checks.",
+          },
+        },
+        {
+          id: "review",
+          title: "Safety net three: human review",
+          body: (
+            <>
+              <p>
+                Automation says whether the code <em>works</em>; CodeRabbit reviews{" "}
+                <em>how</em> it is built. A human decides whether it{" "}
+                <em>should exist this way</em> — the judgement neither of the others
+                can make.
+              </p>
               <p>
                 Start with the PR description, then read the changed models and their
                 lineage. A good review asks questions in three places.
