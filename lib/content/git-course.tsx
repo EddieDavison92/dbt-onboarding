@@ -508,334 +508,6 @@ dbt_packages/
     },
     // ------------------------------------------------------------------
     {
-      slug: "the-daily-commands",
-      title: "The daily commands",
-      blurb: "Six commands, introduced one at a time",
-      minutes: 16,
-      steps: [
-        {
-          id: "intro",
-          body: (
-            <>
-              <p>
-                Git has hundreds of commands. Daily work here uses{" "}
-                <strong>six</strong>. This lesson introduces them one at a time —
-                and you will <em>run</em>{" "}each one in a simulated terminal, so you
-                see exactly what your real machine will say back. Nothing to
-                install; type the command (or use “type it for me”) and press Enter.
-              </p>
-            </>
-          ),
-        },
-        {
-          id: "pull",
-          title: "1 · git pull — start from fresh main",
-          body: (
-            <>
-              <p>
-                Before starting new work, return to <code>main</code>{" "}and update it
-                from GitHub. Your new branch will begin from exactly that fresh
-                version of the project:
-              </p>
-              <TryIt
-                stages={[
-                  {
-                    cmd: "git switch main",
-                    out: `Switched to branch 'main'
-Your branch is up to date with 'origin/main'.`,
-                    prompt: "first, return to the project's default branch",
-                  },
-                  {
-                    cmd: "git pull",
-                    out: `Updating a17c9b2..e43d0af
-Fast-forward
- models/staging/shared/stg_specialties.sql | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)`,
-                    prompt: "download and apply anything merged since your last update",
-                  },
-                ]}
-                done="Your local main now matches origin/main, so the next branch starts from the team's latest work."
-              />
-              <p>
-                <code>origin/main</code>{" "}means the copy of <code>main</code>{" "}on
-                GitHub. <code>git pull</code>{" "}brings commits from that remote branch
-                into your local <code>main</code>. Do this before creating each new
-                branch, not halfway through work on an existing one.
-              </p>
-            </>
-          ),
-          check: {
-            prompt: "Why run `git pull` on `main` before creating a new branch?",
-            options: [
-              "So the branch starts from the team's latest merged work",
-              "Because `git pull` creates the new branch for you",
-              "So your uncommitted changes are uploaded to GitHub",
-              "Because branches cannot be created from an older commit",
-            ],
-            answer: 0,
-            explain:
-              "A branch begins at your current commit. Updating local `main` first means the branch begins at the latest `origin/main` commit, reducing avoidable conflicts and duplicated work.",
-            affirm: "fresh main first, then branch from the team's latest work.",
-          },
-        },
-        {
-          id: "switch",
-          title: "2 · git switch — create the branch",
-          body: (
-            <>
-              <p>
-                Main is fresh. Now create the safe branch where the work will
-                happen:
-              </p>
-              <TryIt
-                stages={[
-                  {
-                    cmd: "git switch -c feat/opening-hours",
-                    out: `Switched to a new branch 'feat/opening-hours'`,
-                  },
-                ]}
-                done="One quiet line — you're now on a safe parallel line of history, edits intact."
-              />
-              <p>
-                The <code>-c</code>{" "}flag (<em>create</em>) makes the branch as it
-                moves you onto it. Without <code>-c</code>, switch moves between
-                branches that already exist — <code>git switch main</code>{" "}takes you
-                back.
-              </p>
-            </>
-          ),
-          check: {
-            prompt: "What does `git switch -c feat/new-model` do?",
-            options: [
-              "Creates a branch called `feat/new-model` and moves you onto it",
-              "Copies your files into a folder called `feat/new-model`",
-              "Commits your changes to a branch called `feat/new-model`",
-              "Switches to an existing branch called `feat/new-model`",
-            ],
-            answer: 0,
-            explain:
-              "`-c` is create. Without it, `git switch` moves to a branch that already exists. Nothing is committed yet — you've just opened a fresh line to work on.",
-            affirm: "switch -c creates the branch and moves you onto it — nothing is committed yet.",
-          },
-        },
-        {
-          id: "status",
-          title: "3 · git status — what changed?",
-          body: (
-            <>
-              <p>
-                Now imagine you have edited one model file and created its
-                documentation file. Ask git where things stand:
-              </p>
-              <TryIt
-                stages={[
-                  {
-                    cmd: "git status",
-                    out: `On branch feat/opening-hours
-Changes not staged for commit:
-  (use "git add <file>..." to update what will be committed)
-        modified:   models/staging/shared/stg_opening_hours.sql
-
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-        models/staging/shared/stg_opening_hours.yml`,
-                  },
-                ]}
-                done="Branch, changed files, and a suggestion for what to do next — status changes nothing, it only reports."
-              />
-              <p>
-                Read it top to bottom: you are safely on your feature branch, one
-                file is modified, and one is brand new (“untracked”).{" "}
-                <strong>When in doubt, run status.</strong>
-              </p>
-            </>
-          ),
-        },
-        {
-          id: "add",
-          title: "4 · git add — choose what goes in the snapshot",
-          body: (
-            <>
-              <p>
-                The step that surprises newcomers: editing a file does{" "}
-                <strong>not</strong>{" "}put it in your next commit. You explicitly{" "}
-                <em>stage</em>{" "}what you want included. Stage both files, then check
-                what changed:
-              </p>
-              <TryIt
-                stages={[
-                  {
-                    cmd: "git add -u",
-                    out: ``,
-                    prompt: "stage every file you've modified (-u = updated)",
-                  },
-                  {
-                    cmd: "git add models/staging/shared/stg_opening_hours.yml",
-                    out: ``,
-                    prompt: "the new file is untracked, so -u didn't catch it — add it by name",
-                  },
-                  {
-                    cmd: "git status",
-                    out: `On branch feat/opening-hours
-Changes to be committed:
-  (use "git restore --staged <file>..." to unstage)
-        modified:   models/staging/shared/stg_opening_hours.sql
-        new file:   models/staging/shared/stg_opening_hours.yml`,
-                  },
-                ]}
-                done="Silence is success for git add — and status confirms both files are staged, ready for the snapshot."
-              />
-              <p>
-                Why the extra step? Because you often change more than you mean to
-                share — staging lets you commit exactly what you intend and nothing
-                else. Note that <code>git add</code>{" "}prints nothing when it works;
-                status is how you confirm.
-              </p>
-            </>
-          ),
-          check: {
-            prompt:
-              "You edited three files but only staged one. What does the next commit contain?",
-            options: [
-              "All three files — committing saves everything",
-              "Only the staged file",
-              "Nothing — you must stage all changes first",
-              "The staged file plus any file changed in the last hour",
-            ],
-            answer: 1,
-            explain:
-              "The commit is exactly the staged set. The other two files keep their changes on disk, uncommitted — git status will keep showing them until you stage or discard them.",
-            affirm: "a commit contains exactly what you staged — nothing more.",
-          },
-        },
-        {
-          id: "commit",
-          title: "5 · git commit — take the snapshot",
-          body: (
-            <>
-              <p>
-                Both files staged — record the snapshot, with a conventional-commits
-                message (type prefix, colon, short description). Then check status
-                to see what changed:
-              </p>
-              <TryIt
-                stages={[
-                  {
-                    cmd: 'git commit -m "feat: add opening hours staging model"',
-                    out: `[feat/opening-hours 3f2a1c9] feat: add opening hours staging model
- 2 files changed, 34 insertions(+)`,
-                  },
-                  {
-                    cmd: "git status",
-                    out: `On branch feat/opening-hours
-nothing to commit, working tree clean`,
-                    prompt: "where did the staged files go? ask status",
-                  },
-                ]}
-                done="The staged files are now a permanent snapshot in your branch's history — which is why status reports a clean working tree."
-              />
-              <p>What actually happened, decoded from that first output line:</p>
-              <ul>
-                <li>
-                  Your two staged files became a <strong>permanent snapshot</strong>{" "}
-                  in the branch&apos;s history — that is the whole event.
-                </li>
-                <li>
-                  <code>3f2a1c9</code>{" "}is the snapshot&apos;s id: a short reference
-                  you (or anyone) can use to look at exactly this version forever.
-                </li>
-                <li>
-                  <code>2 files changed, 34 insertions(+)</code>{" "}summarises the
-                  difference this snapshot records against the previous one.
-                </li>
-                <li>
-                  The staging area is now empty — hence{" "}
-                  <code>working tree clean</code>. Editing a file would start the
-                  status → add → commit cycle again.
-                </li>
-              </ul>
-              <p>
-                A hook checks the message format (<code>feat</code>,{" "}
-                <code>fix</code>, <code>docs</code>, <code>chore</code>…) and tells
-                you if it is off. And note: committing is <strong>local</strong> —
-                nothing has left your machine yet.
-              </p>
-            </>
-          ),
-        },
-        {
-          id: "push",
-          title: "6 · git push — share it",
-          body: (
-            <>
-              <TryIt
-                stages={[
-                  {
-                    cmd: "git push",
-                    out: `Enumerating objects: 9, done.
-Writing objects: 100% (6/6), 1.21 KiB, done.
-remote:
-remote: Create a pull request for 'feat/opening-hours' on GitHub by visiting:
-remote:   https://github.com/wnl-icb-analytics/dbt-analytics/pull/new/feat/opening-hours
-remote:
-To https://github.com/wnl-icb-analytics/dbt-analytics.git
- * [new branch]      feat/opening-hours -> feat/opening-hours`,
-                  },
-                ]}
-                done="Your branch is on GitHub — and git even hands you the link to open the pull request."
-              />
-              <p>
-                Until you push, your work exists only on your machine — push is the
-                moment it becomes shared. (A brand-new branch may first ask you to
-                set an “upstream”; git prints the exact command to run, once.)
-              </p>
-            </>
-          ),
-        },
-        {
-          id: "loop",
-          title: "The whole loop",
-          body: (
-            <>
-              <CodeBlock
-                lang="bash"
-                title="the daily rhythm"
-                code={`
-git switch main                 # 1. return to main
-git pull                        # 2. update it from origin/main
-git switch -c feat/my-change    # 3. branch from fresh main
-# ...edit files...
-git status                      # 4. what did I change?
-git add -u                      # 5. stage it
-git commit -m "feat: ..."       # 6. snapshot it
-git push                        # share the branch
-`}
-              />
-              <p>
-                That is the daily rhythm. Freshen main, branch once per piece of
-                work, then status, add and commit as you go; push when you want the
-                branch shared.
-              </p>
-            </>
-          ),
-          check: {
-            prompt: "Right after `git commit`, where does your work exist?",
-            options: [
-              "On GitHub, visible to the team",
-              "Only on your machine, on your branch",
-              "On `main`, ready for tonight's build",
-              "In the staging area, waiting to be pushed",
-            ],
-            answer: 1,
-            explain:
-              "Commit is local. The snapshot is safely recorded on your branch — but only push sends it to GitHub. (And nothing reaches main until a pull request is merged.)",
-            affirm: "commit saves locally — push is what shares it.",
-          },
-        },
-      ],
-    },
-    // ------------------------------------------------------------------
-    {
       slug: "pull-requests",
       title: "Pull requests",
       blurb: "How automated checks, AI review and a human get a branch into production",
@@ -1219,6 +891,334 @@ git pull          # bring main up to date, now including your work
             explain:
               "Main is protected: direct pushes are rejected for everyone. Review + green checks + merge is the single road, which is exactly why main can be trusted as production.",
             affirm: "a reviewed, green pull request is the only road into main.",
+          },
+        },
+      ],
+    },
+    // ------------------------------------------------------------------
+    {
+      slug: "the-daily-commands",
+      title: "The daily commands",
+      blurb: "Six commands, introduced one at a time",
+      minutes: 16,
+      steps: [
+        {
+          id: "intro",
+          body: (
+            <>
+              <p>
+                Git has hundreds of commands. Daily work here uses{" "}
+                <strong>six</strong>. This lesson introduces them one at a time —
+                and you will <em>run</em>{" "}each one in a simulated terminal, so you
+                see exactly what your real machine will say back. Nothing to
+                install; type the command (or use “type it for me”) and press Enter.
+              </p>
+            </>
+          ),
+        },
+        {
+          id: "pull",
+          title: "1 · git pull — start from fresh main",
+          body: (
+            <>
+              <p>
+                Before starting new work, return to <code>main</code>{" "}and update it
+                from GitHub. Your new branch will begin from exactly that fresh
+                version of the project:
+              </p>
+              <TryIt
+                stages={[
+                  {
+                    cmd: "git switch main",
+                    out: `Switched to branch 'main'
+Your branch is up to date with 'origin/main'.`,
+                    prompt: "first, return to the project's default branch",
+                  },
+                  {
+                    cmd: "git pull",
+                    out: `Updating a17c9b2..e43d0af
+Fast-forward
+ models/staging/shared/stg_specialties.sql | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)`,
+                    prompt: "download and apply anything merged since your last update",
+                  },
+                ]}
+                done="Your local main now matches origin/main, so the next branch starts from the team's latest work."
+              />
+              <p>
+                <code>origin/main</code>{" "}means the copy of <code>main</code>{" "}on
+                GitHub. <code>git pull</code>{" "}brings commits from that remote branch
+                into your local <code>main</code>. Do this before creating each new
+                branch, not halfway through work on an existing one.
+              </p>
+            </>
+          ),
+          check: {
+            prompt: "Why run `git pull` on `main` before creating a new branch?",
+            options: [
+              "So the branch starts from the team's latest merged work",
+              "Because `git pull` creates the new branch for you",
+              "So your uncommitted changes are uploaded to GitHub",
+              "Because branches cannot be created from an older commit",
+            ],
+            answer: 0,
+            explain:
+              "A branch begins at your current commit. Updating local `main` first means the branch begins at the latest `origin/main` commit, reducing avoidable conflicts and duplicated work.",
+            affirm: "fresh main first, then branch from the team's latest work.",
+          },
+        },
+        {
+          id: "switch",
+          title: "2 · git switch — create the branch",
+          body: (
+            <>
+              <p>
+                Main is fresh. Now create the safe branch where the work will
+                happen:
+              </p>
+              <TryIt
+                stages={[
+                  {
+                    cmd: "git switch -c feat/opening-hours",
+                    out: `Switched to a new branch 'feat/opening-hours'`,
+                  },
+                ]}
+                done="One quiet line — you're now on a safe parallel line of history, edits intact."
+              />
+              <p>
+                The <code>-c</code>{" "}flag (<em>create</em>) makes the branch as it
+                moves you onto it. Without <code>-c</code>, switch moves between
+                branches that already exist — <code>git switch main</code>{" "}takes you
+                back.
+              </p>
+            </>
+          ),
+          check: {
+            prompt: "What does `git switch -c feat/new-model` do?",
+            options: [
+              "Creates a branch called `feat/new-model` and moves you onto it",
+              "Copies your files into a folder called `feat/new-model`",
+              "Commits your changes to a branch called `feat/new-model`",
+              "Switches to an existing branch called `feat/new-model`",
+            ],
+            answer: 0,
+            explain:
+              "`-c` is create. Without it, `git switch` moves to a branch that already exists. Nothing is committed yet — you've just opened a fresh line to work on.",
+            affirm: "switch -c creates the branch and moves you onto it — nothing is committed yet.",
+          },
+        },
+        {
+          id: "status",
+          title: "3 · git status — what changed?",
+          body: (
+            <>
+              <p>
+                Now imagine you have edited one model file and created its
+                documentation file. Ask git where things stand:
+              </p>
+              <TryIt
+                stages={[
+                  {
+                    cmd: "git status",
+                    out: `On branch feat/opening-hours
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+        modified:   models/staging/shared/stg_opening_hours.sql
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        models/staging/shared/stg_opening_hours.yml`,
+                  },
+                ]}
+                done="Branch, changed files, and a suggestion for what to do next — status changes nothing, it only reports."
+              />
+              <p>
+                Read it top to bottom: you are safely on your feature branch, one
+                file is modified, and one is brand new (“untracked”).{" "}
+                <strong>When in doubt, run status.</strong>
+              </p>
+            </>
+          ),
+        },
+        {
+          id: "add",
+          title: "4 · git add — choose what goes in the snapshot",
+          body: (
+            <>
+              <p>
+                The step that surprises newcomers: editing a file does{" "}
+                <strong>not</strong>{" "}put it in your next commit. You explicitly{" "}
+                <em>stage</em>{" "}what you want included. Stage both files, then check
+                what changed:
+              </p>
+              <TryIt
+                stages={[
+                  {
+                    cmd: "git add -u",
+                    out: ``,
+                    prompt: "stage every file you've modified (-u = updated)",
+                  },
+                  {
+                    cmd: "git add models/staging/shared/stg_opening_hours.yml",
+                    out: ``,
+                    prompt: "the new file is untracked, so -u didn't catch it — add it by name",
+                  },
+                  {
+                    cmd: "git status",
+                    out: `On branch feat/opening-hours
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   models/staging/shared/stg_opening_hours.sql
+        new file:   models/staging/shared/stg_opening_hours.yml`,
+                  },
+                ]}
+                done="Silence is success for git add — and status confirms both files are staged, ready for the snapshot."
+              />
+              <p>
+                Why the extra step? Because you often change more than you mean to
+                share — staging lets you commit exactly what you intend and nothing
+                else. Note that <code>git add</code>{" "}prints nothing when it works;
+                status is how you confirm.
+              </p>
+            </>
+          ),
+          check: {
+            prompt:
+              "You edited three files but only staged one. What does the next commit contain?",
+            options: [
+              "All three files — committing saves everything",
+              "Only the staged file",
+              "Nothing — you must stage all changes first",
+              "The staged file plus any file changed in the last hour",
+            ],
+            answer: 1,
+            explain:
+              "The commit is exactly the staged set. The other two files keep their changes on disk, uncommitted — git status will keep showing them until you stage or discard them.",
+            affirm: "a commit contains exactly what you staged — nothing more.",
+          },
+        },
+        {
+          id: "commit",
+          title: "5 · git commit — take the snapshot",
+          body: (
+            <>
+              <p>
+                Both files staged — record the snapshot, with a conventional-commits
+                message (type prefix, colon, short description). Then check status
+                to see what changed:
+              </p>
+              <TryIt
+                stages={[
+                  {
+                    cmd: 'git commit -m "feat: add opening hours staging model"',
+                    out: `[feat/opening-hours 3f2a1c9] feat: add opening hours staging model
+ 2 files changed, 34 insertions(+)`,
+                  },
+                  {
+                    cmd: "git status",
+                    out: `On branch feat/opening-hours
+nothing to commit, working tree clean`,
+                    prompt: "where did the staged files go? ask status",
+                  },
+                ]}
+                done="The staged files are now a permanent snapshot in your branch's history — which is why status reports a clean working tree."
+              />
+              <p>What actually happened, decoded from that first output line:</p>
+              <ul>
+                <li>
+                  Your two staged files became a <strong>permanent snapshot</strong>{" "}
+                  in the branch&apos;s history — that is the whole event.
+                </li>
+                <li>
+                  <code>3f2a1c9</code>{" "}is the snapshot&apos;s id: a short reference
+                  you (or anyone) can use to look at exactly this version forever.
+                </li>
+                <li>
+                  <code>2 files changed, 34 insertions(+)</code>{" "}summarises the
+                  difference this snapshot records against the previous one.
+                </li>
+                <li>
+                  The staging area is now empty — hence{" "}
+                  <code>working tree clean</code>. Editing a file would start the
+                  status → add → commit cycle again.
+                </li>
+              </ul>
+              <p>
+                A hook checks the message format (<code>feat</code>,{" "}
+                <code>fix</code>, <code>docs</code>, <code>chore</code>…) and tells
+                you if it is off. And note: committing is <strong>local</strong> —
+                nothing has left your machine yet.
+              </p>
+            </>
+          ),
+        },
+        {
+          id: "push",
+          title: "6 · git push — share it",
+          body: (
+            <>
+              <TryIt
+                stages={[
+                  {
+                    cmd: "git push",
+                    out: `Enumerating objects: 9, done.
+Writing objects: 100% (6/6), 1.21 KiB, done.
+remote:
+remote: Create a pull request for 'feat/opening-hours' on GitHub by visiting:
+remote:   https://github.com/wnl-icb-analytics/dbt-analytics/pull/new/feat/opening-hours
+remote:
+To https://github.com/wnl-icb-analytics/dbt-analytics.git
+ * [new branch]      feat/opening-hours -> feat/opening-hours`,
+                  },
+                ]}
+                done="Your branch is on GitHub — and git even hands you the link to open the pull request."
+              />
+              <p>
+                Until you push, your work exists only on your machine — push is the
+                moment it becomes shared. (A brand-new branch may first ask you to
+                set an “upstream”; git prints the exact command to run, once.)
+              </p>
+            </>
+          ),
+        },
+        {
+          id: "loop",
+          title: "The whole loop",
+          body: (
+            <>
+              <CodeBlock
+                lang="bash"
+                title="the daily rhythm"
+                code={`
+git switch main                 # 1. return to main
+git pull                        # 2. update it from origin/main
+git switch -c feat/my-change    # 3. branch from fresh main
+# ...edit files...
+git status                      # 4. what did I change?
+git add -u                      # 5. stage it
+git commit -m "feat: ..."       # 6. snapshot it
+git push                        # share the branch
+`}
+              />
+              <p>
+                That is the daily rhythm. Freshen main, branch once per piece of
+                work, then status, add and commit as you go; push when you want the
+                branch shared.
+              </p>
+            </>
+          ),
+          check: {
+            prompt: "Right after `git commit`, where does your work exist?",
+            options: [
+              "On GitHub, visible to the team",
+              "Only on your machine, on your branch",
+              "On `main`, ready for tonight's build",
+              "In the staging area, waiting to be pushed",
+            ],
+            answer: 1,
+            explain:
+              "Commit is local. The snapshot is safely recorded on your branch — but only push sends it to GitHub. (And nothing reaches main until a pull request is merged.)",
+            affirm: "commit saves locally — push is what shares it.",
           },
         },
       ],
