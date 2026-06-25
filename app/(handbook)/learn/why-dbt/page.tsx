@@ -146,8 +146,8 @@ create or replace view DEV__STAGING.CSDS.STG_CSDS_BRIDGING as (
         </li>
       </ol>
       <p>
-        Your day-to-day barely changes: it is still writing SELECT statements against
-        Snowflake. What changes is that your SQL now lives in a repo where it is ordered,
+        You are still writing SELECT statements against Snowflake. What changes is that
+        your SQL now lives in a repo where it is ordered,
         tested, reviewed and rerun automatically every day.
       </p>
 

@@ -11,9 +11,9 @@ import { GrainFanout } from "@/components/GrainFanout";
 import { BranchToProd } from "@/components/BranchToProd";
 import { YamlWorkshop } from "@/components/YamlWorkshop";
 
-export const HOW_DBT_THINKS_COURSE: Course = {
-  slug: "how-dbt-thinks",
-  title: "How dbt thinks",
+export const UNDERSTANDING_DBT_COURSE: Course = {
+  slug: "understanding-dbt",
+  title: "Understanding dbt",
   tagline: "What dbt is and why it exists — in pictures, before you ever run it",
   audience:
     "For SQL analysts who have never used dbt. Nothing to install, nothing to run — short visual chunks with a question at each step. Take it after Git essentials, before Your first PR.",
@@ -105,10 +105,9 @@ export const HOW_DBT_THINKS_COURSE: Course = {
                 </span>
               </div>
               <p>
-                Your day-to-day barely changes: it is still writing SELECT
-                statements against Snowflake. What changes is that your SQL now
-                lives somewhere it is ordered, tested, reviewed and rerun
-                automatically.
+                You are still writing SELECT statements against Snowflake.
+                What changes is that your SQL now lives somewhere it is
+                ordered, tested, reviewed and rerun automatically.
               </p>
             </>
           ),

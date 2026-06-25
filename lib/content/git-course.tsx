@@ -1192,7 +1192,7 @@ git pull          # bring main up to date, now including your work
               <p>
                 Repo, branch, commit, push, PR, merge — that is the entire mental
                 model this project requires, and you now have it. Next,{" "}
-                <strong>How dbt thinks</strong>{" "}shows you what dbt is and why the
+                <strong>Understanding dbt</strong>{" "}shows you what dbt is and why the
                 project is shaped the way it is — all pictures and questions, nothing
                 to install. After that, Your first PR puts both skills together on
                 the real repository, including the one-off signed-commit setup.

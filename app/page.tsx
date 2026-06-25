@@ -141,7 +141,7 @@ export default function Home() {
         </div>
         <p className="mt-4 max-w-[64ch] text-sm leading-relaxed text-ink-faint">
           Start with Git essentials if version control is new — everything else
-          assumes it. Already fluent in git? Start with How dbt thinks, then use
+          assumes it. Already fluent in git? Start with Understanding dbt, then use
           Your first PR as the practical capstone. Progress and certificates are saved
           in your browser.
         </p>
@@ -170,8 +170,8 @@ export default function Home() {
           ))}
         </div>
         <p className="mt-5 max-w-[64ch] text-[15px] leading-relaxed text-ink-soft">
-          The day-to-day barely changes — it is still SQL against Snowflake. What
-          changes is the starting point: instead of rebuilding demographics, registers
+          It is still SQL against Snowflake. What changes is the starting point:
+          instead of rebuilding demographics, registers
           and lookups for every piece of work, you join models that already exist, are
           already tested, and refresh themselves every night. The setup is a one-off;
           the everyday loop — edit, build, PR — takes minutes.

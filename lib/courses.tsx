@@ -1,11 +1,11 @@
 import type { Course, CourseMeta } from "@/lib/course-types";
 import { GIT_COURSE } from "@/lib/content/git-course";
-import { HOW_DBT_THINKS_COURSE } from "@/lib/content/how-dbt-thinks-course";
+import { UNDERSTANDING_DBT_COURSE } from "@/lib/content/understanding-dbt-course";
 import { FIRST_PR_COURSE } from "@/lib/content/first-pr-course";
 
 export const COURSES: Course[] = [
   GIT_COURSE,
-  HOW_DBT_THINKS_COURSE,
+  UNDERSTANDING_DBT_COURSE,
   FIRST_PR_COURSE,
 ];
 
