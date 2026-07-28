@@ -4,6 +4,7 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { Dag } from "@/components/Dag";
 import { LayerCake } from "@/components/LayerCake";
 import { LayerSorter } from "@/components/LayerSorter";
+import { ModelFinder } from "@/components/ModelFinder";
 import { ModelJourney } from "@/components/ModelJourney";
 import { ScriptChaos } from "@/components/ScriptChaos";
 import { TestProbe } from "@/components/TestProbe";
@@ -17,7 +18,7 @@ export const UNDERSTANDING_DBT_COURSE: Course = {
   tagline: "What dbt is and why it exists — in pictures, before you ever run it",
   audience:
     "For SQL analysts who have never used dbt. Nothing to install, nothing to run — short visual chunks with a question at each step. Take it after Git essentials, before Your first PR.",
-  hours: "~1 hr",
+  hours: "~1¼ hrs",
   accent: "var(--layer-modelling)",
   lessons: [
     // ------------------------------------------------------------------
@@ -448,6 +449,160 @@ from {{ ref('raw_people') }}
     },
     // ------------------------------------------------------------------
     {
+      slug: "names-are-the-map",
+      title: "Names are the map",
+      blurb: "Read any model name — and search before you build",
+      minutes: 7,
+      steps: [
+        {
+          id: "grammar",
+          body: (
+            <>
+              <p>
+                With 1,500+ models in the project, the naming convention is not
+                tidiness — it is how you find things. Every model name is a
+                little sentence: <strong>layer, subject, shape</strong>. Read
+                these three without opening a single file:
+              </p>
+              <div className="my-6 flex flex-col gap-2.5">
+                {[
+                  {
+                    name: ["int_", "hba1c", "_latest"],
+                    gloss: "modelling layer · HbA1c results · most recent per person",
+                  },
+                  {
+                    name: ["fct_", "person_diabetes", "_register"],
+                    gloss: "reporting layer · people with diabetes · a disease register",
+                  },
+                  {
+                    name: ["stg_", "olids_observation", ""],
+                    gloss: "staging layer · the OLIDS observation table, cleaned",
+                  },
+                ].map(({ name, gloss }) => (
+                  <div
+                    key={gloss}
+                    className="rounded-xl border border-line bg-paper-warm/60 px-4 py-3"
+                  >
+                    <p className="!my-0 font-mono text-[13px]">
+                      <span className="font-bold text-flame-deep">{name[0]}</span>
+                      <span className="text-ink">{name[1]}</span>
+                      <span className="font-bold text-layer-modelling">{name[2]}</span>
+                    </p>
+                    <p className="!mb-0 !mt-1 text-xs !text-ink-faint">{gloss}</p>
+                  </div>
+                ))}
+              </div>
+              <p>
+                The prefix you already know — it names the layer. The middle is
+                the subject. The suffix, when there is one, tells you the
+                model&apos;s <em>shape</em>.
+              </p>
+            </>
+          ),
+          check: {
+            prompt:
+              "Without opening it, what does `int_smoking_status_latest` contain?",
+            options: [
+              "A modelling-layer block: each person's most recent smoking status",
+              "Every smoking status ever recorded, one row per observation",
+              "A staging model cleaning the smoking feed",
+              "A report on smoking rates by practice",
+            ],
+            answer: 0,
+            explain:
+              "int_ = modelling layer, smoking_status = the subject, _latest = most recent per person. The name told you the layer, the subject and the shape.",
+            affirm: "layer, subject, shape — the name is a sentence.",
+          },
+        },
+        {
+          id: "suffixes",
+          title: "_all and _latest are different tables of the same thing",
+          body: (
+            <>
+              <p>
+                The suffix pairs recur across the whole modelling layer, and
+                the difference between them is <strong>what one row means</strong>:
+              </p>
+              <div className="my-6 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border-2 border-ink bg-paper p-4 shadow-[4px_4px_0_0_var(--color-layer-modelling)]">
+                  <p className="!my-0 font-mono text-[13px] font-bold !text-ink">int_hba1c_all</p>
+                  <p className="!mb-0 !mt-1.5 text-sm !text-ink-soft">
+                    Every HbA1c ever recorded. <strong>One row per test</strong>{" "}
+                    — a person with twenty tests has twenty rows.
+                  </p>
+                </div>
+                <div className="rounded-2xl border-2 border-ink bg-paper p-4 shadow-[4px_4px_0_0_var(--color-layer-staging)]">
+                  <p className="!my-0 font-mono text-[13px] font-bold !text-ink">int_hba1c_latest</p>
+                  <p className="!mb-0 !mt-1.5 text-sm !text-ink-soft">
+                    The most recent HbA1c only. <strong>One row per person</strong>{" "}
+                    — built for joining onto person-level analysis.
+                  </p>
+                </div>
+              </div>
+              <p>
+                Same pattern for blood pressure, BMI, eGFR, cholesterol, smoking
+                status. Pick by the question: trends over time need{" "}
+                <code>_all</code>; “what is it now, per person” needs{" "}
+                <code>_latest</code>. Join the wrong one and every person with
+                repeat tests silently multiplies your rows.
+              </p>
+            </>
+          ),
+          check: {
+            prompt:
+              "You join `int_blood_pressure_all` onto a one-row-per-person list, when you wanted `_latest`. What happens?",
+            options: [
+              "Nothing — the tables hold the same data",
+              "Each person repeats once per recorded blood pressure — your row count multiplies",
+              "dbt refuses the join because the grains differ",
+              "Only people with no readings are affected",
+            ],
+            answer: 1,
+            explain:
+              "_all is one row per reading, so the join fans your list out. The suffix was the warning — it tells you what one row means before you join.",
+            affirm: "the suffix says what one row means — read it before you join.",
+          },
+        },
+        {
+          id: "finder",
+          title: "Your turn: search before you build",
+          body: (
+            <>
+              <p>
+                Because names follow the grammar, the editor&apos;s file search
+                (<code>Ctrl+P</code>) becomes an index of everything the team
+                has built. Three real situations — find each model by typing
+                the concept:
+              </p>
+              <ModelFinder />
+              <p>
+                This is the reflex that saves the most time in this project:
+                someone has probably built it, and the name will find it.
+                Starting an analysis by searching costs thirty seconds;
+                rebuilding an existing block costs days — and a review comment.
+              </p>
+            </>
+          ),
+          interact: true,
+          check: {
+            prompt:
+              "A colleague asks whether the project tracks who is housebound. Your fastest first move?",
+            options: [
+              "Type `housebound` into the editor's file search",
+              "Ask in the team channel and wait",
+              "Start writing a model that derives it from observations",
+              "Browse the folder tree top to bottom",
+            ],
+            answer: 0,
+            explain:
+              "The naming convention makes search the index: dim_person_housebound_status turns up in seconds. The channel and the folder tree work too — but the name is faster, and building first is how duplicates happen.",
+            affirm: "search the name space first — someone has probably built it.",
+          },
+        },
+      ],
+    },
+    // ------------------------------------------------------------------
+    {
       slug: "yaml-describes-the-project",
       title: "YAML describes the project",
       blurb: "Keys, lists and indentation, written by you",
@@ -825,9 +980,10 @@ models:
             <>
               <p>
                 You now have the mental model: models are SELECTs,{" "}
-                <code>ref()</code>{" "}draws the map, YAML records what dbt should
-                know, layers give each model one job, tests guard the data nightly,
-                and only reviewed code from <code>main</code>{" "}should run in production.
+                <code>ref()</code>{" "}draws the map, layers give each model one
+                job, names tell you what exists, YAML records what dbt should
+                know, tests guard the data nightly, and only reviewed code from{" "}
+                <code>main</code>{" "}should run in production.
               </p>
               <p>
                 <strong>Your first PR</strong>{" "}makes it real: you will set up
@@ -844,8 +1000,8 @@ models:
     {
       slug: "fundamentals-check",
       title: "Can you predict dbt?",
-      blurb: "Seven situations to confirm the mental model",
-      minutes: 7,
+      blurb: "Eight situations to confirm the mental model",
+      minutes: 8,
       steps: [
         {
           id: "intro",
@@ -970,8 +1126,26 @@ models:
           },
         },
         {
+          id: "q-name",
+          title: "7. The name",
+          body: <p>A new piece of work needs each person&apos;s most recent smoking status.</p>,
+          check: {
+            prompt: "Your first move?",
+            options: [
+              "Search the project for `smoking` — a model like int_smoking_status_latest probably exists",
+              "Write a new model deriving it from observations",
+              "Query the raw feed directly in a worksheet",
+              "Ask the team to build it",
+            ],
+            answer: 0,
+            explain:
+              "The naming grammar makes search the index: layer, subject, shape. int_smoking_status_latest is exactly the one-row-per-person block the work needs — and it already exists.",
+            affirm: "search the name space before building anything.",
+          },
+        },
+        {
           id: "q-change",
-          title: "7. The change",
+          title: "8. The change",
           body: <p>Your PR is approved, checks are green, and you merge it to main.</p>,
           check: {
             prompt: "What happens to production?",
