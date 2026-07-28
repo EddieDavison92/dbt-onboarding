@@ -2,13 +2,30 @@
 
 import { useRef, useState } from "react";
 
+/** where each file (or commit) sits after a command runs */
+export type GitZones = {
+  working: string[];
+  staged: string[];
+  branch: string[];
+  origin: string[];
+};
+
 type Stage = {
   cmd: string;
   /** what the terminal prints back */
   out: string;
   /** shown above the prompt while this stage is active */
   prompt?: string;
+  /** zone snapshot after this command; falls back to the previous stage's */
+  state?: GitZones;
 };
+
+const ZONES: { key: keyof GitZones; label: string; via?: string }[] = [
+  { key: "working", label: "working tree" },
+  { key: "staged", label: "staged", via: "add" },
+  { key: "branch", label: "your branch", via: "commit" },
+  { key: "origin", label: "GitHub", via: "push" },
+];
 
 /** Normalise a typed command for comparison: collapse whitespace, trim. */
 function norm(s: string) {
@@ -20,7 +37,16 @@ function norm(s: string) {
  * realistic output. "Do it for me" fills the command for anyone who'd rather
  * not type.
  */
-export function TryIt({ stages, done = "That's the real output — exactly what you'll see on your machine." }: { stages: Stage[]; done?: string }) {
+export function TryIt({
+  stages,
+  done = "That's the real output — exactly what you'll see on your machine.",
+  initialState,
+}: {
+  stages: Stage[];
+  done?: string;
+  /** when set, a four-zone map below the terminal shows where files are */
+  initialState?: GitZones;
+}) {
   const [history, setHistory] = useState<{ cmd: string; out: string }[]>([]);
   const [input, setInput] = useState("");
   const [nudge, setNudge] = useState(false);
@@ -28,6 +54,19 @@ export function TryIt({ stages, done = "That's the real output — exactly what 
 
   const stage = stages[history.length];
   const finished = !stage;
+
+  // zone snapshot after the first n commands (last defined state wins)
+  const zonesAt = (n: number): GitZones | null => {
+    if (!initialState) return null;
+    let zones = initialState;
+    for (let i = 0; i < n; i++) {
+      const s = stages[i]?.state;
+      if (s) zones = s;
+    }
+    return zones;
+  };
+  const zones = zonesAt(history.length);
+  const prevZones = zonesAt(Math.max(0, history.length - 1));
 
   const run = (typed: string) => {
     if (!stage) return;
@@ -148,6 +187,49 @@ export function TryIt({ stages, done = "That's the real output — exactly what 
           <p className="!mb-0 !mt-2 text-[11px] text-[#7ee2c0]">{done}</p>
         )}
       </div>
+
+      {zones && (
+        <div className="border-t border-white/10 px-3 pb-3 pt-2.5">
+          <p className="!my-0 mb-2 px-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white/35">
+            where your work is
+          </p>
+          <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+            {ZONES.map(({ key, label, via }) => {
+              const moved = (chip: string) =>
+                history.length > 0 && !!prevZones && !prevZones[key].includes(chip);
+              return (
+                <div
+                  key={key}
+                  className="min-w-0 rounded-lg border border-white/10 bg-white/[0.03] px-2 py-1.5"
+                >
+                  <p className="!my-0 truncate font-mono text-[9.5px] uppercase tracking-wider text-white/45">
+                    {label}
+                    {via && <span className="ml-1 normal-case text-white/25">← {via}</span>}
+                  </p>
+                  <div className="mt-1.5 flex min-h-6 flex-col gap-1">
+                    {zones[key].length === 0 && (
+                      <span className="font-mono text-[10px] text-white/20">—</span>
+                    )}
+                    {zones[key].map((chip) => (
+                      <span
+                        key={`${history.length}-${chip}`}
+                        title={chip}
+                        className={`truncate rounded border px-1.5 py-0.5 font-mono text-[10.5px] ${
+                          moved(chip)
+                            ? "rise border-flame/70 bg-flame/15 text-[#ffd9cd]"
+                            : "border-white/15 text-white/65"
+                        }`}
+                      >
+                        {chip}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {!finished && (
         <div className="border-t border-white/10 px-4 py-2 text-right">

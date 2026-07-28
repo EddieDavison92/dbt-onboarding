@@ -1,6 +1,7 @@
 import type { Course } from "@/lib/course-types";
 import { CodeBlock } from "@/components/CodeBlock";
 import { BranchDiagram } from "@/components/BranchDiagram";
+import { CloneDiagram } from "@/components/CloneDiagram";
 import { TryIt } from "@/components/TryIt";
 import { Callout } from "@/components/Callout";
 
@@ -91,8 +92,12 @@ analysis_v2_FINAL_jw_comments.sql
                 The repo lives in two kinds of place at once: on{" "}
                 <strong>GitHub</strong>{" "}(the shared copy everyone can see) and as a{" "}
                 <strong>clone</strong>{" "}on each person&apos;s machine (your private
-                working copy). You work locally; sharing happens when you choose to
-                send your snapshots up.
+                working copy):
+              </p>
+              <CloneDiagram />
+              <p>
+                You work locally; sharing happens when you choose to send your
+                snapshots up.
               </p>
             </>
           ),
@@ -473,12 +478,36 @@ dbt_packages/
                 in ignored dbt directories. Data extracts stay outside the project
                 workspace altogether.
               </p>
+              <div className="my-6 overflow-hidden rounded-2xl border-2 border-ink bg-graphite-deep shadow-[5px_5px_0_0_var(--color-layer-staging)]">
+                <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
+                  <span className="font-display text-xs font-extrabold uppercase tracking-[0.14em] text-white">
+                    What a push publishes
+                  </span>
+                  <span className="rounded-full bg-flame/20 px-2.5 py-1 font-mono text-[10px] font-bold text-[#ffb4a1]">
+                    VISIBLE TO ANYONE
+                  </span>
+                </div>
+                <div className="grid gap-px bg-white/10 sm:grid-cols-2">
+                  {[
+                    ["File contents", "Every tracked file — SQL, YAML and the comments inside them."],
+                    ["Filenames & folders", "The whole project structure, including work-in-progress names."],
+                    ["Author", "Your name, on every commit, forever."],
+                    ["Commit messages", "The one-line story of every change."],
+                    ["History", "Every earlier committed version — deleting a file later does not unpublish it."],
+                    ["PR discussion", "Descriptions and review threads stay public on GitHub."],
+                  ].map(([label, copy]) => (
+                    <div key={label} className="bg-graphite-deep p-4">
+                      <p className="!my-0 font-display text-[10px] font-extrabold uppercase tracking-[0.16em] !text-[#7ee2c0]">
+                        {label}
+                      </p>
+                      <p className="!mb-0 !mt-1.5 text-sm leading-6 !text-white/75">{copy}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
               <p>
-                Once pushed, the code, YAML, comments, filenames, commit authors and
-                commit messages are visible to anyone, including earlier committed
-                versions. Pull request descriptions and review conversations are public
-                on GitHub too. Write them as a professional record that helps a future
-                reader understand the work; never use them for data, credentials or
+                Write all of it as a professional record that helps a future reader
+                understand the work; never use any of it for data, credentials or
                 private notes.
               </p>
               <p>
@@ -913,6 +942,12 @@ git pull          # bring main up to date, now including your work
                 see exactly what your real machine will say back. Nothing to
                 install; type the command (or use “type it for me”) and press Enter.
               </p>
+              <p>
+                From the third command on, a map appears under the terminal
+                showing <strong>where your work is</strong> — on disk, staged,
+                committed, or shared on GitHub. Watching files move across it is
+                the fastest way to understand what each command actually does.
+              </p>
             </>
           ),
         },
@@ -1017,6 +1052,12 @@ Fast-forward
                 documentation file. Ask git where things stand:
               </p>
               <TryIt
+                initialState={{
+                  working: ["opening_hours.sql", "opening_hours.yml"],
+                  staged: [],
+                  branch: [],
+                  origin: [],
+                }}
                 stages={[
                   {
                     cmd: "git status",
@@ -1030,7 +1071,7 @@ Untracked files:
         models/staging/shared/stg_opening_hours.yml`,
                   },
                 ]}
-                done="Branch, changed files, and a suggestion for what to do next — status changes nothing, it only reports."
+                done="Branch, changed files, and a suggestion for what to do next — status changes nothing, it only reports. Both files sit in your working tree, and nowhere else."
               />
               <p>
                 Read it top to bottom: you are safely on your feature branch, one
@@ -1052,16 +1093,34 @@ Untracked files:
                 what changed:
               </p>
               <TryIt
+                initialState={{
+                  working: ["opening_hours.sql", "opening_hours.yml"],
+                  staged: [],
+                  branch: [],
+                  origin: [],
+                }}
                 stages={[
                   {
                     cmd: "git add -u",
                     out: ``,
                     prompt: "stage every file you've modified (-u = updated)",
+                    state: {
+                      working: ["opening_hours.yml"],
+                      staged: ["opening_hours.sql"],
+                      branch: [],
+                      origin: [],
+                    },
                   },
                   {
                     cmd: "git add models/staging/shared/stg_opening_hours.yml",
                     out: ``,
                     prompt: "the new file is untracked, so -u didn't catch it — add it by name",
+                    state: {
+                      working: [],
+                      staged: ["opening_hours.sql", "opening_hours.yml"],
+                      branch: [],
+                      origin: [],
+                    },
                   },
                   {
                     cmd: "git status",
@@ -1072,7 +1131,7 @@ Changes to be committed:
         new file:   models/staging/shared/stg_opening_hours.yml`,
                   },
                 ]}
-                done="Silence is success for git add — and status confirms both files are staged, ready for the snapshot."
+                done="Silence is success for git add — the map shows both files moved to staged, ready for the snapshot."
               />
               <p>
                 Why the extra step? Because you often change more than you mean to
@@ -1108,11 +1167,23 @@ Changes to be committed:
                 to see what changed:
               </p>
               <TryIt
+                initialState={{
+                  working: [],
+                  staged: ["opening_hours.sql", "opening_hours.yml"],
+                  branch: [],
+                  origin: [],
+                }}
                 stages={[
                   {
                     cmd: 'git commit -m "feat: add opening hours staging model"',
                     out: `[feat/opening-hours 3f2a1c9] feat: add opening hours staging model
  2 files changed, 34 insertions(+)`,
+                    state: {
+                      working: [],
+                      staged: [],
+                      branch: ["3f2a1c9 · 2 files"],
+                      origin: [],
+                    },
                   },
                   {
                     cmd: "git status",
@@ -1121,7 +1192,7 @@ nothing to commit, working tree clean`,
                     prompt: "where did the staged files go? ask status",
                   },
                 ]}
-                done="The staged files are now a permanent snapshot in your branch's history — which is why status reports a clean working tree."
+                done="The staged files became snapshot 3f2a1c9 on your branch — which is why status reports a clean working tree."
               />
               <p>What actually happened, decoded from that first output line:</p>
               <ul>
@@ -1138,9 +1209,10 @@ nothing to commit, working tree clean`,
                   difference this snapshot records against the previous one.
                 </li>
                 <li>
-                  The staging area is now empty — hence{" "}
-                  <code>working tree clean</code>. Editing a file would start the
-                  status → add → commit cycle again.
+                  The map shows why status says{" "}
+                  <code>working tree clean</code>: nothing is left in the working
+                  tree or staged. Editing a file starts the status → add → commit
+                  cycle again.
                 </li>
               </ul>
               <p>
@@ -1158,9 +1230,21 @@ nothing to commit, working tree clean`,
           body: (
             <>
               <TryIt
+                initialState={{
+                  working: [],
+                  staged: [],
+                  branch: ["3f2a1c9 · 2 files"],
+                  origin: [],
+                }}
                 stages={[
                   {
                     cmd: "git push",
+                    state: {
+                      working: [],
+                      staged: [],
+                      branch: ["3f2a1c9 · 2 files"],
+                      origin: ["3f2a1c9 · 2 files"],
+                    },
                     out: `Enumerating objects: 9, done.
 Writing objects: 100% (6/6), 1.21 KiB, done.
 remote:
@@ -1171,7 +1255,7 @@ To https://github.com/wnl-icb-analytics/dbt-analytics.git
  * [new branch]      feat/opening-hours -> feat/opening-hours`,
                   },
                 ]}
-                done="Your branch is on GitHub — and git even hands you the link to open the pull request."
+                done="Your branch is on GitHub — the snapshot now exists in both places, and git even hands you the link to open the pull request."
               />
               <p>
                 Until you push, your work exists only on your machine — push is the
