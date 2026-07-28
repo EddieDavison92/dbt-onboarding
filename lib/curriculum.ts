@@ -88,10 +88,10 @@ export const PRACTICE: NavItem[] = [
     minutes: 6,
   },
   {
-    slug: "when-git-goes-wrong",
-    title: "When git goes wrong",
-    blurb: "Conflicts, wrong branches and undo — the calm recovery moves",
-    minutes: 12,
+    slug: "undoing-changes",
+    title: "How undo works in git",
+    blurb: "Commits never change and branches are pointers — the model that makes recovery make sense",
+    minutes: 10,
   },
 ];
 
