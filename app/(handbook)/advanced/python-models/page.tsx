@@ -13,7 +13,7 @@ export default function Page() {
       slug="python-models"
       kicker="Going further 08"
       title="Python models"
-      lede="A dbt model doesn't have to be SQL. A .py file in models/ joins the same DAG, gets the same tests and lineage — and runs Python where SQL runs out of road."
+      lede="A dbt model doesn't have to be SQL. A .py file in models/ joins the same DAG and gets the same tests and lineage — for the work SQL cannot express well."
       minutes={8}
     >
       <Callout kind="info" title="We don't have any yet">

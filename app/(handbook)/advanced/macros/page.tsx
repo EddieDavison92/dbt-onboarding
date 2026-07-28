@@ -176,12 +176,40 @@ where {{ is_active_record('open_date', 'close_date') }}
         </li>
       </ul>
 
-      <Callout kind="tip" title="The rule of three">
+      <h2>The two mistakes everyone makes first</h2>
+      <p>
+        <strong>Nesting curlies.</strong>{" "}Once you are inside{" "}
+        <code>{"{{ … }}"}</code>{" "}or <code>{"{% … %}"}</code>, you are already in
+        Jinja — opening another pair does not evaluate anything, it passes the
+        literal text. So a macro that takes a model as an argument is called with{" "}
+        <code>ref()</code>{" "}bare:
+      </p>
+      <CodeBlock
+        lang="sql"
+        code={`
+{{ deduplicate_table(ref('stg_olids_patient'), 'person_id') }}   -- right
+{{ deduplicate_table("{{ ref('stg_olids_patient') }}", ...) }}   -- passes literal text
+`}
+      />
+      <p>
+        <strong>Missing quotes.</strong>{" "}Column names passed to a macro are
+        strings and need quoting:{" "}
+        <code>{"{{ calculate_age_attributes('birth_date') }}"}</code>. Without the
+        quotes, Jinja looks for a <em>variable</em>{" "}called{" "}
+        <code>birth_date</code>, finds nothing, and renders nothing — which
+        surfaces later as baffling SQL rather than a helpful error. When either
+        mistake has you stuck, <code>dbt compile</code>{" "}and read what was
+        actually rendered.
+      </p>
+
+      <Callout kind="tip" title="The rule of three — and its counterweight">
         <p>
           Pasting the same logic into a third model is the signal to stop — it should
           become a macro (or an <code>int_</code>{" "}model, if it is more data than logic).
-          Ask in review if unsure; promoting logic later is harder than starting it in
-          the right place.
+          First check whether <code>dbt_utils</code>{" "}already provides it. And dbt&apos;s
+          own counterweight applies: a model made of macro calls is harder to read than
+          one with a little repeated SQL, so favour readability when the abstraction
+          saves only a line or two.
         </p>
       </Callout>
 

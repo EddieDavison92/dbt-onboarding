@@ -140,7 +140,10 @@ select ...
         <li>
           <strong>Cardinality matters at both extremes.</strong>{" "}A two-value flag
           barely narrows anything; a unique timestamp scatters grouping. Mid-cardinality
-          columns — person, code, practice, date — sit in the useful range.
+          columns — person, code, practice, date — sit in the useful range. When the
+          natural column is too fine-grained, Snowflake&apos;s advice is to cluster on
+          an expression that coarsens it — a timestamp cast to a date, for example —
+          keeping the ordering while giving the partitions something to group by.
         </li>
       </ol>
       <p>

@@ -85,6 +85,16 @@ from {{ ref('stg_pds_registration') }}
           which makes it the natural choice for most of what we want to snapshot.
         </li>
       </ul>
+      <p>
+        dbt&apos;s general advice is to prefer <code>timestamp</code>{" "}wherever the
+        source has a reliable last-updated column — it is cheaper and more robust.
+        Much of what this project snapshots has no such column, for the reason the
+        next section explains, so <code>check</code>{" "}appears here more often than
+        in most projects. Whichever strategy you use, the <code>unique_key</code>{" "}
+        must genuinely be unique: it is how dbt matches this run&apos;s rows to the
+        recorded versions, and a duplicated key corrupts the very history the
+        snapshot exists to protect.
+      </p>
 
       <h2>Why check strategy fits population health</h2>
       <p>

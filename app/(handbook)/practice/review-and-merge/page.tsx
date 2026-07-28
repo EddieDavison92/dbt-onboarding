@@ -38,6 +38,14 @@ export default function Page() {
           a future source or definition change would require?
         </li>
       </ul>
+      <p>
+        The standard worth holding each other to is the one Google wrote down for
+        its own reviews: approve once the change definitely improves the codebase,
+        even though it is not perfect — there is no perfect model, only a better
+        one. A change that makes things better should not wait days for polish;
+        mark optional suggestions as such (a “nit:” prefix works) so the author can
+        tell what blocks the merge from what is merely worth considering.
+      </p>
       <Callout kind="info" title="Make the reasoning useful">
         <p>
           A strong review comment names the concern and why it matters, then asks a

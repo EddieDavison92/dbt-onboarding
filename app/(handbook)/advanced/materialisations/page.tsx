@@ -66,6 +66,13 @@ export default function Page() {
         fresh for free. Modelling and reporting do real computation, so tables pay the
         cost once per night instead of on every query.
       </p>
+      <p>
+        dbt&apos;s own guidance compresses the whole decision into one escalation
+        ladder, worth memorising: start with a view; when the view gets too slow to{" "}
+        <em>query</em>, make it a table; when the table gets too slow to{" "}
+        <em>build</em>, make it incremental. Each promotion is a response to a
+        pain you have actually felt, never a precaution.
+      </p>
 
       <h2>Overriding per model</h2>
       <p>
@@ -155,7 +162,7 @@ from {{ ref('stg_big_event_feed') }}
         a team conversation about orchestration — not a config change on a model.
       </p>
 
-      <h2>The pitfalls that earn incremental its reputation</h2>
+      <h2>Where incremental models go wrong</h2>
       <p>
         The pattern above looks simple; the failure modes are where the care goes:
       </p>

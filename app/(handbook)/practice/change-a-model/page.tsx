@@ -14,116 +14,102 @@ export default function Page() {
       slug="change-a-model"
       kicker="Field guide · 8"
       title="Change an existing model"
-      lede="Most work is not a new model — it is a change to one that other models already depend on. Look downstream before you edit, not after CI does."
-      minutes={6}
+      lede="Your first PR added a model nothing depended on. Most work after that is different: editing a model that other models already read. The edit itself is the same — what changes is that you now need to know who is downstream before you start."
+      minutes={7}
     >
-      <h2>Before you edit: measure the blast radius</h2>
-      <CodeBlock
-        lang="bash"
-        code={`
-dbt ls -s my_model+        # everything downstream of the model
-dbt ls -s my_model+ | wc -l
-`}
-      />
-      <ul>
-        <li>
-          A handful of downstream models: read them; you can probably verify the
-          whole set yourself.
-        </li>
-        <li>
-          Dozens: read the direct children, then rely on their tests — and say
-          so in the PR.
-        </li>
-        <li>
-          Check the YAML of affected models for <code>owner</code>{" "}names. A
-          breaking change to someone else&apos;s model deserves a heads-up
-          before the PR, not a surprise in review.
-        </li>
-      </ul>
-
-      <h2>Classify the change</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Change</th>
-            <th>Risk</th>
-            <th>What it needs</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Add a column</td>
-            <td>Low</td>
-            <td>Document and test it; downstream models are unaffected.</td>
-          </tr>
-          <tr>
-            <td>Rename or remove a column</td>
-            <td>Breaking</td>
-            <td>
-              Find every usage and update it in the same PR. The{" "}
-              <Link href="/advanced/dbt-extension">dbt extension</Link>{" "}renames a
-              column across the project by lineage, not text-matching.
-            </td>
-          </tr>
-          <tr>
-            <td>Change a filter, join or derivation</td>
-            <td>Silent</td>
-            <td>
-              The columns look identical but the numbers change. Say exactly what
-              moves and why in the PR; downstream owners judge the impact.
-            </td>
-          </tr>
-          <tr>
-            <td>Change the grain</td>
-            <td>Contract</td>
-            <td>
-              Every consumer&apos;s assumptions break. Talk to downstream owners
-              first, update the grain test, and treat it as a coordinated change.
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h2>Prove it locally</h2>
-      <CodeBlock
-        lang="bash"
-        code={`
-dbt build -s my_model+     # rebuild the model AND everything downstream, tests included
-`}
-      />
+      <h2>Look downstream before you edit</h2>
       <p>
-        Downstream tests are the point: a green build of just your model proves
-        nothing about the models that read it. For a very wide selection, build the
-        direct children at minimum and say in the PR how far you verified.
+        A new model can only be wrong in itself. An existing model can be right
+        in itself and still break the things that read it — and those breaks
+        happen at build time, in CI, or worst of all silently in the numbers.
+        One command shows you what you are dealing with before any of that:
       </p>
-      <Callout kind="warn" title="Incremental models remember the past">
+      <CodeBlock lang="bash" code={`dbt ls -s my_model+`} />
+      <p>
+        The <code>+</code>{" "}after the name lists the model and everything
+        downstream of it. A short list means you can read each consumer and
+        verify the whole set yourself. A long one changes the plan: read the
+        direct children, rely on the others&apos; tests, and say in the PR how
+        far you looked.
+      </p>
+      <p>
+        While you are there, open the YAML of the models you would affect and
+        note their owners. If your change will alter what someone else&apos;s
+        model produces, a message to them before the PR is cheaper than a
+        surprise during review — they usually know a constraint you do not.
+      </p>
+
+      <h2>Not all changes carry the same risk</h2>
+      <p>
+        <strong>Adding a column</strong>{" "}is the gentle case. Downstream models
+        select their columns explicitly, so a new column changes nothing for
+        them until someone chooses to use it. Document it, test it if it has
+        rules worth asserting, and move on.
+      </p>
+      <p>
+        <strong>Renaming or removing a column</strong>{" "}breaks every model
+        that selects it, immediately and visibly — the build fails. The work
+        is finding the usages and updating them in the same PR. The{" "}
+        <Link href="/advanced/dbt-extension">dbt extension</Link>{" "}can rename a
+        column across the whole project by following lineage rather than
+        matching text, which is the reliable way to catch a usage hiding in a
+        macro or an alias.
+      </p>
+      <p>
+        <strong>Changing logic — a filter, a join, a derivation</strong>{" "}is
+        the case that deserves the most respect, because nothing fails. The
+        columns keep their names, every build stays green, and the numbers
+        downstream quietly change. Whether that change is correct is exactly
+        what your PR has to establish: say what moves and why, and show a
+        before-and-after for one example a reviewer can check.
+      </p>
+      <p>
+        <strong>Changing the grain</strong>{" "}— what one row means — is a
+        different order of change. Every consumer was written against the old
+        grain, and their joins and counts assume it. Talk to the owners of the
+        downstream models first, update the grain test to assert the new
+        contract, and treat the whole thing as a coordinated piece of work
+        rather than an edit.
+      </p>
+
+      <h2>Prove it downstream, not just locally</h2>
+      <CodeBlock lang="bash" code={`dbt build -s my_model+`} />
+      <p>
+        The same <code>+</code>{" "}that listed the consumers now rebuilds and
+        tests them. This is the step that makes the difference: a green build
+        of your model alone proves the SQL runs, and nothing more. The grain
+        tests of the models downstream are what tell you whether your change
+        fanned out someone&apos;s join or emptied someone&apos;s filter. If the
+        selection is too wide to build in full, build the direct children at
+        least, and say in the PR where you stopped.
+      </p>
+      <Callout kind="warn" title="If anything in the chain is incremental">
         <p>
-          If the model (or a downstream one) is incremental, a logic change only
-          applies to new rows until someone runs a{" "}
-          <code>--full-refresh</code>. That usually means a deliberate production
-          run after merge — see{" "}
-          <Link href="/advanced/materialisations">materialisations</Link>{" "}and
-          flag it in the PR so it is planned, not discovered.
+          An incremental model applies new logic only to new rows — history
+          keeps the old behaviour until someone runs a{" "}
+          <code>--full-refresh</code>. If your change flows into one, the
+          production refresh needs to be planned, not discovered: flag it in
+          the PR so the merge and the refresh happen together. The{" "}
+          <Link href="/advanced/materialisations">materialisations page</Link>{" "}
+          covers why.
         </p>
       </Callout>
 
-      <h2>In the PR</h2>
-      <ul>
-        <li>Name the models affected downstream and what changes for them.</li>
-        <li>State how far you built and tested (<code>my_model+</code>, or which subset).</li>
-        <li>
-          For semantic changes, show before/after numbers for one example the
-          reviewer can check.
-        </li>
-      </ul>
+      <h2>Write the PR for the people downstream</h2>
+      <p>
+        The reviewer of a change to a shared model is standing in for everyone
+        who reads it. Give them what they need: which models are affected and
+        how, how far you built and tested, and — for a logic change — one
+        concrete example of a number that moves, with the reason it should.
+      </p>
 
       <Checklist
         id="change-a-model"
         items={[
-          { key: "ls", label: <><code>dbt ls -s my_model+</code>{" "}reviewed before editing</> },
-          { key: "class", label: <>Change classified — additive, breaking, silent or contract</> },
-          { key: "built", label: <>Downstream built and tested locally, or the limit stated in the PR</> },
-          { key: "owners", label: <>Owners of affected models know about breaking or silent changes</> },
+          { key: "ls", label: <><code>dbt ls -s my_model+</code>{" "}read before editing</> },
+          { key: "owners", label: <>Owners contacted where the change alters their models</> },
+          { key: "built", label: <>Downstream built and tested, or the limit stated in the PR</> },
+          { key: "semantic", label: <>Logic changes explained with a checkable example</> },
         ]}
       />
     </LessonShell>

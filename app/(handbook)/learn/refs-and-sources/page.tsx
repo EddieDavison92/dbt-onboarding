@@ -94,7 +94,7 @@ from {{ source('csds', 'ActiveSubmission') }}
         them.
       </p>
 
-      <Callout kind="smell" title="Spot the smell">
+      <Callout kind="smell" title="A pattern reviewers flag">
         <p>
           A hardcoded <code>DATABASE.SCHEMA.TABLE</code>{" "}in a model, or a{" "}
           <code>source()</code>{" "}call outside the raw layer, will draw a review comment.
