@@ -322,7 +322,12 @@ git switch -c feat/opening-hours-staging`}
                 code={`DATA_LAKE__NCL.ANALYST_MANAGED.OPENING_HOURS`}
               />
               <p>
-                In VS Code press <code>Ctrl+P</code>{" "}and search in this order:
+                In VS Code press <code>Ctrl+P</code>{" "}and search in this order.
+                Zeroth, before any of it: type the <em>concept</em>{" "}itself —
+                the naming grammar means an existing <code>dim_</code>,{" "}
+                <code>int_</code>{" "}or <code>fct_</code>{" "}model for your idea
+                shows up by name, and finding one can change (or finish) your
+                plan. Then:
               </p>
               <ol>
                 <li>
@@ -519,6 +524,13 @@ from {{ ref('raw_reference_opening_hours') }}
                   <strong>No joins, no filters with business meaning</strong> — the
                   moment you want one, that is a modelling-layer (<code>int_</code>)
                   model instead.
+                </li>
+                <li>
+                  <strong>Renames follow the column conventions</strong> —
+                  booleans get <code>is_</code>{" "}or <code>has_</code>{" "}
+                  (<code>is_open_24h</code>), dates end <code>_date</code>,
+                  timestamps <code>_at</code>, identifiers <code>_id</code>.
+                  CodeRabbit flags departures on every PR.
                 </li>
                 <li>
                   <strong>Lowercase keywords</strong> — the linter in CI checks it.
