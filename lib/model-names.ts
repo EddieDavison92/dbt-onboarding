@@ -192,6 +192,7 @@ export const MODEL_NAMES: string[] = [
   "int_blood_glucose_all",
   "int_blood_glucose_latest",
   "int_blood_pressure_all",
+  "int_blood_pressure_observations_base",
   "int_blood_pressure_latest",
   "int_bmi_all",
   "int_bmi_latest",

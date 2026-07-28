@@ -15,16 +15,18 @@ type Task = {
 
 const TASKS: Task[] = [
   {
-    prompt: "Your analysis needs each person's most recent HbA1c result.",
-    answer: "int_hba1c_latest",
+    prompt: "Your analysis needs each person's most recent blood pressure reading.",
+    answer: "int_blood_pressure_latest",
     near: {
-      int_hba1c_all:
-        "int_hba1c_all is every HbA1c ever recorded — one row per test, many per person. The suffix you want is _latest.",
-      dq_hba1c_issues:
-        "dq_ models list data-quality problems, not results. You want the modelling-layer block: int_hba1c_latest.",
+      int_blood_pressure_all:
+        "That's every reading ever recorded — one row per measurement, many per person. The suffix you want is _latest.",
+      dq_blood_pressure_issues:
+        "dq_ models list data-quality problems, not readings. You want the modelling-layer block: int_blood_pressure_latest.",
+      int_blood_pressure_observations_base:
+        "_base is an internal building step other int_ models assemble from. For one row per person, the suffix is _latest.",
     },
     explain:
-      "_latest means one row per person; _all means one row per test. And you found it by typing the concept — nobody had to tell you it existed.",
+      "The _all / _latest pattern you just learned works for every measure, not just the example — and you found this one by typing the concept, not by asking anyone.",
   },
   {
     prompt:
