@@ -63,6 +63,71 @@ export default function Page() {
             </tr>
           </tbody>
         </table>
+        <p>
+          Programmes may add their own reporting prefixes (<code>cltcs_</code>,{" "}
+          <code>def_</code>) — the layer rules above still apply.
+        </p>
+
+        <h2>Suffixes: what one row means</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Suffix</th>
+              <th>One row per</th>
+              <th>Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>_all</code></td>
+              <td>Event — every record ever, many per person</td>
+              <td><code>int_hba1c_all</code></td>
+            </tr>
+            <tr>
+              <td><code>_latest</code></td>
+              <td>Person — most recent record only</td>
+              <td><code>int_hba1c_latest</code></td>
+            </tr>
+            <tr>
+              <td><code>_current</code> / <code>_historical</code></td>
+              <td>Active now / full history</td>
+              <td><code>dim_person_current_practice</code></td>
+            </tr>
+            <tr>
+              <td><code>_summary</code></td>
+              <td>Group — an aggregated rollup</td>
+              <td><code>dim_person_status_summary</code></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>Name families worth searching</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Pattern</th>
+              <th>Finds</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>dim_person_</code></td>
+              <td>Every person-level attribute block: age, ethnicity, care home, language…</td>
+            </tr>
+            <tr>
+              <td><code>fct_person_&#123;condition&#125;_register</code></td>
+              <td>Every disease register — 40+ conditions</td>
+            </tr>
+            <tr>
+              <td><code>int_&#123;drug class&#125;_medications_all</code></td>
+              <td>Medication order events per BNF-style class</td>
+            </tr>
+            <tr>
+              <td><code>stg_&#123;source&#125;_&#123;table&#125;</code></td>
+              <td>The cleaned version of any source table; mirrors <code>raw_&#123;source&#125;_&#123;table&#125;</code></td>
+            </tr>
+          </tbody>
+        </table>
 
         <h2>Branch & commit conventions</h2>
         <table>
