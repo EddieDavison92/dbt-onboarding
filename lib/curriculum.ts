@@ -91,7 +91,7 @@ export const PRACTICE: NavItem[] = [
     slug: "when-git-goes-wrong",
     title: "When git goes wrong",
     blurb: "Conflicts, wrong branches and undo — the calm recovery moves",
-    minutes: 6,
+    minutes: 12,
   },
 ];
 
