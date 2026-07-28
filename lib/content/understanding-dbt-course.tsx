@@ -453,7 +453,7 @@ from {{ ref('raw_people') }}
       slug: "names-are-the-map",
       title: "Names are the map",
       blurb: "Read any model name — and search before you build",
-      minutes: 7,
+      minutes: 9,
       steps: [
         {
           id: "grammar",
@@ -551,6 +551,86 @@ from {{ ref('raw_people') }}
             explain:
               "int_ = modelling layer, smoking_status = the subject, _latest = most recent per person. The name told you the layer, the subject and the shape.",
             affirm: "layer, subject, shape — the name is a sentence.",
+          },
+        },
+        {
+          id: "words",
+          title: "What the words actually mean",
+          body: (
+            <>
+              <p>
+                These prefixes are not arbitrary labels — most come from{" "}
+                <strong>dimensional modelling</strong>, the warehouse-design
+                tradition Ralph Kimball wrote down in the 1990s and most
+                analytics teams still build on. Two words carry the core idea:
+              </p>
+              <div className="my-6 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border-2 border-ink bg-paper p-4 shadow-[4px_4px_0_0_var(--color-layer-reporting)]">
+                  <p className="!my-0 font-mono text-[13px] font-bold !text-ink">fct_ · fact</p>
+                  <p className="!mb-0 !mt-2 text-sm !text-ink-soft">
+                    <strong>What you measure</strong> — events that happened or
+                    states that hold, always at a stated grain. The classic
+                    example is <code>fct_sales</code>, one row per transaction.
+                    Ours: <code>fct_person_diabetes_register</code>, one row
+                    per person on the register.
+                  </p>
+                </div>
+                <div className="rounded-2xl border-2 border-ink bg-paper p-4 shadow-[4px_4px_0_0_var(--color-layer-staging)]">
+                  <p className="!my-0 font-mono text-[13px] font-bold !text-ink">dim_ · dimension</p>
+                  <p className="!mb-0 !mt-2 text-sm !text-ink-soft">
+                    <strong>How you slice it</strong> — the descriptive context
+                    around the measurement: who the person is, which practice,
+                    what area. The classic example is <code>dim_customer</code>.
+                    Ours: <code>dim_person_ethnicity</code>.
+                  </p>
+                </div>
+              </div>
+              <p>
+                Healthcare analytics bends the classic examples without
+                changing the idea. Our facts are rarely tills ringing — they
+                are person-level clinical states: being on a register, a
+                screening status, blood pressure control. And instead of one
+                wide <code>dim_person</code>{" "}table, the person dimension is
+                decomposed into narrow attribute blocks you join as needed.
+                The roles hold: <em>facts are the thing you count; dimensions
+                are what you break it down by.</em>
+              </p>
+              <p>The other prefixes sit around that pair:</p>
+              <ul>
+                <li>
+                  <code>stg_</code> — a source table cleaned, nothing more. No
+                  meaning has been added yet.
+                </li>
+                <li>
+                  <code>int_</code> — dbt&apos;s own term, not Kimball&apos;s:
+                  the intermediate workbench where facts and dimensions get
+                  assembled. Reusable, but not the finished article.
+                </li>
+                <li>
+                  <code>obt_</code> — “one big table”: a fact pre-joined to its
+                  dimensions for tools that want one wide table instead of a
+                  star of joins.
+                </li>
+                <li>
+                  <code>pit_</code> — point-in-time: a fact as it stood on a
+                  reference date, for retrospective (QOF-style) reporting.
+                </li>
+              </ul>
+            </>
+          ),
+          check: {
+            prompt:
+              "`fct_person_asthma_register` is one row per person on the asthma register. Why is it a fact, not a dimension?",
+            options: [
+              "It is the thing being measured and reported — dimensions like ethnicity or practice are the context you break it down by",
+              "Facts are always larger tables than dimensions",
+              "Anything at person grain is automatically a fact",
+              "Because it lives in the reporting layer",
+            ],
+            answer: 0,
+            explain:
+              "The fact/dimension split is about role, not size or grain. The register is what you count; ethnicity, age and practice are how you slice the count. Both can be one row per person.",
+            affirm: "facts are what you measure; dimensions are how you slice it.",
           },
         },
         {
