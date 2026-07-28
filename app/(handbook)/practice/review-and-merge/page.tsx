@@ -92,11 +92,15 @@ git branch -d feat/short-description
       />
 
       <h2>After the merge</h2>
-      <ul>
-        <li>The deploy workflow builds the selected production models.</li>
-        <li>The nightly build continues running the model and its tests.</li>
-        <li>dbt docs and Snowflake comments pick up the merged descriptions.</li>
-      </ul>
+      <p>
+        Merge is the moment responsibility transfers from you to the pipeline.
+        The deploy workflow builds your changed models into production; from
+        that night on, the scheduled build rebuilds them and runs their tests
+        without you; and your YAML descriptions go live on the docs site and
+        as Snowflake comments. Nothing further is owed unless something fails
+        — which is why the deployment result is worth one look before you move
+        on.
+      </p>
       <p>
         If production fails, keep the PR link and failing job together when asking for
         help. The useful question is not only “what failed?” but “did this also fail in

@@ -61,7 +61,7 @@ export const PRACTICE: NavItem[] = [
     slug: "yaml-and-tests",
     title: "Add the YAML",
     blurb: "Generate the file, then add the decisions that matter",
-    minutes: 5,
+    minutes: 8,
   },
   {
     slug: "build-and-test",
@@ -73,7 +73,7 @@ export const PRACTICE: NavItem[] = [
     slug: "open-a-pr",
     title: "Open your pull request",
     blurb: "The command sequence, PR template and CI recovery",
-    minutes: 5,
+    minutes: 7,
   },
   {
     slug: "review-and-merge",

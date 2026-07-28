@@ -15,7 +15,7 @@ export default function Page() {
       kicker="Field guide · 6"
       title="Open your pull request"
       lede="The repeatable branch-to-PR sequence, plus the checks worth making before code leaves your machine."
-      minutes={5}
+      minutes={7}
     >
       <GuidedCourseLink href="/courses/first-pr/open-the-pr" />
 
@@ -50,11 +50,38 @@ gh pr create --fill
         </p>
       </Callout>
 
+      <h2>What opening the PR sets in motion</h2>
+      <p>
+        A pull request is not a form to fill in; it starts machinery. The fast
+        checks run immediately — the project compiles, conventions are linted,
+        ownership is verified. When the PR leaves draft, CodeRabbit reads the
+        diff and comments against the project&apos;s written conventions. A
+        human reviewer is assigned, and once review is underway the heavier
+        validation builds your changed models in a shared dev environment and
+        runs their tests. Each layer exists because it catches what the
+        previous one cannot: compilers catch what linters miss, an automated
+        reviewer catches pattern violations tirelessly, and the human judges
+        the things no automation can — whether the model should exist in this
+        shape at all.
+      </p>
+      <p>
+        A red check is information, not a verdict, and it blocks nothing
+        permanently: open the failed check, read the log from the bottom (the
+        real error is almost always the last thing that happened), fix it
+        locally, and push to the same branch. The checks rerun and the review
+        history stays intact — a PR that went red and then green tells a
+        better story than one abandoned and reopened.
+      </p>
+
       <h2>Use a useful description</h2>
       <p>
-        Treat the PR as a proposal, not a receipt. A reviewer should be able to see why
-        the change exists, what job each model does, what you have already checked and
-        where their judgement would help most.
+        The reviewer reads your description before your diff, and it sets up
+        everything they do next. Its job is to answer, in advance, the four
+        questions any reviewer must otherwise reconstruct: why does this
+        change exist, what does each model do, what has already been verified,
+        and where is judgement actually needed. The third one deserves the
+        most care — the “Checked” section converts your local evidence into
+        their confidence, which is what makes reviews fast.
       </p>
       <CodeBlock
         lang="text"
@@ -75,14 +102,6 @@ Needed for the access dashboard; no staging model exists today.
 - Does the representation of 24-hour opening make the downstream use clear?
 `}
       />
-
-      <h2>If CI goes red</h2>
-      <ol>
-        <li>Open the failed check and read the log from the bottom.</li>
-        <li>Reproduce the failure locally where possible.</li>
-        <li>Fix, commit and push to the same branch.</li>
-        <li>Keep the same PR; the checks rerun and the review history stays intact.</li>
-      </ol>
 
       <Checklist
         id="pr"
