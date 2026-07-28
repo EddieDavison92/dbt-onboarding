@@ -15,7 +15,7 @@ export default function Page() {
       kicker="Field guide · 8"
       title="Change an existing model"
       lede="Your first PR added a model nothing depended on. Most work after that is different: editing a model that other models already read. The edit itself is the same — what changes is that you now need to know who is downstream before you start."
-      minutes={7}
+      minutes={8}
     >
       <h2>Look downstream before you edit</h2>
       <p>
@@ -62,6 +62,28 @@ export default function Page() {
         downstream quietly change. Whether that change is correct is exactly
         what your PR has to establish: say what moves and why, and show a
         before-and-after for one example a reviewer can check.
+      </p>
+      <p>
+        The before-and-after is easier to produce than it sounds, because
+        while you develop, both versions exist: production still holds the
+        output of main&apos;s logic, and your dev build holds yours. One
+        worksheet query puts them side by side:
+      </p>
+      <CodeBlock
+        lang="sql"
+        title="a comparison query, run in a Snowflake worksheet"
+        code={`
+select 'prod' as version, count(*) as rows, count(distinct person_id) as people
+from REPORTING.OLIDS.FCT_PERSON_DIABETES_REGISTER
+union all
+select 'dev', count(*), count(distinct person_id)
+from DEV__REPORTING.OLIDS.FCT_PERSON_DIABETES_REGISTER
+`}
+      />
+      <p>
+        Differences you expected become the evidence in your PR. Differences
+        you did not expect are the review finding itself — caught by you, in
+        dev, instead of by a dashboard user in a month.
       </p>
       <p>
         <strong>Changing the grain</strong>{" "}— what one row means — is a

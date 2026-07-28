@@ -49,13 +49,13 @@ export const PRACTICE: NavItem[] = [
     slug: "find-a-source",
     title: "Find your source",
     blurb: "Find the raw model or choose the right source route",
-    minutes: 5,
+    minutes: 12,
   },
   {
     slug: "first-model",
     title: "Write a staging model",
     blurb: "The staging contract, template and quick checks",
-    minutes: 5,
+    minutes: 7,
   },
   {
     slug: "yaml-and-tests",
@@ -67,7 +67,7 @@ export const PRACTICE: NavItem[] = [
     slug: "build-and-test",
     title: "Build & test locally",
     blurb: "Daily selectors and a failure triage guide",
-    minutes: 5,
+    minutes: 8,
   },
   {
     slug: "open-a-pr",
@@ -85,7 +85,7 @@ export const PRACTICE: NavItem[] = [
     slug: "change-a-model",
     title: "Change an existing model",
     blurb: "Check the blast radius, classify the change, ship it safely",
-    minutes: 6,
+    minutes: 8,
   },
   {
     slug: "undoing-changes",
