@@ -208,7 +208,8 @@ export default function Home() {
               Working practice
             </span>
             <span className="block text-sm text-ink-soft">
-              Setup, sources, models, YAML, building, PRs — {PRACTICE.length} pages
+              Setup, sources, models, building, PRs, changing models, git recovery
+              — {PRACTICE.length} pages
             </span>
           </Link>
           <Link

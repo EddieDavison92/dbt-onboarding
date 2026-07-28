@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { LessonShell } from "@/components/LessonShell";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Callout } from "@/components/Callout";
@@ -82,7 +83,11 @@ from {{ source('csds', 'ActiveSubmission') }}
         This layer is where most of your work <em>starts</em>, not where it ends: when
         a question lands, check what already exists in reporting before building
         anything. The fastest model is the one someone already wrote, tested and
-        refreshes nightly.
+        refreshes nightly. Names make that search work — <code>dim_person</code>{" "}
+        enumerates the person-level blocks, <code>register</code>{" "}lists every
+        disease register; the{" "}
+        <Link href="/reference">reference page</Link>{" "}has the suffix and
+        name-family tables.
       </p>
 
       <h3>Published — governed outputs</h3>

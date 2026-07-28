@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Course } from "@/lib/course-types";
 import { AnnotatedCode } from "@/components/AnnotatedCode";
 import { CodeBlock } from "@/components/CodeBlock";
@@ -1128,6 +1129,13 @@ git pull
                 That is the full loop, and it is the same loop for everything from a
                 one-line fix to a new disease register. It felt heavyweight this
                 time; from the second PR on, the loop is minutes.
+              </p>
+              <p>
+                One heads-up for that second PR: it will probably <em>change</em>{" "}
+                an existing model rather than add one, which brings one extra habit —
+                checking what sits downstream before you edit. The handbook&apos;s{" "}
+                <Link href="/practice/change-a-model">Change an existing model</Link>{" "}
+                field guide covers it in five minutes.
               </p>
             </>
           ),

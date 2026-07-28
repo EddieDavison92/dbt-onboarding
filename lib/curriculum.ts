@@ -81,6 +81,18 @@ export const PRACTICE: NavItem[] = [
     blurb: "Update the PR, merge, and sync your local checkout",
     minutes: 4,
   },
+  {
+    slug: "change-a-model",
+    title: "Change an existing model",
+    blurb: "Check the blast radius, classify the change, ship it safely",
+    minutes: 6,
+  },
+  {
+    slug: "when-git-goes-wrong",
+    title: "When git goes wrong",
+    blurb: "Conflicts, wrong branches and undo — the calm recovery moves",
+    minutes: 6,
+  },
 ];
 
 export const ADVANCED: NavItem[] = [

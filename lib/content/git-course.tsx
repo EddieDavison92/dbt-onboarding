@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Course } from "@/lib/course-types";
 import { CodeBlock } from "@/components/CodeBlock";
 import { BranchDiagram } from "@/components/BranchDiagram";
@@ -271,7 +272,10 @@ docs: describe waiting list snapshot logic
                   A merge conflict happens when your branch and <code>main</code> have
                   changed the same lines in the same file. Git cannot know which
                   version you intend to keep, so it stops and asks a person instead
-                  of silently choosing one.
+                  of silently choosing one. When you meet your first one, the
+                  handbook&apos;s{" "}
+                  <Link href="/practice/when-git-goes-wrong">When git goes wrong</Link>{" "}
+                  page walks the fix.
                 </p>
               </Callout>
             </>
