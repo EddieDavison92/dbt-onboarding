@@ -7,6 +7,7 @@ import { LayerSorter } from "@/components/LayerSorter";
 import { ModelFinder } from "@/components/ModelFinder";
 import { ModelJourney } from "@/components/ModelJourney";
 import { ScriptChaos } from "@/components/ScriptChaos";
+import { TestFailFlow } from "@/components/TestFailFlow";
 import { TestProbe } from "@/components/TestProbe";
 import { GrainFanout } from "@/components/GrainFanout";
 import { BranchToProd } from "@/components/BranchToProd";
@@ -569,12 +570,38 @@ from {{ ref('raw_people') }}
           body: (
             <>
               <p>
-                Because names follow the grammar, the editor&apos;s file search
-                (<code>Ctrl+P</code>) becomes an index of everything the team
-                has built. Three real situations — find each model by typing
-                the concept:
+                Because names follow the grammar, any search box becomes an
+                index of everything the team has built. In VS Code, press{" "}
+                <code>Ctrl+P</code>{" "}(<code>⌘P</code>{" "}on a Mac) to open the{" "}
+                <strong>file search</strong>: a box that filters every file in
+                the project as you type. And since every model builds a
+                Snowflake object with the same name, the same trick works in
+                Snowsight&apos;s search box too.
+              </p>
+              <p>
+                Five real situations — find each model by typing the concept:
               </p>
               <ModelFinder />
+              <p>
+                Each search you just did used a <strong>family</strong> — one
+                pattern that names a whole shelf of models:
+              </p>
+              <div className="my-5 flex flex-col gap-2">
+                {[
+                  ["dim_person_*", "35+ person-level attribute blocks — age, ethnicity, care home, language…"],
+                  ["fct_person_{condition}_register", "40+ disease registers, one per condition"],
+                  ["int_{measure}_all / _latest", "every recorded event, or the most recent per person"],
+                  ["int_{drug class}_medications_all", "prescribing events for a whole drug class"],
+                ].map(([pattern, gloss]) => (
+                  <div
+                    key={pattern}
+                    className="flex flex-col gap-0.5 rounded-xl border border-line bg-paper-warm/60 px-4 py-2.5 sm:flex-row sm:items-baseline sm:gap-3"
+                  >
+                    <code className="shrink-0 !whitespace-normal text-[12px] font-bold">{pattern}</code>
+                    <span className="text-[13px] text-ink-soft">{gloss}</span>
+                  </div>
+                ))}
+              </div>
               <p>
                 This is the reflex that saves the most time in this project:
                 someone has probably built it, and the name will find it.
@@ -836,27 +863,22 @@ models:
             <>
               <p>
                 Tests run when a model is built, again on every pull request,
-                and again in the nightly production build. So when a feed
-                starts sending duplicates six months from now, the test fails
-                that night and the team hears about it immediately.
+                and again in the nightly production build. Six months from now
+                the feed starts sending duplicates. Step through what that
+                night looks like:
               </p>
-              <Callout kind="warn" title="Build first, then test">
-                <p>
-                  dbt has already updated the model by the time its test runs. If
-                  the test fails, dbt leaves that model in place but skips selected
-                  models downstream of it. Existing downstream tables keep their
-                  previous successful data. They become stale rather than being
-                  rebuilt from rows that failed the test. A tool that reads the
-                  failed model directly can still see those new rows.
-                </p>
-              </Callout>
+              <TestFailFlow />
               <p>
-                That is the trade dbt offers: write down what you know about
-                the data once, and the pipeline checks it every night, forever,
-                without you.
+                Note the order: dbt builds first, then tests, so the failed
+                model itself keeps its new rows — anyone querying it directly
+                sees them. What the failure stops is the <em>spread</em>{" "}
+                downstream. That is the trade dbt offers: write down what you
+                know about the data once, and the pipeline checks it every
+                night, forever, without you.
               </p>
             </>
           ),
+          interact: true,
           check: {
             prompt: "Six months on, a feed starts sending duplicate rows. Who finds out first, and how?",
             options: [
@@ -914,14 +936,55 @@ models:
             <>
               <p>
                 This is the most useful thing to internalise before touching
-                the real project. There are exactly two environments:{" "}
-                <strong>dev</strong>{" "}and <strong>prod</strong>. While you
-                develop, the normal local target builds into the DEV__ databases —{" "}
-                <code>DEV__STAGING</code>, <code>DEV__MODELLING</code>,{" "}
-                <code>DEV__REPORTING</code> — and
-                no report or dashboard reads from them. Build nonsense, break
-                a model, rebuild it: dev objects are cheap to recreate.
+                the real project. There are exactly two environments, and they
+                are different lanes of the same warehouse:
               </p>
+              <div className="my-6 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border-2 border-ink bg-paper p-4 shadow-[4px_4px_0_0_var(--color-layer-staging)]">
+                  <p className="!my-0 font-display text-[10px] font-extrabold uppercase tracking-[0.16em] !text-layer-staging">
+                    dev — where you work
+                  </p>
+                  <p className="!mb-0 !mt-2 font-mono text-[11px] leading-5 !text-ink-soft">
+                    DEV__STAGING · DEV__MODELLING · DEV__REPORTING
+                  </p>
+                  <dl className="!mb-0 !mt-3 flex flex-col gap-1.5 text-sm">
+                    <div className="rounded-lg bg-paper-warm px-3 py-1.5">
+                      <dt className="font-mono text-[10px] uppercase text-ink-faint">written by</dt>
+                      <dd className="!my-0 text-ink-soft">your local builds — and your teammates&apos;</dd>
+                    </div>
+                    <div className="rounded-lg bg-paper-warm px-3 py-1.5">
+                      <dt className="font-mono text-[10px] uppercase text-ink-faint">read by</dt>
+                      <dd className="!my-0 text-ink-soft">no report or dashboard, ever</dd>
+                    </div>
+                  </dl>
+                  <p className="!mb-0 !mt-3 text-sm !text-ink-soft">
+                    Build nonsense, break a model, rebuild it — dev objects are
+                    cheap to recreate.
+                  </p>
+                </div>
+                <div className="rounded-2xl border-2 border-ink bg-paper p-4 shadow-[4px_4px_0_0_var(--color-layer-reporting)]">
+                  <p className="!my-0 font-display text-[10px] font-extrabold uppercase tracking-[0.16em] !text-layer-reporting">
+                    prod — what the org reads
+                  </p>
+                  <p className="!mb-0 !mt-2 font-mono text-[11px] leading-5 !text-ink-soft">
+                    STAGING · MODELLING · REPORTING
+                  </p>
+                  <dl className="!mb-0 !mt-3 flex flex-col gap-1.5 text-sm">
+                    <div className="rounded-lg bg-paper-warm px-3 py-1.5">
+                      <dt className="font-mono text-[10px] uppercase text-ink-faint">written by</dt>
+                      <dd className="!my-0 text-ink-soft">scheduled runs of reviewed code from main</dd>
+                    </div>
+                    <div className="rounded-lg bg-paper-warm px-3 py-1.5">
+                      <dt className="font-mono text-[10px] uppercase text-ink-faint">read by</dt>
+                      <dd className="!my-0 text-ink-soft">every dashboard and report</dd>
+                    </div>
+                  </dl>
+                  <p className="!mb-0 !mt-3 text-sm !text-ink-soft">
+                    Reached only through merge — or a deliberate, authorised
+                    manual run.
+                  </p>
+                </div>
+              </div>
               <p>
                 One honest caveat: dev is shared by the whole analytics team,
                 not a private sandbox. If a teammate rebuilds the same model,

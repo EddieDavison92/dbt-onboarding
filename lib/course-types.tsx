@@ -25,6 +25,8 @@ export type Lesson = {
   title: string;
   blurb: string;
   minutes: number;
+  /** short label on the course journey strip; set on every lesson or none */
+  waypoint?: string;
   steps: Step[];
 };
 

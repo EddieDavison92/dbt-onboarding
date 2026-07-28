@@ -35,9 +35,13 @@ export default async function LessonPage({
     ? `/courses/${course.slug}/${next.slug}`
     : `/courses/${course.slug}/certificate`;
   const nextLabel = next ? next.title : "your certificate";
+  const waypoints = course.lessons.every((l) => l.waypoint)
+    ? course.lessons.map((l) => l.waypoint as string)
+    : undefined;
 
   return (
     <LessonPlayer
+      waypoints={waypoints}
       courseSlug={course.slug}
       courseTitle={course.title}
       lessonSlug={lesson.slug}

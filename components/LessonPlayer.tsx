@@ -113,6 +113,7 @@ export function LessonPlayer({
   steps,
   nextHref,
   nextLabel,
+  waypoints,
 }: {
   courseSlug: string;
   courseTitle: string;
@@ -123,6 +124,8 @@ export function LessonPlayer({
   steps: Step[];
   nextHref: string;
   nextLabel: string;
+  /** one short label per lesson — shows the whole journey with the current stop lit */
+  waypoints?: string[];
 }) {
   const lessonId = `${courseSlug}/${lessonSlug}`;
   const { ready, getStep, setStep, markDone, isDone } = useProgress();
@@ -205,6 +208,34 @@ export function LessonPlayer({
             lesson {lessonIndex + 1} of {lessonCount}
           </span>
         </p>
+        {waypoints && (
+          <ol
+            className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1.5"
+            aria-label="your route through the course"
+          >
+            {waypoints.map((w, wi) => (
+              <li key={w} className="flex items-center gap-x-1.5">
+                <span
+                  className={`font-display text-[9px] font-extrabold uppercase tracking-[0.12em] ${
+                    wi === lessonIndex
+                      ? "rounded-full bg-flame px-2 py-0.5 text-white"
+                      : wi < lessonIndex
+                        ? "text-ink-soft"
+                        : "text-ink-faint/60"
+                  }`}
+                >
+                  {wi < lessonIndex && <span aria-label="done">✓ </span>}
+                  {w}
+                </span>
+                {wi < waypoints.length - 1 && (
+                  <span className="text-[10px] text-ink-faint/40" aria-hidden>
+                    ›
+                  </span>
+                )}
+              </li>
+            ))}
+          </ol>
+        )}
         <h1 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-ink">
           {lessonTitle}
         </h1>

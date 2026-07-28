@@ -2,10 +2,10 @@
 
 import { useState, type ReactNode } from "react";
 
-type Lang = "sql" | "yaml" | "bash" | "text";
+export type Lang = "sql" | "yaml" | "bash" | "text";
 
 /** Minimal tokenizer — enough colour for teaching snippets, no dependency. */
-function highlight(code: string, lang: Lang): ReactNode[] {
+export function highlight(code: string, lang: Lang): ReactNode[] {
   const patterns: { re: RegExp; cls: string }[] =
     lang === "sql"
       ? [

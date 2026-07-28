@@ -1,4 +1,5 @@
 import type { Course } from "@/lib/course-types";
+import { AnnotatedCode } from "@/components/AnnotatedCode";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Callout } from "@/components/Callout";
 import { FolderPicker } from "@/components/FolderPicker";
@@ -24,6 +25,7 @@ export const FIRST_PR_COURSE: Course = {
     // ------------------------------------------------------------------
     {
       slug: "set-up-your-machine",
+      waypoint: "set up",
       title: "Set up your development environment",
       blurb: "Windows, macOS or Codespaces, ending with a green dbt debug",
       minutes: 30,
@@ -188,6 +190,7 @@ export const FIRST_PR_COURSE: Course = {
     // ------------------------------------------------------------------
     {
       slug: "pick-your-table",
+      waypoint: "pick data",
       title: "Pick your table",
       blurb: "Choose familiar data and state its grain",
       minutes: 12,
@@ -278,6 +281,7 @@ git switch -c feat/opening-hours-staging`}
     // ------------------------------------------------------------------
     {
       slug: "find-or-add-the-source",
+      waypoint: "find source",
       title: "Find your source",
       blurb: "1,500+ models already exist — your input is almost certainly one of them",
       minutes: 10,
@@ -322,7 +326,8 @@ git switch -c feat/opening-hours-staging`}
                 code={`DATA_LAKE__NCL.ANALYST_MANAGED.OPENING_HOURS`}
               />
               <p>
-                In VS Code press <code>Ctrl+P</code>{" "}and search in this order.
+                In VS Code press <code>Ctrl+P</code>{" "}(<code>⌘P</code>{" "}on a
+                Mac) to open the file search, and search in this order.
                 Zeroth, before any of it: type the <em>concept</em>{" "}itself —
                 the naming grammar means an existing <code>dim_</code>,{" "}
                 <code>int_</code>{" "}or <code>fct_</code>{" "}model for your idea
@@ -398,6 +403,7 @@ git switch -c feat/opening-hours-staging`}
     // ------------------------------------------------------------------
     {
       slug: "where-does-it-go",
+      waypoint: "place it",
       title: "Where does it go?",
       blurb: "Layers × domains: choosing the folder (it chooses your config)",
       minutes: 12,
@@ -483,6 +489,7 @@ git switch -c feat/opening-hours-staging`}
     // ------------------------------------------------------------------
     {
       slug: "write-the-model",
+      waypoint: "model",
       title: "Write the model",
       blurb: "One SELECT, project style, previewed as you go",
       minutes: 25,
@@ -493,49 +500,38 @@ git switch -c feat/opening-hours-staging`}
             <>
               <p>
                 A staging model is one SELECT from the raw model: explicit columns,
-                light cleaning, renames to conventions. Write yours; for the worked
-                example:
+                light cleaning, renames to conventions. Here is the worked example —
+                every choice in it is deliberate, and each explanation sits on the
+                line it belongs to. Tap the numbers, then write yours:
               </p>
-              <CodeBlock
+              <AnnotatedCode
                 lang="sql"
                 title="stg_reference_opening_hours.sql"
-                code={`
-select
-    organisation_code,
-    upper(trim(site_code)) as site_code,
-    day_of_week,
-    opens_at::time as opens_at,
-    closes_at::time as closes_at,
-    is_open_24h::boolean as is_open_24h
-from {{ ref('raw_reference_opening_hours') }}
-`}
+                segments={[
+                  {
+                    code: "select",
+                    note: "Lowercase keywords (the linter in CI checks it), and explicit columns — never select *. The column list is the interface downstream models rely on; with *, a source change slips through unannounced.",
+                  },
+                  { code: "    organisation_code," },
+                  {
+                    code: "    upper(trim(site_code)) as site_code,",
+                    note: "Light cleaning and renames to conventions happen here, once — every downstream model inherits them. Identifiers end _id, dates _date, timestamps _at; CodeRabbit flags departures on every PR.",
+                  },
+                  { code: "    day_of_week," },
+                  {
+                    code: "    opens_at::time as opens_at,\n    closes_at::time as closes_at,",
+                    note: "Casting text to real types is staging work. Do it here and nobody downstream ever parses a string again.",
+                  },
+                  {
+                    code: "    is_open_24h::boolean as is_open_24h",
+                    note: "Booleans are named is_ or has_ — a reader knows what the column holds from the name alone.",
+                  },
+                  {
+                    code: "from {{ ref('raw_reference_opening_hours') }}",
+                    note: "ref(), never a hardcoded table — dbt fills in the right database per environment and records the dependency. And exactly one table, no filters with business meaning: the moment you want either, that is a modelling-layer (int_) model instead.",
+                  },
+                ]}
               />
-              <p>Why each choice:</p>
-              <ul>
-                <li>
-                  <code>ref()</code>, never a hardcoded table — dbt fills in the
-                  right database per environment and learns the dependency.
-                </li>
-                <li>
-                  <strong>Explicit columns</strong>, no <code>select *</code> — you
-                  are defining the interface downstream models will rely on.
-                </li>
-                <li>
-                  <strong>No joins, no filters with business meaning</strong> — the
-                  moment you want one, that is a modelling-layer (<code>int_</code>)
-                  model instead.
-                </li>
-                <li>
-                  <strong>Renames follow the column conventions</strong> —
-                  booleans get <code>is_</code>{" "}or <code>has_</code>{" "}
-                  (<code>is_open_24h</code>), dates end <code>_date</code>,
-                  timestamps <code>_at</code>, identifiers <code>_id</code>.
-                  CodeRabbit flags departures on every PR.
-                </li>
-                <li>
-                  <strong>Lowercase keywords</strong> — the linter in CI checks it.
-                </li>
-              </ul>
             </>
           ),
         },
@@ -612,6 +608,7 @@ dbt compile                                # render every model to plain SQL
     // ------------------------------------------------------------------
     {
       slug: "describe-and-test",
+      waypoint: "YAML",
       title: "Describe and test it",
       blurb: "Eight lines of YAML, written by hand, that work forever",
       minutes: 20,
@@ -629,61 +626,50 @@ dbt compile                                # render every model to plain SQL
               </p>
               <p>
                 Write it by hand — it is short, and writing it is how you make the
-                decisions it contains:
+                decisions it contains. Tap the numbers to see what each part is
+                for:
               </p>
-              <CodeBlock
+              <AnnotatedCode
                 lang="yaml"
                 title="stg_reference_opening_hours.yml"
-                code={`
-models:
-  - name: stg_reference_opening_hours
-    description: Site opening hours reference, one row per site per day of week
-    config:
-      meta:
-        owner:
-          name: Your Name
-    data_tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns: [site_code, day_of_week]
-    columns:
-      - name: site_code
-        description: Standardised site identifier
-        data_tests: [not_null]
-      - name: day_of_week
-        description: ISO day of week (1 = Monday)
-        data_tests: [not_null]
-`}
+                segments={[
+                  { code: "models:\n  - name: stg_reference_opening_hours" },
+                  {
+                    code: "    description: Site opening hours reference, one row per site per day of week",
+                    note: "The description states the grain — one row per what. It ends up in dbt docs and as a comment on the Snowflake object.",
+                  },
+                  {
+                    code: "    config:\n      meta:\n        owner:\n          name: Your Name",
+                    note: "Every model names a human owner; CI checks it. This is who a reviewer or a 2 am incident asks about the model.",
+                  },
+                  {
+                    code: "    data_tests:\n      - dbt_utils.unique_combination_of_columns:\n          arguments:\n            combination_of_columns: [site_code, day_of_week]",
+                    note: "Your one-sentence grain, turned into the single most valuable test you can write: it fails the moment anything — a dirty feed, a future join — duplicates rows.",
+                  },
+                  {
+                    code: "    columns:\n      - name: site_code\n        description: Standardised site identifier\n        data_tests: [not_null]\n      - name: day_of_week\n        description: ISO day of week (1 = Monday)\n        data_tests: [not_null]",
+                    note: "not_null on the key columns the grain depends on — a null here would make the grain test meaningless. Column descriptions travel to docs and Snowflake too.",
+                  },
+                ]}
               />
             </>
           ),
         },
         {
           id: "anatomy",
-          title: "What each part does",
+          title: "How much is enough?",
           body: (
             <>
-              <ul>
-                <li>
-                  <strong>description</strong> — note it states the grain. Ends up in
-                  dbt docs and as a Snowflake comment.
-                </li>
-                <li>
-                  <strong>owner</strong> — every model names a human; CI checks.
-                </li>
-                <li>
-                  <strong>the grain test</strong> — remember your one-sentence grain?{" "}
-                  <code>unique_combination_of_columns</code>{" "}on those columns is the
-                  single most valuable test you can write: it fails the moment
-                  anything duplicates rows.
-                </li>
-                <li>
-                  <strong>not_null</strong>{" "}on the key columns the grain depends on.
-                </li>
-              </ul>
               <p>
-                Three tests is right for a staging model. Every test compiles to a
-                query that hunts for violating rows — zero rows back means pass.
+                Three tests is right for a staging model: the grain test, and{" "}
+                <code>not_null</code>{" "}on the columns the grain depends on. Every
+                test compiles to a query that hunts for violating rows — zero rows
+                back means pass.
+              </p>
+              <p>
+                Resist the urge to test everything. A test that cannot fail
+                meaningfully is noise; the grain test is the one that catches real
+                accidents, which is why it gets written first.
               </p>
             </>
           ),
@@ -723,6 +709,7 @@ models:
     // ------------------------------------------------------------------
     {
       slug: "build-and-test",
+      waypoint: "build",
       title: "Build it",
       blurb: "run, test, build and selectors — learned on your own model",
       minutes: 35,
@@ -768,12 +755,9 @@ Completed successfully
               <p>
                 <code>run</code>{" "}creates without testing; <code>test</code>{" "}
                 tests without creating; <code>build</code>{" "}does both, in DAG
-                order. The order matters: dbt builds a model, then tests the rows
-                it just wrote. If an error-level test fails, dbt leaves that model
-                in place and skips selected downstream nodes. Existing downstream
-                tables stay on their previous version, so they become stale rather
-                than being rebuilt from data that failed its checks. For everyday
-                model work, build is the answer.
+                order — and, as the build run just showed, a failing test stops
+                the spread downstream without rolling back the model itself.
+                For everyday model work, build is the answer.
               </p>
             </>
           ),
@@ -804,13 +788,10 @@ Completed successfully
               </p>
               <Callout kind="warn" title="The model has already been built">
                 <p>
-                  <code>dbt build</code>{" "}writes the model before it runs that
-                  model&apos;s tests. A failing error-level test does not roll the
-                  relation back. Instead, dbt marks the build as failed and skips
-                  selected downstream nodes. Any existing downstream tables remain
-                  on their last successful version: stale, rather than updated from
-                  the failed model. Someone querying the failed model directly can
-                  still see its new rows.
+                  Build first, then test: a failing test does not roll the
+                  relation back. The rows that failed are in your dev table, and
+                  anything querying that model directly can see them — dbt only
+                  stops them spreading downstream.
                 </p>
               </Callout>
               <ul>
@@ -958,6 +939,7 @@ stg_reference_opening_hours`,
     // ------------------------------------------------------------------
     {
       slug: "open-the-pr",
+      waypoint: "PR",
       title: "Open the PR",
       blurb: "Branch, commit, push, propose — then watch the checks",
       minutes: 20,
@@ -1068,6 +1050,7 @@ Needed for the access dashboard; nothing currently stages this table.
     // ------------------------------------------------------------------
     {
       slug: "merge-and-after",
+      waypoint: "merge",
       title: "Merge — and what happens next",
       blurb: "Responding to review, landing on main, and your model's new life",
       minutes: 15,
