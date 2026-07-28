@@ -81,6 +81,15 @@ const TASKS: Task[] = [
   },
 ];
 
+/** revealed once all tasks are solved — each task exercised one of these */
+const FAMILIES: [string, string][] = [
+  ["dim_person_*", "35+ person-level attribute blocks — age, ethnicity, care home, language…"],
+  ["fct_person_{condition}_register", "40+ disease registers, one per condition"],
+  ["int_{measure}_all / _latest", "every recorded event, or the most recent per person"],
+  ["int_{drug class}_medications_all", "prescribing events for a whole drug class"],
+  ["dim_practice_*", "practice-level blocks, same pattern as dim_person_*"],
+];
+
 const PREFIX_COLOR: [string, string][] = [
   ["raw_", "var(--layer-raw)"],
   ["stg_", "var(--layer-staging)"],
@@ -237,9 +246,26 @@ export function ModelFinder() {
             </div>
           )}
           {finished && (
-            <p className="!my-0 w-full !max-w-none bg-paper-warm px-5 py-3 text-center font-mono text-[11px] !text-ink-faint">
-              that reflex — type the concept before building anything — is the whole lesson
-            </p>
+            <div className="w-full bg-paper-warm px-5 py-4">
+              <p className="!my-0 w-full !max-w-none text-sm font-medium !text-ink">
+                Each search you just did used a <strong>family</strong> — one
+                pattern that names a whole shelf of models:
+              </p>
+              <div className="mt-2.5 flex flex-col gap-1.5">
+                {FAMILIES.map(([pattern, gloss]) => (
+                  <div
+                    key={pattern}
+                    className="flex flex-col gap-0.5 rounded-xl border border-line bg-paper px-3.5 py-2 sm:flex-row sm:items-baseline sm:gap-3"
+                  >
+                    <code className="shrink-0 !whitespace-normal text-[12px] font-bold">{pattern}</code>
+                    <span className="text-[13px] text-ink-soft">{gloss}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="!mb-0 !mt-3 w-full !max-w-none text-center font-mono text-[11px] !text-ink-faint">
+                that reflex — type the concept before building anything — is the whole lesson
+              </p>
+            </div>
           )}
         </div>
       )}

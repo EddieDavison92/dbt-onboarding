@@ -460,10 +460,13 @@ from {{ ref('raw_people') }}
           body: (
             <>
               <p>
-                With 1,500+ models in the project, the naming convention is not
-                tidiness — it is how you find things. Every model name is a
-                little sentence: <strong>layer, subject, shape</strong>. Read
-                these three without opening a single file:
+                With 1,500+ models, nobody finds anything by browsing folders.
+                What makes the project navigable is that every name is built
+                the same way — so the names themselves become the index, the
+                way a consistent address format is what makes a city
+                searchable. Every model name is a little sentence:{" "}
+                <strong>layer, subject, shape</strong>. Read these three
+                without opening a single file:
               </p>
               <div className="my-6 flex flex-col gap-2.5">
                 {[
@@ -493,10 +496,45 @@ from {{ ref('raw_people') }}
                   </div>
                 ))}
               </div>
+              <div className="my-6 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl border-2 border-ink bg-paper p-4 shadow-[4px_4px_0_0_var(--color-flame)]">
+                  <p className="!my-0 font-display text-[10px] font-extrabold uppercase tracking-[0.16em] !text-flame-deep">
+                    prefix · the layer
+                  </p>
+                  <p className="!mb-0 !mt-2 text-sm !text-ink-soft">
+                    The job, from the layer cake: <code>stg_</code>{" "}cleans,{" "}
+                    <code>int_</code>{" "}derives, <code>dim_</code>/<code>fct_</code>{" "}
+                    serve analysis.
+                  </p>
+                </div>
+                <div className="rounded-2xl border-2 border-ink bg-paper p-4 shadow-[4px_4px_0_0_var(--color-ink)]">
+                  <p className="!my-0 font-display text-[10px] font-extrabold uppercase tracking-[0.16em] !text-ink">
+                    middle · the subject
+                  </p>
+                  <p className="!mb-0 !mt-2 text-sm !text-ink-soft">
+                    Entity first, then attribute —{" "}
+                    <code>person_ethnicity</code>, <code>practice_neighbourhood</code> —
+                    so related models sit together in any sorted list.
+                  </p>
+                </div>
+                <div className="rounded-2xl border-2 border-ink bg-paper p-4 shadow-[4px_4px_0_0_var(--color-layer-modelling)]">
+                  <p className="!my-0 font-display text-[10px] font-extrabold uppercase tracking-[0.16em] !text-layer-modelling">
+                    suffix · the shape
+                  </p>
+                  <p className="!mb-0 !mt-2 text-sm !text-ink-soft">
+                    What one row means — <code>_all</code>, <code>_latest</code>,{" "}
+                    <code>_register</code>, <code>_summary</code>. More on this
+                    next.
+                  </p>
+                </div>
+              </div>
               <p>
-                The prefix you already know — it names the layer. The middle is
-                the subject. The suffix, when there is one, tells you the
-                model&apos;s <em>shape</em>.
+                Two things follow. This is not project-specific cleverness —{" "}
+                <code>stg_</code>/<code>int_</code>/<code>fct_</code>/<code>dim_</code>{" "}
+                are the wider dbt community&apos;s convention, so reading names
+                is a skill that travels. And the grammar cuts both ways: when
+                you name a model, you are writing the search result the next
+                analyst will find — or miss.
               </p>
             </>
           ),
@@ -582,26 +620,6 @@ from {{ ref('raw_people') }}
                 Five real situations — find each model by typing the concept:
               </p>
               <ModelFinder />
-              <p>
-                Each search you just did used a <strong>family</strong> — one
-                pattern that names a whole shelf of models:
-              </p>
-              <div className="my-5 flex flex-col gap-2">
-                {[
-                  ["dim_person_*", "35+ person-level attribute blocks — age, ethnicity, care home, language…"],
-                  ["fct_person_{condition}_register", "40+ disease registers, one per condition"],
-                  ["int_{measure}_all / _latest", "every recorded event, or the most recent per person"],
-                  ["int_{drug class}_medications_all", "prescribing events for a whole drug class"],
-                ].map(([pattern, gloss]) => (
-                  <div
-                    key={pattern}
-                    className="flex flex-col gap-0.5 rounded-xl border border-line bg-paper-warm/60 px-4 py-2.5 sm:flex-row sm:items-baseline sm:gap-3"
-                  >
-                    <code className="shrink-0 !whitespace-normal text-[12px] font-bold">{pattern}</code>
-                    <span className="text-[13px] text-ink-soft">{gloss}</span>
-                  </div>
-                ))}
-              </div>
               <p>
                 This is the reflex that saves the most time in this project:
                 someone has probably built it, and the name will find it.
