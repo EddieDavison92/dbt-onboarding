@@ -89,9 +89,9 @@ export const PRACTICE: NavItem[] = [
   },
   {
     slug: "undoing-changes",
-    title: "How undo works in git",
-    blurb: "Commits never change and branches are pointers — the model that makes recovery make sense",
-    minutes: 10,
+    title: "Undoing things in git",
+    blurb: "Wrong branch, unwanted commits, conflicts — what happened, and the way back",
+    minutes: 14,
   },
 ];
 

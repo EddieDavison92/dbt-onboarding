@@ -273,7 +273,7 @@ docs: describe waiting list snapshot logic
                   changed the same lines in the same file. Git cannot know which
                   version you intend to keep, so it stops and asks a person instead
                   of silently choosing one. The handbook&apos;s{" "}
-                  <Link href="/practice/undoing-changes">How undo works in git</Link>{" "}
+                  <Link href="/practice/undoing-changes">Undoing things in git</Link>{" "}
                   page covers resolving one, and recovery in general.
                 </p>
               </Callout>
