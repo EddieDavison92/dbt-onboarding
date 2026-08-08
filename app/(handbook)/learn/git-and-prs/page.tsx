@@ -39,7 +39,7 @@ export default function Page() {
     <LessonShell
       section="learn"
       slug="git-and-prs"
-      kicker="Learn 05"
+      kicker="Learn 06"
       title="Git & pull requests"
       lede="Git is version control for the whole project; a pull request is how your change gets a human review and automated checks before it reaches production."
       minutes={12}

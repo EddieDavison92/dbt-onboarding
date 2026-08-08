@@ -12,7 +12,7 @@ export default function Page() {
     <LessonShell
       section="learn"
       slug="refs-and-sources"
-      kicker="Learn 03"
+      kicker="Learn 04"
       title="ref() and source()"
       lede="Two small functions replace every hardcoded table name in the project — and give dbt the map it needs to build everything in the right order."
       minutes={6}

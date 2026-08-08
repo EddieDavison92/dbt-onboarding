@@ -15,8 +15,14 @@ export const LEARN: NavItem[] = [
   {
     slug: "layer-cake",
     title: "The layer cake",
-    blurb: "Five layers, one job each — raw to published",
+    blurb: "Five layers, a different promise at each — raw to published",
     minutes: 8,
+  },
+  {
+    slug: "model-design",
+    title: "Designing models",
+    blurb: "Define concepts independently, then compose useful analytical models",
+    minutes: 14,
   },
   {
     slug: "refs-and-sources",

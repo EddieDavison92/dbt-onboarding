@@ -15,7 +15,7 @@ export default function Page() {
       slug="layer-cake"
       kicker="Learn 02"
       title="The layer cake"
-      lede="Five layers, each with exactly one job. Once you can name the job, you know where any model belongs — and what it is not allowed to do."
+      lede="Five layers, each making a different promise about the data. Once you understand the promise, you can decide where a transformation belongs."
       minutes={8}
     >
       <p>

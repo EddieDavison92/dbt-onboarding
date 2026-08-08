@@ -11,7 +11,7 @@ export default function Page() {
     <LessonShell
       section="learn"
       slug="tests-and-docs"
-      kicker="Learn 04"
+      kicker="Learn 05"
       title="Tests & documentation"
       lede="Every model travels with a YAML file: who owns it, what each column means, and the assertions that must hold every single night."
       minutes={9}
